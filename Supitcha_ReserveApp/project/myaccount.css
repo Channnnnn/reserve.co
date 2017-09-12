@@ -1,0 +1,58 @@
+
+
+
+body {
+    background-color: #FFFFFF;
+    color: #000;
+}
+
+#Myaccount {
+    
+    color: rgb(128, 206, 231);
+       
+}
+
+#share {
+    border:solid 2px #72C2DC;
+    width:250px;
+    height:40px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:30px;
+    background:#FFFFFF;
+    float: right;
+    text-align:center;
+    margin-left: auto;
+    margin-right: auto;
+  
+}
+#null {
+    background-color: #80CEE7;
+    color: #FFFFFF;
+    text-align:center;
+    
+  
+  
+    height:200px;
+}
+
+#shopname {
+    text-align:center;
+
+
+}
+
+#oval {
+    color: #FFFFFF;
+    text-align:center;
+    border:solid 1px #80CEE7;
+    width:1180px;
+    height:50px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:30px;
+    background:#80CEE7;
+    margin-left: auto;
+    margin-right: auto;
+    }
+
