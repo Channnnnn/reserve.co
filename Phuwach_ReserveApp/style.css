@@ -1,0 +1,113 @@
+*{
+  padding:0;
+  margin:0;
+}
+
+@font-face {
+  font-family: JosefinSlab-Bold;
+  src:url(css/fonts/JosefinSlab-Bold.ttf);
+  font-family: JosefinSlab-Light;
+  src:url(css/fonts/JosefinSlab-Light.ttf);
+  font-family: JosefinSlab-Regular;
+  src:url(css/fonts/JosefinSlab-Regular.ttf);
+}
+
+body {
+  background-color: white;
+  font-family: JosefinSlab-Regular;
+}
+
+#nav {
+  position: fixed;
+  width: 100%;
+  text-align: center;
+  height: 48px;
+  background-color: #8e0000;
+}
+
+#nav ul {
+  display: inline-block;
+  list-style-type: none;
+  overflow: hidden;
+  background-color: #8e0000;
+}
+
+#nav li{
+  float: left;
+}
+
+#nav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  padding: 16px 26px;
+}
+
+#nav li a:hover{
+  background-color: #c62828;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+#container{
+  width: 920px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#header {
+  background-color: white;
+  color: black;
+  height: 256px;
+  line-height: 256px;
+  font-size: 42px;
+  text-align: center;
+}
+
+#content{
+  background-color: white;
+
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+#content:hover{
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+#content_head {
+  background-color: #ff5f52;
+  color: black;
+  height: 48px;
+  line-height: 48px;
+  font-size: 16px;
+  text-align: left;
+}
+
+#content_middle {
+  padding-top: 25px;
+  padding-bottom: 45px;
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+#content_middle * {
+  width: 100%;
+  line-height: 32px;
+}
+
+#submit_btn{
+  background-color: #ff5f52;
+  margin-top: 25px;
+  line-height: 36px;
+  border:none;
+}
+
+#content_head_text {
+  padding: 0px 20px;
+}
+
+#footer{
+  padding: 65px;
+  text-align: center;
+}
