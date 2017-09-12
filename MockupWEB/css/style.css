@@ -6,10 +6,19 @@
 }
 
 .forcedmobile{
-    width:300px;
+    width:300px !important;
 }
 .forcedmobile .button{
     min-width: 145px !important;
+}
+
+.invisible{
+    visibility: hidden;
+}
+
+div.fa{
+    text-align: center;
+    vertical-align: middle;
 }
 
 body,html{
@@ -18,6 +27,8 @@ body,html{
     color: rgb(var(--grey));
     --blue: 39, 159, 191;
     --grey: 92,92,92;
+    --red: 224, 88, 76;
+    --green: 143, 190, 13;
 }
 
 .container{
@@ -25,11 +36,15 @@ body,html{
     display: flex;
     flex-direction: column;
     margin: auto;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     height: 100vh;
     font-family: "Quark";
     text-align: center;
+}
+
+.midscreen{
+    justify-content: center !important; 
 }
 
 .section{
@@ -50,12 +65,17 @@ body,html{
 
 span.right{
     float: right;
+    color: rgb(var(--green));
 }
 
 span.divider{
     display: block;
-    height: .5px;
+    height: 1px;
     background-color: rgb(var(--grey));
+    margin: 1em 0 1em 0;
+}
+span.mini.divider{
+    margin: .5em 0 .5em 0 !important; 
 }
 
 div.divider{
@@ -64,10 +84,10 @@ div.divider{
     color: rgb(var(--grey));
     font-size: .75em;
 }
-div.divider::before,.divider::after{
+div.divider::before,div.divider::after{
     display: inline-block;
     content: "";
-    height: .5px;
+    height: 1px;
     position: relative;
     vertical-align: middle;
     width: 50%;
@@ -105,20 +125,71 @@ a.wide.button{
     display: block !important;
 }
 
+/* Single Icon button */
+a.micro.button {
+    font-size: inherit;
+    height: 2em;
+    min-width: 2em;
+    margin: 0;
+    justify-self: center;
+    align-self: center;
+}
+
 a.mini.button {
     font-size: .8em;
     padding: .5em 1em .5em 1em;
     min-width: 100px;
 }
 
+a.huge.button{
+    font-size: 1.75em;
+    font-weight: bold;
+    margin: .5em 0 .5em 0;
+}
+
+.groupedbutton{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.groupedbutton a.button:first-child{
+    border-radius: 5px 0 0 5px;
+}
+
+.groupedbutton a.button:last-child{
+    border-radius: 0 5px 5px 0;
+}
+
+a.sub.button{
+    border-radius: unset;
+    line-height: unset;
+    min-width: 2.4em;
+    width: 100%;
+    margin: 0;
+}
+
+a.sub.glyph.button{
+    max-width: 35%;
+}
+
 a.transparent.button{
     opacity: var(--link);
     border: 1px solid rgb(var(--blue)) !important;
     color: rgb(var(--blue)) !important;
-    background: transparent !important;
+    background-color: transparent !important;
 }
 a.transparent.button:hover{
     opacity: 1;
+    background-color: transparent !important;
+}
+a.red.transparent.button{
+    border: 1px solid rgb(var(--red)) !important;
+    color: rgb(var(--red)) !important;
+    background-color: transparent !important;
+}
+a.red.transparent.button:hover{
+    opacity: 1;
+    background-color: transparent !important;
 }
 
 a.blue.button{
@@ -126,6 +197,25 @@ a.blue.button{
 }
 a.blue.button:hover {
     background-color: rgb(var(--blue)) !important;
+}
+
+a.red.button{
+    background-color: rgba(var(--red),var(--link)) !important;
+}
+a.red.button:hover {
+    background-color: rgb(var(--red)) !important;
+}
+
+a.disabled.button, a.disabled.button:hover{
+    background-color: rgb(var(--grey)) !important;
+    opacity: .25;
+}
+
+a.disabled.transparent.button, a.disabled.transparent.button:hover{
+    border-color: rgb(var(--grey)) !important;
+    color: rgb(var(--grey)) !important;
+    background-color: transparent !important;
+    opacity: .25;
 }
 
 a.social-facebook.button{
@@ -219,10 +309,11 @@ App element
     min-width: 300px;
     width: 100%;
     display: flex;
+    position: fixed;
     justify-content: flex-start;
     align-items: center;
     padding: .75em;
-    margin-bottom: auto;
+    background-color: white;
 }
 .nav .menu{
     font-size: 1.2em;
@@ -230,8 +321,98 @@ App element
 .nav .right{
     margin-left: auto;
 }
+.fixoverlap{
+    margin-top: 3.1em !important;
+}
+
+/*
+
+Shop Elements
+
+*/
 
 .cover{
-    min-height: 250px;
-    background-color: 
+    width: 100%;
+    min-height: 200px;
+    background-color: rgb(var(--red));
+}
+
+h1,h2 {
+    display: block;
+    margin: 0;
+    color: rgb(var(--red));
+}
+
+.shopinfo{
+    width: -webkit-fill-available;
+    min-width: 275px;
+    margin: 0 25% 0 25%;
+}
+
+.reservation.shopinfo{
+    margin-left: .5em !important;
+    margin-right: .5em !important;
+}
+
+a.link{
+    display: inline-block;
+    text-decoration: none;
+}
+
+.red.link{
+    color: rgb(var(--red));
+}
+
+.urlinfo{
+    font-weight: bold;
+}
+.shopurl{
+color: white;
+    background-color: rgba(var(--grey),.75);
+    border-radius: 5px;
+    font-size: 0.9em;
+    padding: .25em 1em .25em 1em;
+}
+.shopurl::before{
+    font-family: 'FontAwesome';
+    content: " ";
+    display: inline;
+    color: rgba(white,.5); 
+}
+
+.queue{
+    display: grid;
+    grid-template-columns: 1fr 3fr 3fr 4fr;
+}
+.queue.list{
+    margin: 5px 2.5px 5px 2.5px;
+    align-items: center;
+}
+.queue.header{
+    font-size: .8em;
+}
+
+.status{
+    font-size: .9em;
+    font-weight: bold;
+}
+
+.servicing.status{
+    color: rgb(var(--blue));
+}
+.expired.status{
+    color: rgb(var(--red));
+}
+.canceled.status{
+    color: rgb(var(--grey));
+}
+.ready.status{
+    color: rgb(var(--green));
+}
+.waiting.status{
+    color: black;
+}
+
+.expired + .groupedbutton a.activated.button {
+    background-color: rgb(var(--red)) !important;
 }
