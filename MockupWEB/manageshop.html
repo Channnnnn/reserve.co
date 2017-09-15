@@ -18,26 +18,29 @@
             <a class="mini red transparent button right" href="#">Manage Account</a>
         </div>
         <div class="cover fixoverlap"></div>
-        <div class="shopinfo">
+        <div class="main">
             <div class="section">
-                <h1>Shop Name</h1>
-                <a class="red link" href="#">
-                    <div class="fa fa-pencil-square spaced"></div>Edit Shop Info</a>
+                <h2>Shop Name</h2>
             </div>
             <div class="column group">
                 <li class="lite">
-                    <div class="fa fa-pencil-square-o spaced"></div>Shop descriptions</li>
+                    <div class="fa fa-pencil-square-o xspaced shopdescription" aria-hidden="true"></div>Shop descriptions</li>
                 <li class="lite">
-                    <div class="fa fa-clock-o spaced"></div>9:30 - 21:30 · Mon-Fri <span class="right">Now Opening</span></li>
+                    <div class="fa fa-clock-o xspaced"></div>9:30 - 21:30 · Mon-Fri
+                    <div class="right bubble pointleft">Opening</div>
+                </li>
                 <li class="lite">
-                    <div class="fa fa-phone spaced"></div>087 654 3210</li>
+                    <div class="fa fa-phone xspaced"></div>087 654 3210</li>
             </div>
-            <span class="divider"></span>
-            <div class="manage">
-                <a class="huge wide red button">Manage Reservation</a>
+            <div class="column group">
+                <a class="red transparent button link" href="#">
+                    Edit Shop Info</a>
+                <a class="huge wide green button" href="managereservations.html">Manage Reservation</a>
             </div>
-            <span class="urlinfo">Shop URL</span>
-            <span class="shopurl">https://reserve.co/shopURL</span>
+            <div class="roundgroup rowflex urlinfo">
+                <a class="copy button">Copy URL</a>
+                <input class="shopurl" type="text" value="https://reserve.co/shopURL" readonly="readonly" />
+            </div>
         </div>
     </div>
 </body>

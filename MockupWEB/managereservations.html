@@ -5,97 +5,129 @@
     <title>Reserve.co</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/style.css" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Kanit:400,700&amp;subset=thai" rel="stylesheet"> -->
+    <link href="C:\Users\Chan\OneDrive\CPEs\4_AdvCom\405Project\MockupWEB\css\style.css" rel="stylesheet">
     <script src="https://use.fontawesome.com/fae100f333.js"></script>
 </head>
 
 <body>
     <div class="container">
         <div class="nav">
-            <a class="red menu link" href="#">
+            <a class="red menu link" href="manageshop.html">
                 <div class="fa fa-arrow-left rightspaced"></div>MY SHOP
             </a>
-            
+
         </div>
-        <div class="reservation shopinfo fixoverlap">
-            <div class="section">
-                <h2>Shop Name Reservation</h2>
-                <div class="queue header">
-                    <span>Queue</span>
-                    <span>Customer</span>
-                    <span>Status</span>
-                    <span>Action</span>
-                </div>
-                <span class="mini divider"></span>
-            </div>
+        <div class="section list-header fixoverlap">
+            <h2>Shop Name Reservation</h2>
+        </div>
+        <div class="reservation main fixoverlap">
             <div class="column group">
-                <li class="queue list">
-                    <span>27</span>    
-                    <span>Somsak</span>
-                    <span class="status servicing">Servicing</span>
-                    <span class="groupedbutton">
-                        <a class="sub button">Checkout</a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status servicing"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="checkout unsetbtn button" href="#checkedout"></a>
                 </li>
-                <li class="queue list">
-                    <span>28</span>    
-                    <span>Sompong</span>
-                    <span class="status servicing">Servicing</span>
-                    <span class="groupedbutton">
-                        <a class="sub button">Checkout</a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status checkedout"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
                 </li>
-                <li class="queue list">
-                    <span>29</span>    
-                    <span>Somsuk</span>
-                    <span class="status expired">Expired</span>
-                    <span class="groupedbutton">
-                        <a class="disabled glyph sub button"><div class="fa fa-check"></div></a>
-                        <a class="activated glyph sub button"><div class="fa fa-times"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status ready"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="checkin unsetbtn button" href="#checkedin"></a>
+                    <a class="expire unsetbtn button" href="#expired"></a>
                 </li>
-                <li class="queue list">
-                    <span>30</span>    
-                    <span>Somboi</span>
-                    <span class="status ready">Ready</span>
-                    <span class="groupedbutton">
-                        <a class="glyph sub button"><div class="fa fa-check"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-times"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status expired"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="dismiss unsetbtn button" href="#dismissed"></a>
                 </li>
-                <li class="queue list">
-                    <span>31</span>    
-                    <span>Somchai</span>
-                    <span class="status ready">Ready</span>
-                    <span class="groupedbutton">
-                        <a class="glyph sub button"><div class="fa fa-check"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-times"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status canceled"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="dismiss unsetbtn button" href="#dismissed"></a>
                 </li>
-                <li class="queue list">
-                    <span>32</span>    
-                    <span>Somsuk</span>
-                    <span class="status canceled">Canceled</span>
-                    <span class="groupedbutton">
-                        <a class="disabled glyph sub button"><div class="fa fa-check"></div></a>
-                        <a class="disabled glyph sub button"><div class="fa fa-times"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status waiting"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
                 </li>
-                <li class="queue list">
-                    <span>33</span>    
-                    <span>Somsuk</span>
-                    <span class="status waiting">Waiting</span>
-                    <span class="groupedbutton">
-                        <a class="invisible glyph sub button"><div class="fa fa-check"></div></a>
-                        <a class="invisible glyph sub button"><div class="fa fa-times"></div></a>
-                        <a class="glyph sub button"><div class="fa fa-ellipsis-v"></div></a>
-                    </span>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status servicing"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="checkout unsetbtn button" href="#checkedout"></a>
+                </li>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status checkedout"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                </li>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status ready"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="checkin unsetbtn button" href="#checkedin"></a>
+                    <a class="expire unsetbtn button" href="#expired"></a>
+                </li>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status expired"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="dismiss unsetbtn button" href="#dismissed"></a>
+                </li>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status canceled"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
+                    <a class="dismiss unsetbtn button" href="#dismissed"></a>
+                </li>
+                <li class="queue roundgroup">
+                    <span class="q-num">27</span>
+                    <a class="detail" href="#detail">
+                        <span class="q-name">Somsak</span>
+                        <span class="q-status waiting"></span>
+                        <span class="q-more fa fa-ellipsis-v"></span>
+                    </a>
                 </li>
             </div>
         </div>
