@@ -136,7 +136,7 @@ li.lite.em{
     margin: 0;
 }
 .group.buttons{
-    margin: 1em calc(var(--gutter)*(-1));
+    margin: 1em calc(var(--gutter)*(-1)) !important;
 }
 .group.row{
     flex-direction: row;
@@ -243,7 +243,7 @@ a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
 a.em.button{
     font-size: 1.1rem;
 }
-.group a.em.button{
+.group .em.button{
     margin: 1em 0;
 }
 
@@ -799,7 +799,7 @@ input[type=checkbox].lite:focus + label, input[type=checkbox].lite:valid + label
 
 input.s-time{
     font-size: 1.75em;
-    width: 3.75em;
+    width: 4.2em;
 }
 
 .s-day{
