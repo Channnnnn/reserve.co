@@ -17,6 +17,9 @@ div.fa{
     text-align: center;
     vertical-align: middle;
 }
+.link .fa {
+    vertical-align: unset;
+}
 
 body, html{
     margin: 0;
@@ -41,6 +44,22 @@ a {
 a.link{
     opacity: var(--link);
 }
+a.disabled.link, a.disabled.link:hover{
+    opacity: .1;
+    cursor: unset;
+}
+
+li.lite{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    list-style: none;
+    text-align: left;
+}
+
+li.lite.em{
+    font-size: 1.5em;
+}
 
 /* LAYOUT CONFIG */
 .container{
@@ -62,7 +81,7 @@ a.link{
 
 .right{
     float: right;
-    margin-left: auto;
+    margin-left: auto !important;
 }
 
 .left{
@@ -76,11 +95,15 @@ a.link{
 .nomargin{
     margin: 0 !important;
 }
+.fullwidth{
+    width: 100% !important;
+}
 
 /* SECTION PROPERTIES : for text layout */
 .section{
     margin: 1em auto 1em auto;
 }
+
 .section.list-header{
     width: 100%;
     margin-bottom: 0;
@@ -138,6 +161,10 @@ div.divider{
     text-align: center;
     color: rgb(var(--grey));
     font-size: .75em;
+}
+div.big.divider
+{
+    font-size: unset;
 }
 div.divider::before,div.divider::after{
     display: inline-block;
@@ -200,7 +227,7 @@ a.button{
     background-color: rgb(var(--grey));
     opacity: var(--link);
 }
-a.link:hover, a.button:hover{
+a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
     opacity: 1;
 }
 
@@ -215,6 +242,9 @@ a.link:hover, a.button:hover{
 /* EMPHASIZED BUTTON */
 a.em.button{
     font-size: 1.1rem;
+}
+.group a.em.button{
+    margin: 1em 0;
 }
 
 a.wide.button{
@@ -234,13 +264,13 @@ a.micro.button {
 /* Navbar Button */
 a.mini.button {
     font-size: .8em;
-    padding: .5em 1em .5em 1em;
+    padding: .5em .75em;
     min-width: 100px;
 }
 
 /* Modified Appearance */
 a.huge.button{
-    /* TODO : mobile 1.5em */
+    /* TODO : full: 1.75em */
     font-size: 1.5em;
     font-weight: var(--bold);
     margin: .5em 0 .5em 0;
@@ -279,24 +309,25 @@ a.red.button{
 a.green.button{
     background-color: rgb(var(--green)) !important;
 }
+a.social-facebook.button{
+    background-color: hsl(221, 42%, 42%) !important;
+}
+a.social-google.button{
+    background-color: hsl(5, 70%, 59%) !important;
+}
 
 /* DISABLED BUTTON */
 a.disabled.button, a.disabled.button:hover{
     background-color: rgb(var(--grey)) !important;
     opacity: .25;
+    cursor: unset;
 }
 a.disabled.transparent.button, a.disabled.transparent.button:hover{
     border-color: rgb(var(--grey)) !important;
     color: rgb(var(--grey)) !important;
     background-color: transparent !important;
     opacity: .25;
-}
-
-a.social-facebook.button{
-    background-color: hsl(221, 42%, 42%) !important;
-}
-a.social-google.button{
-    background-color: hsl(5, 70%, 59%) !important;
+    cursor: unset;
 }
 
 .spaced{
@@ -312,23 +343,22 @@ a.social-google.button{
 }
 
 .xspaced{
+    min-width: max-content;
     width: 1em;
     text-align: center;
-    margin-left: .5em;
-    margin-right: .5em;
+    margin-left: .5rem;
+    margin-right: .5rem;
 }
 
-.glyph{
+.button .fa:first-child{
     margin-right: .25em;
-    padding-bottom: .25em;
+    margin-bottom: .25em;
 }
-
-li.lite{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    list-style: none;
-    text-align: left;
+.mini .fa:last-child{
+    margin: -.1em 0 0 .25em;
+}
+.mini .fa:first-child{
+    margin: -.1em .25em 0 0;
 }
 
 /*
@@ -505,15 +535,12 @@ a.link{
 
 .queue{
     display: grid;
-    margin: 5px;
+    margin: 5px 0;
     border-radius: 6px;
     border: 1px solid rgba(var(--grey),.1);
     line-height: 3em;
     grid-template-areas: "num detail action1 action2";
     grid-template-columns: 2.5em auto min-content min-content ;
-}
-.queue + * {
-    margin: 5px !important;
 }
 
 .rounded :first-child {
@@ -700,6 +727,190 @@ a.dismiss.button:hover{
 
 /* 
  *
+ *  SHOPFORM ELEMENT
+ *
+*/
+.shopform{
+    display: grid;
+    grid-template-columns: 1em auto;
+    grid-template-areas: "glyph form";
+    grid-template-rows: auto;
+    align-items: center;
+    grid-gap: .25rem;
+}
+.shopform .fa-pencil{
+    grid-area: glyph;
+}
+.shopform .wide.button{
+    grid-column: 2 span;
+}
+
+.group.form{
+    width: calc(100% - .125rem);
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    position: relative;
+    text-align: left;
+}
+
+input.lite{
+    width: -webkit-fill-available;
+    box-sizing: border-box;
+    border: 0;
+    box-shadow: 0 1px rgba(var(--grey),.5);
+    outline: none;
+    color: rgb(var(--grey));
+    font-family: 'Kanit', sans-serif;
+    font-weight: var(--normal);
+    font-size: 1em;
+    transition: all .15s;
+}
+input.lite:focus, input.lite:valid{
+    box-shadow: 0 2px rgba(var(--red),.5);
+}
+input.lite:focus + label, input.lite:valid + label{
+    font-size: .8em;
+    top: -1.25em;
+    color: rgb(var(--red));
+}
+input[type=checkbox].lite {
+    display: none !important;
+}
+input[type=checkbox].lite + label{
+    border-radius: 5px;
+    border: 1px solid rgb(var(--red));
+    color: rgb(var(--red));
+    display: inline-block;
+    line-height: 3rem;
+    text-align: center;
+    width: 2.125rem;
+    position: unset;
+    margin: .75rem .125rem;
+    opacity: .5;
+}
+input[type=checkbox].lite:focus + label, input[type=checkbox].lite:valid + label{
+    font-size: 1.1em;
+    top: unset;
+    color: white;
+    background-color: rgb(var(--red));
+    border-color: transparent;
+    opacity: 1;
+}
+
+input.s-time{
+    font-size: 1.75em;
+    width: 3.75em;
+}
+
+.s-day{
+    display: block;
+    position: absolute;
+    color: rgb(var(--red));
+    font-size: .8em;
+    top: -1.25em;
+}
+
+label{
+    display: block;
+    position: absolute;
+    color: rgba(var(--grey),.5);
+    transition: all .15s;
+    top: 0em;
+}
+
+
+/* 
+ *
+ *  QUEUE ELEMENT
+ *
+*/
+.q-date{
+    line-height: 2em;
+    color: unset !important;
+}
+
+.q-label{
+    line-height: 1em;
+    font-size: 3em;
+    font-weight: var(--bold);
+    user-select: none;
+}
+
+.q-order{
+    line-height: .8em;
+    font-size: 8em;
+    font-weight: var(--bold);
+    user-select: none;
+}
+
+.left.previous{
+    order: -1;
+    padding: 1em;
+    opacity: 0.25;
+}
+.left.previous::after{
+    content: "";
+    font-family: 'FontAwesome';
+    font-size: 3em;
+}
+.left.previous:hover{
+    background-color: rgba(var(--grey), .1);
+}
+
+.right.next{
+    padding: 1em;
+    opacity: 0.25;
+}
+.right.next::after{
+    content: "";
+    font-family: 'FontAwesome';
+    font-size: 3em;
+}
+.right.next:hover{
+    background-color: rgba(var(--grey), .1);
+}
+
+.q-band{
+    width: 100%;
+    line-height: 1.75em;
+    font-size: 1.5em;
+    color: white;
+}
+
+.servicing .q-detail > *, .ready .q-detail > *{
+    color: rgb(var(--blue));
+}
+.checkedout .q-detail > *{
+    color: rgb(var(--green));
+}
+.waiting .q-detail > *{
+    color: black;
+}
+.servicing + .q-band, .ready + .q-band{
+    background-color: rgb(var(--blue));
+}
+.checkedout + .q-band{
+    background-color: rgb(var(--green));
+}
+.waiting + .q-band{
+    background-color: black;
+}
+.servicing + .q-band::after{content: "Servicing";}
+.ready + .q-band::after{content: "Ready";}
+.checkedout + .q-band::after{content: "Checked out";}
+.waiting + .q-band::after{content: "Waiting";}
+
+.q-time{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: .5em 0;
+}
+.q-time > :nth-child(2n){
+    text-align: left;
+}
+
+/* 
+ *
  *  ACCOUNT ELEMENTS
  *
 */
@@ -718,8 +929,4 @@ a.dismiss.button:hover{
     display: grid;
     grid-template-columns: 1fr 1fr;
     text-align: left;
-}
-
-.setupshop.button{
-    height: 2.4em;
 }

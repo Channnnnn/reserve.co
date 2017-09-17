@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Reserve.co</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/fae100f333.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <a class="blue menu link" href="manageshop.html">
+                <div class="fa fa-arrow-left rightspaced"></div>ACCOUNT SETTINGS
+            </a>
+            
+        </div>
+        <div class="cover fixoverlap" style="background-color:rgb(var(--red)); color: white;line-height: 200px;opacity:0.5;">Change Brand Image</div>
+        <div class="main">
+            <div class="section">
+                <h2>Setup a Shop</h2>
+            </div>
+            <div class="shopform">
+                <div class="form group">
+                    <input required type="text" id="s-name" class="lite" value="" />
+                    <label for="s-name">Shop Name</label>
+                </div>
+                <div class="fa fa-pencil"></div>
+                <div class="fa fa-pencil-square-o"></div>
+                <div class="form group">
+                    <input required type="text" id="s-desc" class="lite" value="" />
+                    <label for="s-desc">Shop Description</label>
+                </div>
+                <div class="fa fa-phone"></div>
+                <div class="form group">
+                    <input required type="text" id="s-phone" class="lite" value="" />
+                    <label for="s-phone">Shop Phone No.</label>
+                </div>
+                <div class="fa fa-male"></div>
+                <div class="form group">
+                    <input required type="text" id="s-serv" class="lite" value="" />
+                    <label for="s-serv">Shop Service Capacity</label>
+                </div>
+                <div class="fa fa-clock-o"></div>
+                <div class="row group nomargin">
+                    <div class="form group">
+                        <input required type="time" id="s-timestart" class="lite s-time" value="08:00" />
+                        <label for="s-time">Shop Queue Open</label>
+                    </div>
+                    <div class="form group">
+                        <input required type="time" id="s-timeend" class="lite s-time" value="16:00" />
+                        <label for="s-time">Shop Queue Close</label>
+                    </div>
+                </div>
+                <div class="fa fa-calendar"></div>
+                <div class="form group">
+                    <div class="row group nomargin">
+                        <input required type="checkbox" id="s-sunday" class="lite" value="" /><label for="s-sunday">Sun</label>
+                        <input required type="checkbox" id="s-monday" class="lite" value="" /><label for="s-monday">Mon</label>
+                        <input required type="checkbox" id="s-tuesday" class="lite" value="" /><label for="s-tuesday">Tue</label>
+                        <input required type="checkbox" id="s-wednesday" class="lite" value="" /><label for="s-wednesday">Wed</label>
+                        <input required type="checkbox" id="s-thursday" class="lite" value="" /><label for="s-thursday">Thu</label>
+                        <input required type="checkbox" id="s-friday" class="lite" value="" /><label for="s-friday">Fri</label>
+                        <input required type="checkbox" id="s-saturday" class="lite" value="" /><label for="s-saturday">Sat</label>
+                    </div>
+                    <div class="s-day">Shop Service Days</div>
+                </div>
+                <a class="red wide transparent button" href="#">Add Staff Memeber</a>
+            </div>
+            <div class="column group">
+                <a class="wide red button" href="manageshop.html">Setup Shop</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
