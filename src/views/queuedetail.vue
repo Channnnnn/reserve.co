@@ -16,10 +16,6 @@
         <div class=" q-action a1row group buttons">          
           <vButton href="#" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
           <vButton href="#" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</vButton>
-            <!-- <a href="#" class=" blue transparent mini button fullwidth">
-                <div class="fa fa-search"></div>View Shop</a>
-            <a href="#" class="right red transparent mini button fullwidth">
-                <div class="fa fa-times"></div>Cancel reservation</a> -->
         </div>
         <div class="big divider">Queue Timestamp</div>
         <div class="q-time">
@@ -27,8 +23,6 @@
           <span>12:15 PM</span><span>Queue Ready</span>
           <span>12:16 PM</span><span>Checked in</span>
         </div>
-          <!-- <span class="mini divider"></span>
-          <h3 class="nomargin">Queue Detail</h3> -->
       </div>
     </div>
   </div>
@@ -37,29 +31,28 @@
 <script>
 import vButton from "@/components/button.vue"
 export default {
-    components: {
-        vButton
-    },
-    props: ['data'],
-    data(){
-      return{
-        queue: null,
-      }
-    },
-    methods:{ 
-      GetQueueData: function() {
-        console.log("Hello world")
-        this.data.queues.forEach(q => {
-          if (q.id == this.$route.params.id){
-            this.queue = q;
-          }
-        });
-      }
-    },
-    beforeMount(){
-      this.GetQueueData()
+  components: {
+    vButton
+  },
+  props: ['data'],
+  data(){
+    return{
+      queue: null,
     }
-    
+  },
+  methods:{ 
+    GetQueueData: function() {
+      console.log("Hello world")
+      this.data.queues.forEach(q => {
+        if (q.id == this.$route.params.id){
+          this.queue = q;
+        }
+      });
+    }
+  },
+  beforeMount(){
+    this.GetQueueData()
+  }
 }
 </script>
 
