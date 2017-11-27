@@ -370,6 +370,7 @@ a.disabled.transparent.button, a.disabled.transparent.button:hover{
 .footer{
     margin-top: auto;
     margin-bottom: .5em;
+    font-weight: var(--normal);
 }
 
 .footer ul{
