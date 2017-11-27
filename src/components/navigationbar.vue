@@ -1,25 +1,21 @@
 <template>
     <div class="nav">
-        <a class="blue menu link" href="accountsetting.html">
+        <a class="blue menu link" href="#">
             <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
         </a>
-        <Button class="mini blue transparent button right" :data="test"></Button>
+        <vButton v-if="$route.name == 'account'" class="mini blue transparent button right" href="#">Manage Shop</vButton>
     </div>
 </template>
 
 <script>
-import Button from "@/components/button.vue"
+import vButton from "@/components/button.vue"
 export default {
   data () {
     return {
-      test: {
-        link: 'manageshop.html',
-        name: 'Manage Shop'
-      }
     }
   },
   components: {
-    Button
+    vButton
   }
 }
 </script>
@@ -27,6 +23,7 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/variable";
 .nav{
+    top: 0;
     box-sizing: border-box;
     min-width: 300px;
     width: 100%;

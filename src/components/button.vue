@@ -1,16 +1,15 @@
 <template>
-  <a class="button" :href="data.link">{{data.name}}</a>
+  <a class="button"><slot></slot></a>
 </template>
 
 <script>
 export default {
-  props: ['data']
+  props: ['data'],
 }
 </script>
 
 <style lang="scss" scoped>
 @import "~@/assets/variable";
-
 a.button{
     display: inline-block;
     border-radius: 5px;
@@ -78,6 +77,9 @@ a.button{
         font-size: .8em;
         padding: .5em .75em;
         min-width: 100px;
+        & .fa:first-child {
+            margin: -.1em .25em 0 0;
+        }
     }
     &.huge{
         font-size: 1.5em;
@@ -87,6 +89,9 @@ a.button{
             font-weight:  $font-normal;
         }
     }    
+}
+.fullwidth {
+    width: 100% !important;
 }
 </style>
 

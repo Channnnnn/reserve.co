@@ -1,77 +1,39 @@
 <template>
     <div class="container">
-        <Navbar></Navbar>
-        <div class="section list-header fixoverlap">
+        <div class="section list-header">
             <div class="avatar"></div>
             <h2>Thomas Carpenter</h2>
             <div class="row group tab">
-                <a href="#" class="blue tab active">Reservation</a>
-                <a href="account2.html" class="blue tab">History</a>
+                <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab">Reservation</a>
+                <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab">History</a>
             </div>
         </div>
         <div class="main account reservation">
-            <queue-item v-for="queue in queues" :key="queue.number"></queue-item>
             <div class="column group">
-                <li class="queue rounded">
-                    <span class="q-num">27</span>
-                    <a class="detail" href="queue4.html">
-                        <span class="q-name">Shop 7</span>
-                        <span class="q-status waiting"></span>
-                        <span class="q-more fa fa-ellipsis-v"></span>
-                    </a>
-                </li>
-                <li class="queue rounded">
-                    <span class="q-num">14</span>
-                    <a class="detail" href="queue2.html">
-                        <span class="q-name">Shop 8</span>
-                        <span class="q-status ready"></span>
-                        <span class="q-more fa fa-ellipsis-v"></span>
-                    </a>
-                </li>
-                <li class="queue rounded">
-                    <span class="q-num">10</span>
-                    <a class="detail" href="#detail">
-                        <span class="q-name">Shop 86</span>
-                        <span class="q-status expired"></span>
-                        <span class="q-more fa fa-ellipsis-v"></span>
-                    </a>
-                </li>
-                <a class="huge blue transparent button" href="viewshop.html">Make Reservation</a>
+                <queue-item v-for="queue in data.queues" :key="queue.number" :data="queue"></queue-item>
+                <a class="huge blue transparent button" href="#">Make Reservation</a>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import Navbar from '@/components/navigationbar.vue'
 import QueueItem from '@/components/queueEntry.vue'
 export default {
     components: {
-        Navbar,
-        /*'queue-item': */QueueItem,
+        QueueItem,
+    },
+    props: ['data'],
+    methods: {
+        SwitchTab(){
+            this.showingHistory = !this.showingHistory;
+            this.showingReservation = !this.showingReservation;
+        },
     },
     data() {
         return {
-            queues:[
-                {
-                    number: 27,
-                    shopName: 'Shop27',
-                    status: 'waiting',
-                    detail: ''
-                },
-                {
-                    number: 14,
-                    shopName: 'Shop8',
-                    status: 'waiting',
-                    detail: ''
-                },
-                {
-                    number: 10,
-                    shopName: 'Shop86',
-                    status: 'waiting',
-                    detail: ''
-                },
-            ]
+            showingReservation: true,
+            showingHistory: false,
         }
     },
 }
@@ -99,15 +61,14 @@ export default {
     margin: 1em auto 1em auto;
     &.list-header{
         width: 100%;
+        margin-top: 0;
         margin-bottom: 0;
+        padding-top: 1em;
         position: fixed;
         left: 0;
         border-bottom: 1px solid $color-grey50;
         background-color: white;
         z-index: 1;
-    }
-    &.list-header + *{
-        overflow-x: hidden;
     }
     &.list-header + * > *{
         margin: unset;
@@ -118,7 +79,7 @@ export default {
         margin-top: 7em !important;
     }
     &.account{
-        margin-top: 17em !important;
+        margin-top: 15em !important;
     }
 }
 
@@ -344,10 +305,6 @@ a.social-google.button{
     .right{
         margin-left: auto !important;
     }
-}
-
-.fixoverlap{
-    margin-top: 3em !important;
 }
 
 /*

@@ -1,17 +1,18 @@
 <template>
     <div class="queue rounded">
-        <span class="q-num">27</span>
-        <a class="detail" href="queue4.html">
-            <span class="q-name">Shop 7</span>
-            <span class="q-status waiting"></span>
+        <span class="q-num">{{data.number}}</span>
+        <router-link :to="{path: 'queue'+ data.id}" class="detail" href="#">
+            <span class="q-name">{{data.shopName}}</span>
+            <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
-        </a>
+        </router-link>
     </div>
 </template>
 
 <script>
 export default {
-
+    name: 'queue',
+    props: ['data']
 }
 </script>
 
