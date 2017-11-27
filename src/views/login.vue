@@ -4,7 +4,7 @@
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <a href="#" class="button transparent">Register</a>
-      <a href="#" class="button">Login</a>
+      <a href="#" class="button" @click="updateShopInfo">Login</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -24,8 +24,59 @@
 </template>
 
 <script>
+import {
+            getUserInfo, 
+            getUserReservation, 
+            getUserHistory, 
+            getShopInfo, 
+            getShopQueues, 
+            addQueue,
+            updateQueue,
+            updateProfile,
+            updateShopInfo
+} from "@/scripts/api.js"
+
 export default {
-  name: 'login'
+  name: 'login',
+  methods: {
+    getUserInfo(){
+      var result = getUserInfo("mNnumnU2IMMhPwf4b4XNZfcDJNz1");
+
+      console.log(result.data)
+    },
+    getUserReservation(){
+      var result = getUserReservation("mNnumnU2IMMhPwf4b4XNZfcDJNz1");
+
+      console.log(result.data)
+    },
+    getUserHistory(){
+      var result = getUserHistory("mNnumnU2IMMhPwf4b4XNZfcDJNz1");
+
+      console.log(result.data)
+    },
+    getShopInfo(){
+      var result = getShopInfo(0);
+
+      console.log(result.data)
+    },
+    getShopQueues(){
+      var result = getShopQueues(0);
+
+      console.log(result.data)
+    },
+    addQueue(){
+      addQueue("mNnumnU2IMMhPwf4b4XNZfcDJNz1",0);
+    },
+    updateQueue(){
+      updateQueue("1511811329","accept");
+    },
+    updateProfile(){
+      updateProfile("mNnumnU2IMMhPwf4b4XNZfcDJNz1", "tester@jongja.com", "testerjongja", "Tester", "JongJa", "01 2345 6789", true);
+    },
+    updateShopInfo(){
+      updateShopInfo(0, "Tester's Shop", "Tester's Shop Description", "mNnumnU2IMMhPwf4b4XNZfcDJNz1", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+    }
+  }
 }
 </script>
 
