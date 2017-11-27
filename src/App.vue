@@ -15,6 +15,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~@/assets/variable";
 $btn-blue: hsl(193, 66%, 45%);
 
 html,body{
@@ -49,9 +50,6 @@ a {
 }
 
 a.button{
-  cursor: pointer;
-  transition: all .15s;
-  text-decoration: none;
   border-radius: 5px;
   box-sizing: border-box;
   padding: .56em 1em;
@@ -71,5 +69,41 @@ a.button{
     box-shadow: .5px 0 0 $btn-blue, -.5px 0 0 $btn-blue,
       0 .5px 0 $btn-blue, 0 -.5px 0 $btn-blue;
   }
+}
+
+.invisible{
+    visibility: hidden;
+}
+
+div.fa{
+    text-align: center;
+    vertical-align: middle;
+}
+.link .fa {
+    vertical-align: unset;
+}
+
+a { 
+    cursor: pointer;
+    transition: all .15s;
+    text-decoration: none;
+    .link{
+        opacity: $opacity-link;
+    }
+    .disabled, .disabled:hover{
+        opacity: .1;
+        cursor: unset;
+    }
+}
+
+li.lite{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    list-style: none;
+    text-align: left;
+    &.em{
+        font-size: 1.5em;
+    }
 }
 </style>

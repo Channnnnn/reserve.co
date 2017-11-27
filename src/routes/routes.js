@@ -1,4 +1,5 @@
 import Login from '@/views/login'
+import Account from '@/views/account'
 
 export default [
   {
@@ -9,5 +10,10 @@ export default [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/account',
+    name: 'account',
+    component: Account
   }
 ]
