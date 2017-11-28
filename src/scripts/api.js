@@ -1,4 +1,4 @@
-import {db} from "@/scripts/firebase_config.js"
+import {db, auth} from "@/scripts/firebase_config.js"
 
 //Get Current UNIX Timestamp
 var getCurrentUnixTimestamp = function() {
@@ -17,6 +17,53 @@ var checkShouldBeHistory = function(timestamp) {
     }
 }
 
+//Get User Data
+var getUserID = function() {
+
+    if(auth.currentUser) {
+        console.log(auth.currentUser.uid)
+        return auth.currentUser.uid
+    }
+    else {
+        console.log("Error while getting User's ID");
+        return null
+    }
+}
+
+//Register New User
+var addNewUser = function(email, password) {
+    auth.createUserWithEmailAndPassword(email, password).then(function() {
+        console.log("Registering Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Registering New User");
+        console.log(error.code);
+    });
+}
+
+//Sign In
+var signIn = function(email, password) {
+    auth.signInWithEmailAndPassword(email, password).then(function() {
+        console.log("Signed In");
+
+    }).catch(function(error) {
+        console.log("Error while Signing In");
+        console.log(error.code);
+    });
+
+}
+
+//Sign Out
+var signOut = function() {
+    auth.signOut().then(function() {
+        console.log("Signed Out");
+
+    }).catch(function(error) {
+        console.log("Error while Signing Out");
+        console.log(error.code);
+    });
+}
+
 //Get User's Info
 var getUserInfo = function(uid) { 
     var ref = db.ref("users/" + uid);
@@ -24,8 +71,10 @@ var getUserInfo = function(uid) {
     
     ref.on("value", function(snapshot) {
         snapValue = snapshot.val();
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving User's Info");
+        console.log(error.code);
     });
 
     return {data: snapValue};
@@ -46,8 +95,10 @@ var getUserReservation = function(uid) {
                 snapValue.push(childData)
             }
         });
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving Reservation");
+        console.log(error.code);
     });
 
     return {data: snapValue};
@@ -68,8 +119,10 @@ var getUserHistory = function(uid) {
                 snapValue.push(childData)
             }
         });
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving History")
+        console.log(error.code);
     });
 
     return {data: snapValue};
@@ -82,8 +135,10 @@ var getShopInfo = function(sid) {
     
     ref.on("value", function(snapshot) {
         snapValue = snapshot.val();
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving Shop's Info")
+        console.log(error.code);
     });
 
     return {data: snapValue};
@@ -104,8 +159,10 @@ var getShopQueues = function(sid) {
                 snapValue.push(childData)
             }
         });
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving Shop's Queues")
+        console.log(error.code);
     });
 
     return {data: snapValue};
@@ -120,8 +177,10 @@ var getCurrentQueueNumber = function(sid) {
     ref.on("value", function(snapshot) {
         var snapValue = snapshot.val();
         currentQueue = snapValue.current_queue;
-    }, function(errorObject) {
-        console.log("Error: " + errorObject.code)
+
+    }, function(error) {
+        console.log("Error while retriving Shop's Current Queue Number")
+        console.log(error.code);
     });
 
     return currentQueue
@@ -138,11 +197,25 @@ var addQueue = function(uid, sid) {
         shop_id: sid,
         user_id: uid,
         queue_number: currentQueue + 1
+
+    }).then(function() {
+        console.log("Add Queue Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Adding Queue");
+
     });
     
     var ref = db.ref("shops/" + sid);
     ref.update({
         "current_queue": currentQueue + 1
+        
+    }).then(function() {
+        console.log("Update Shop's Current Queue Number Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Shop's Current Queue Number");
+
     });
 }
 
@@ -150,6 +223,7 @@ var addQueue = function(uid, sid) {
 var updateQueue = function(qid, action) {
     
     var ref = db.ref("queues");
+    var actionValid = true
 
     switch (action) {
         case "accept":
@@ -168,16 +242,27 @@ var updateQueue = function(qid, action) {
             ref.child(qid).update({
                 "expired": true
             });
-         break;
+            break;
     
         default:
+            console.log("Invalid 'action', action' must be only 'accept', 'cancel', or 'expire'");
+            actionValid = false;
             break;
     }
 
-    ref.child(qid).update({
-        "waiting": false,
-        update_timestamp: getCurrentUnixTimestamp()
-    });
+    if(actionValid) {
+        ref.child(qid).update({
+            "waiting": false,
+            update_timestamp: getCurrentUnixTimestamp()
+            
+        }).then(function() {
+            console.log("Update Queue's Data Complete");
+    
+        }).catch(function(error) {
+            console.log("Error while Updating Queue's Data");
+    
+        });
+    }
 }
 
 //Update Profile
@@ -192,6 +277,45 @@ var updateProfile = function(uid, email, password, firstName, lastName, phoneNum
         "last_name": lastName,
         "phone_number": phoneNumber,
         "push_notification": pushNotification
+
+    }).then(function() {
+        console.log("Update Profile on FRTDB Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Profile on FRTDB");
+
+    });
+
+    var user = auth.currentUser;
+
+    //Update Profile
+    user.updateProfile({
+        displayName: firstName + " " + lastName,
+        photoURL: ""
+    }).then(function() {
+        console.log("Update Profile on FAuth Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Profile on FAuth");
+        
+    });
+
+    //Update Email
+    user.updateEmail(email).then(function() {
+        console.log("Update Email on FAuth Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Email on FAuth");
+        
+    });
+
+    //Update Password
+    user.updatePassword(password).then(function() {
+        console.log("Update Password on FAuth Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Password on FAuth");
+        
     });
 }
 
@@ -210,10 +334,46 @@ var updateShopInfo = function(sid, name, description, owner, staffs, phoneNumber
         "open_time": openTime,
         "close_time": closeTime,
         "service_days": serviceDays
+        
+    }).then(function() {
+        console.log("Update Shop's Info Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Updating Shop's Info");
+
+    });
+}
+
+//Add New Shop
+var addNewShop = function(uid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+
+    var ref = db.ref("shops");
+
+    ref.push().set({
+        "name": name,
+        "description": description,
+        "owner": uid,
+        "staffs": staffs,
+        "phone_number": phoneNumber,
+        "capacity": capacity,
+        "open_time": openTime,
+        "close_time": closeTime,
+        "service_days": serviceDays
+        
+    }).then(function() {
+        console.log("Add New Shop Complete");
+
+    }).catch(function(error) {
+        console.log("Error while Adding New Shop");
+
     });
 }
 
 export {
+            addNewUser,
+            signIn,
+            signOut,
+            getUserID,
             getUserInfo, 
             getUserReservation, 
             getUserHistory, 
@@ -222,5 +382,6 @@ export {
             addQueue,
             updateQueue,
             updateProfile,
-            updateShopInfo
+            updateShopInfo,
+            addNewShop
 }

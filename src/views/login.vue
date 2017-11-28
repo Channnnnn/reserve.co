@@ -4,7 +4,7 @@
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <a href="#" class="button transparent">Register</a>
-      <a href="#" class="button" @click="updateShopInfo">Login</a>
+      <a href="#" class="button" @click="getUserID">Login</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -25,6 +25,10 @@
 
 <script>
 import {
+            addNewUser,
+            signIn,
+            signOut,
+            getUserID,
             getUserInfo, 
             getUserReservation, 
             getUserHistory, 
@@ -33,12 +37,25 @@ import {
             addQueue,
             updateQueue,
             updateProfile,
-            updateShopInfo
+            updateShopInfo,
+            addNewShop
 } from "@/scripts/api.js"
 
 export default {
   name: 'login',
   methods: {
+    addNewUser(){
+      addNewUser("tester@jongja.com", "testerjongja");
+    },
+    signIn(){
+      signIn("tester@jongja.com", "testerjongja");
+    },
+    signOut(){
+      signOut();
+    },
+    getUserID(){
+      var uid = getUserID();
+    },
     getUserInfo(){
       var result = getUserInfo("mNnumnU2IMMhPwf4b4XNZfcDJNz1");
 
@@ -75,9 +92,13 @@ export default {
     },
     updateShopInfo(){
       updateShopInfo(0, "Tester's Shop", "Tester's Shop Description", "mNnumnU2IMMhPwf4b4XNZfcDJNz1", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+    },
+    addNewShop(){
+      addNewShop("mNnumnU2IMMhPwf4b4XNZfcDJNz1", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     }
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
