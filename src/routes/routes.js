@@ -1,6 +1,7 @@
 import Login from '@/views/login'
 import Account from '@/views/account'
 import Queue from '@/views/queuedetail'
+import Settings from "@/views/setting";
 
 export default [
   {
@@ -19,6 +20,12 @@ export default [
   },
   {
     path: '/queue:id',
+    name: 'queue',
     component: Queue
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: Settings
   }
 ]

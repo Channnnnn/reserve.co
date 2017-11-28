@@ -1,8 +1,8 @@
 <template>
     <div class="nav">
-        <a class="blue menu link" href="#">
-            <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
-        </a>
+        <router-link :to="link" class="blue menu link" href="#">
+            <div class="fa rightspaced" :class="[hasBack ? 'fa-arrow-left': 'fa-bars']"></div>MY ACCOUNT
+        </router-link>
         <vButton v-if="$route.name == 'account'" class="mini blue transparent button right" href="#">Manage Shop</vButton>
     </div>
 </template>
@@ -10,6 +10,7 @@
 <script>
 import vButton from "@/components/button.vue"
 export default {
+    props: ['hasBack', 'link'],
   data () {
     return {
     }
@@ -42,14 +43,20 @@ export default {
         margin-left: auto !important;
     }
 }
-a.link:hover, a.button:hover{
-    opacity: 1;
-}
+
 .blue, .blue.link {
     color: $color-blue;
 }
 .rightspaced{
     margin-left: .25em;
     margin-right: .75em;
+}
+.transparent{
+    background-color: transparent;
+    color: $color-blue;
+    border: 1px solid $color-blue;
+    &:hover{
+        box-shadow: 0 0px 3px $color-blue;
+    }
 }
 </style>

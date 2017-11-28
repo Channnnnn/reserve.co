@@ -20,6 +20,7 @@ export default {
 @import "~@/assets/variable";
 
 .queue{
+    min-width: 300px;
     display: grid;
     margin: 5px 0;
     border-radius: 6px;

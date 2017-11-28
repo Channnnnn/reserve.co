@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <Navbar v-if="$route.path != '/login'"></Navbar>
-    <router-view :data="data"></router-view>
+    <router-view :data="data"  class="container"></router-view>
   </div>
 </template>
 
@@ -131,9 +130,7 @@ export default {
 <style lang="scss">
 @import "~@/assets/variable";
 $btn-blue: hsl(193, 66%, 45%);
-.nav + *{
-  margin-top: 3em !important;
-}
+
 
 html,body{
   margin: 0;
@@ -148,7 +145,21 @@ html,body{
 }
 
 h1, h2 {
-  font-weight: lighter;
+    font-weight: $font-bold;
+    margin: 0.5em 0;
+}
+h3{
+    font-size: 1.25em;
+    font-weight: $font-normal;
+    margin: .5em 0;
+}
+h4{
+    font-weight: $font-bold;
+    margin: .5em 0;
+}
+h5{
+    font-weight: $font-normal;
+    margin: .5em 0;
 }
 
 ul {
@@ -179,13 +190,34 @@ a.button{
   &:hover{
     opacity: 1;
   }
-  &.transparent{
-    background-color: transparent;
-    color: $btn-blue;
-    border: 1px solid $btn-blue;
-    box-shadow: .5px 0 0 $btn-blue, -.5px 0 0 $btn-blue,
-      0 .5px 0 $btn-blue, 0 -.5px 0 $btn-blue;
-  }
+}
+a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
+    opacity: 1;
+}
+/* 
+ *  TAB COMPONENTS
+*/
+a.tab{
+    width: -webkit-fill-available;
+    line-height: 2.25em;
+    transition: all .15s;
+    &::after{
+        content: "";
+        display: block;
+        height: 5px;
+        width: auto;
+        background-color: transparent;
+        transition: all .15s;
+    }
+    &:hover::after{
+        background-color: $color-blue10;
+    }
+    &.active::after{
+        background-color: $color-blue85;
+    }
+    &.active:hover{
+        filter: none;
+    }
 }
 
 .invisible{
@@ -224,6 +256,36 @@ li.lite{
     }
 }
 
+.container{
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Kanit', sans-serif;
+    font-weight: $font-normal;
+    text-align: center;
+}
+
+.nav + *{
+  margin-top: 3em !important;
+}
+.panel + *{
+  margin-top: 17em !important; 
+}
+
+/* SPACERS */
+span.divider{
+    display: block;
+    height: 1px;
+    background-color: $color-grey50;
+    margin: 1em 0 1em 0;
+}
+span.mini.divider{
+    margin: .5em 0 .5em 0 !important; 
+}
 div.divider {
     overflow: hidden;
     text-align: center;
@@ -248,6 +310,33 @@ div.divider {
     &::after {
         left: .5em;
         margin-right: -50%;
+    }
+}
+
+.section{
+    margin: 1em auto 1em auto;
+}
+
+.before-after-space{
+    margin: 1em auto !important;
+}
+
+
+/* GROUP PROPERTIES : for button & forms */
+.group{
+    display: flex;
+    margin: 1em 0;
+    &.tab{
+        margin: 0;
+    }
+    &.buttons{
+        margin: 1em calc($gutter * (-1)) !important;
+    }
+    &.row{
+        flex-direction: row;
+    }
+    &.column{
+        flex-direction: column;
     }
 }
 </style>

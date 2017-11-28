@@ -1,27 +1,30 @@
 <template>
-    <div class="container">
-        <div class="section list-header">
-            <div class="avatar"></div>
-            <h2>Thomas Carpenter</h2>
+    <div>
+        <Navbar :hasBack='false' :link="'/settings'"></Navbar>
+        <AccountPanel class="panel">
             <div class="row group tab">
                 <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab">Reservation</a>
                 <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab">History</a>
             </div>
+        </AccountPanel>
+        <div class="reservation account">
+            <queue-item v-for="queue in data.queues" :key="queue.number" :data="queue"></queue-item>
         </div>
-        <div class="main account reservation">
-            <div class="column group">
-                <queue-item v-for="queue in data.queues" :key="queue.number" :data="queue"></queue-item>
-                <a class="huge blue transparent button" href="#">Make Reservation</a>
-            </div>
-        </div>
+        <vButton class="before-after-space huge blue transparent button" href="#">Make Reservation</vButton>
     </div>
 </template>
 
 <script>
+import Navbar from '@/components/navigationbar.vue'
+import vButton from "@/components/button.vue"
+import AccountPanel from "@/components/accountPanel.vue"
 import QueueItem from '@/components/queueEntry.vue'
 export default {
     components: {
+        Navbar,
         QueueItem,
+        AccountPanel,
+        vButton
     },
     props: ['data'],
     methods: {
@@ -41,142 +44,26 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/variable";
-
-/* LAYOUT CONFIG */
-.container{
-    min-width: 320px;
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100vh;
-    font-family: 'Kanit', sans-serif;
-    font-weight: $font-normal;
-    text-align: center;
+.panel{
+    min-width: 300px;
+    width: 100%;
+    position: fixed;
+    // border-bottom: 1px solid $color-grey50;
+    background-color: white;
+    box-shadow: 0 0 10px $color-grey50;
 }
 
 /* SECTION PROPERTIES : for text layout */
-.section{
-    margin: 1em auto 1em auto;
-    &.list-header{
-        width: 100%;
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-top: 1em;
-        position: fixed;
-        left: 0;
-        border-bottom: 1px solid $color-grey50;
-        background-color: white;
-        z-index: 1;
-    }
-    &.list-header + * > *{
-        margin: unset;
-    }
-}
 .reservation{
+    width: calc(100% - 1em);
     &.shop{
         margin-top: 7em !important;
-    }
-    &.account{
-        margin-top: 15em !important;
-    }
-}
-
-/* GROUP PROPERTIES : for button & forms */
-.group{
-    display: flex;
-    margin: 1em 0;
-    &.tab{
-        margin: 0;
-    }
-    &.buttons{
-        margin: 1em calc($gutter * (-1)) !important;
-    }
-    &.row{
-        flex-direction: row;
-    }
-    &.column{
-        flex-direction: column;
-    }
-}
-
-/* SPACERS */
-span.divider{
-    display: block;
-    height: 1px;
-    background-color: $color-grey50;
-    margin: 1em 0 1em 0;
-}
-span.mini.divider{
-    margin: .5em 0 .5em 0 !important; 
-}
-
-div.divider{
-    &.big{
-        font-size: unset;
-    }
-    overflow: hidden;
-    text-align: center;
-    color: $color-grey;
-    font-size: .75em;
-    &::before, &::after{
-        display: inline-block;
-        content: "";
-        height: 1px;
-        position: relative;
-        vertical-align: middle;
-        width: 50%;
-        background-color: $color-grey50; 
-    }
-    &::before{
-        right: .5em; 
-        margin-left: -50%;
-    }
-    &::after{
-        left: .5em; 
-        margin-right: -50%;
-    }
-}
-div.big.divider
-{
-    font-size: unset;
-}
-
-/* 
- *  TAB COMPONENTS
-*/
-a.tab{
-    width: -webkit-fill-available;
-    line-height: 2.25em;
-    transition: all .15s;
-    &::after{
-        content: "";
-        display: block;
-        height: 5px;
-        width: auto;
-        background-color: transparent;
-        transition: all .15s;
-    }
-    &:hover::after{
-        background-color: $color-blue10;
-    }
-    &.active::after{
-        background-color: $color-blue85;
-    }
-    &.active:hover{
-        filter: none;
     }
 }
 
 /* 
  *  BUTTON COMPONENTS
 */
-
-a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
-    opacity: 1;
-}
-
 .row.group > a.button{
     margin: 0 $gutter;
 }
@@ -192,13 +79,6 @@ a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
 
 a.tab:hover{
     filter: brightness(.75) saturate(1.5);
-}
-
-a.social-facebook.button{
-    background-color: hsl(221, 42%, 42%) !important;
-}
-a.social-google.button{
-    background-color: hsl(5, 70%, 59%) !important;
 }
 
 .spaced{
@@ -265,48 +145,6 @@ a.social-google.button{
     }
 }
 
-/*  
- *
- *  Login element  
- *
-*/
-.header{
-    margin-top: auto;
-    font-size: 3.45em;
-    color: $color-blue;
-}
-
-.subhead{
-    font-size: 1.75em;
-    line-height: 1em;
-}
-
-/*  
- *
- *  App element  
- *
-*/
-
-.nav{
-    box-sizing: border-box;
-    min-width: 300px;
-    width: 100%;
-    display: flex;
-    position: fixed;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0 .75em;
-    height: 3em;
-    background-color: white;
-    z-index: 1;
-    .menu{
-        font-size: 1.2em;
-    }
-    .right{
-        margin-left: auto !important;
-    }
-}
-
 /*
  *
  *  Shop Elements
@@ -316,24 +154,6 @@ a.social-google.button{
     width: 100%;
     min-height: 200px;
     background-color: $color-grey;
-}
-
-h1, h2 {
-    font-weight: $font-bold;
-    margin: 0.5em 0;
-}
-h3{
-    font-size: 1.25em;
-    font-weight: $font-normal;
-    margin: .5em 0;
-}
-h4{
-    font-weight: $font-bold;
-    margin: .5em 0;
-}
-h5{
-    font-weight: $font-normal;
-    margin: .5em 0;
 }
 
 .main{
@@ -377,7 +197,7 @@ a.link{
     margin: 0 !important;
     width: max-content;
     min-width: unset !important;
-    font-weight: var(--bold);
+    font-weight: $font-bold;
     font-size: .9em;
     line-height: 2rem !important;
     padding: 0 .5rem !important;
@@ -777,11 +597,5 @@ label{
     background-color: lightgrey;
     margin: 0 auto;
     margin-top: 1em;
-}
-
-.accinfo{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    text-align: left;
 }
 </style>

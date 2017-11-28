@@ -99,9 +99,19 @@ export default {
 }
 .facebook{
   background-color: hsl(221, 42%, 42%);
+  &::before{
+    font-family: 'FontAwesome';
+    content: "\f230";
+    margin-right: 5px;
+  }
 }
 .google{
   background-color: hsl(5, 70%, 59%);
+  &::before{
+    font-family: 'FontAwesome';
+    content: "\f1a0";
+    margin-right: 5px;
+  }
 }
 </style>
 
