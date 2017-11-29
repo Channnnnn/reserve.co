@@ -460,6 +460,32 @@ var checkShopUsernameAvailability = function(username, callback) {
     });
 }
 
+//Check If Already in Queue
+var checkAlreadyInQueue = function(sid, callback) {
+    
+    var ref = db.ref("queues");
+    
+    ref.once("value").then(function(snapshot) {
+        let alreadyInQueue = false;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(childData.user_id == getUserID() && childData.shop_id == sid && !checkShouldBeHistory(key)) {
+                alreadyInQueue = true;
+            }
+        });
+
+        callback(alreadyInQueue);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving Shop's Username");
+        console.log(error.code);
+        callback(true);
+    });
+}
+
 export {
             addNewUser,
             signIn,
@@ -477,5 +503,6 @@ export {
             updateShopInfo,
             addNewShop,
             checkUserUsernameAvailability,
-            checkShopUsernameAvailability
+            checkShopUsernameAvailability,
+            checkAlreadyInQueue
 }

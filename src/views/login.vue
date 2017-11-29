@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="checkShopUsernameAvailability">Login</a>
+          <a class="button blue" @click="checkAlreadyInQueue">Login</a>
         </div>
       </div>
       </transition>
@@ -83,7 +83,8 @@ import {
             updateShopInfo,
             addNewShop,
             checkUserUsernameAvailability,
-            checkShopUsernameAvailability
+            checkShopUsernameAvailability,
+            checkAlreadyInQueue
 } from "@/scripts/api.js"
 
 export default {
@@ -131,10 +132,10 @@ export default {
       console.log(result.data)
     },
     addQueue(){
-      addQueue("-L-10WCvFxAdpCl0D5OJ");
+      addQueue("MekMek");
     },
     updateQueue(){
-      updateQueue("1511962120","accept");
+      updateQueue("1511971409","accept");
     },
     updateProfile(){
       updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true);
@@ -154,13 +155,18 @@ export default {
       this.register = false;
     },
     checkUserUsernameAvailability(){
-      checkUserUsernameAvailability("mekmekja", function(availability) {
-          console.log(availability);
+      checkUserUsernameAvailability("mekmekja", function(result) {
+          console.log(result);
       });
     },
     checkShopUsernameAvailability(){
-      checkShopUsernameAvailability("mekmek", function(availability) {
-          console.log(availability);
+      checkShopUsernameAvailability("mekmek", function(result) {
+          console.log(result);
+      });
+    },
+    checkAlreadyInQueue(){
+      checkAlreadyInQueue("MekMek", function(result) {
+          console.log(result);
       });
     }
   },
