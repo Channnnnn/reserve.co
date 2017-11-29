@@ -3,10 +3,6 @@
     <div class="header">RESERVE.CO</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
-<<<<<<< HEAD
-      <a href="#" class="button transparent">Register</a>
-      <a href="#" class="button" @click="getUserHistory">Login</a>
-=======
       <transition name="fade" mode="out-in">
       <div v-if="register" class="registerDialog" key="reg">
         <h2>Create new account</h2>
@@ -48,7 +44,6 @@
       <a @click="registerDialog" class="button transparent green" v-if="!register && login">or Register new account</a>
       <a @click="loginDialog" class="button blue" v-if="!register && !login">Login</a>
       <a @click="loginDialog" class="button transparent blue" v-if="register && !login">or Login with your account</a>
->>>>>>> convert-to-vue-format
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -90,7 +85,6 @@ import {
 
 export default {
   name: 'login',
-<<<<<<< HEAD
   methods: {
     addNewUser(){
       addNewUser("tester@jongja.com", "testerjongja");
@@ -144,14 +138,7 @@ export default {
     },
     addNewShop(){
       addNewShop("Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
-=======
-  data(){
-    return{
-      register: false,
-      login:false,
-    }
-  },
-  methods: {
+    },
     registerDialog(){
       this.register = true;
       this.login = false;
@@ -159,9 +146,14 @@ export default {
     loginDialog(){
       this.login = true;
       this.register = false;
->>>>>>> convert-to-vue-format
     }
-  }
+  },
+  data(){
+    return{
+      register: false,
+      login:false,
+    }
+  },
 }
 
 </script>
