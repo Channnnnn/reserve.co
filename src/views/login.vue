@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue">Login</a>
+          <a class="button blue" @click="getUserHistory">Login</a>
         </div>
       </div>
       </transition>

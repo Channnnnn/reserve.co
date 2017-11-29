@@ -69,7 +69,7 @@ var getUserInfo = function() {
     var ref = db.ref("users/" + getUserID());
     var snapValue;
     
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
 
     }, function(error) {
@@ -85,7 +85,7 @@ var getUserReservation = function() {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -110,7 +110,7 @@ var getUserHistory = function() {
     var snapValue = [];
     var keyForExpired = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -139,7 +139,7 @@ var getShopInfo = function(sid) {
     var ref = db.ref("shops/" + sid);
     var snapValue;
     
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
 
     }, function(error) {
@@ -155,7 +155,7 @@ var getShopQueues = function(sid) {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -173,36 +173,20 @@ var getShopQueues = function(sid) {
 
     return {data: snapValue};
 }
-
-//Get Current Shop's Queue Number
-var getCurrentQueueNumber = function(sid) {
-
-    var currentQueue;
-    
-    var ref = db.ref("shops/" + sid + "/current_queue");    
-    ref.on("value", function(snapshot) {
-        var snapValue = snapshot.val();
-        currentQueue = snapValue;
-
-    }, function(error) {
-        console.log("Error while retriving Shop's Current Queue Number")
-        console.log(error.code);
-    });
-
-    return currentQueue
-}
-
 //Add Queue
 var addQueue = function(sid) {
     
-    var currentQueue = getCurrentQueueNumber(sid);
+    var currentQueue;
     var currentTime = getCurrentUnixTimestamp();
 
     var ref = db.ref("shops/" + sid);
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         var snapValue = snapshot.val();
         if(checkShouldBeHistory(snapValue.current_queue_time)) {
             currentQueue = 0;
+        }
+        else {
+            currentQueue = snapValue.current_queue;
         }
         
         var ref = db.ref("queues");
