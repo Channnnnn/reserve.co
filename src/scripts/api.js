@@ -362,7 +362,9 @@ var addNewShop = function(name, description, staffs, phoneNumber, capacity, open
         "capacity": capacity,
         "open_time": openTime,
         "close_time": closeTime,
-        "service_days": serviceDays
+        "service_days": serviceDays,
+        "current_queue": 0,
+        "current_queue_time": 0
         
     }).then(function() {
         console.log("Add New Shop Complete");
