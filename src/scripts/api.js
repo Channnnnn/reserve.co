@@ -1,5 +1,8 @@
 import {db, auth} from "@/scripts/firebase_config.js"
 
+var _username;
+var _phoneNumber;
+
 //Get Current UNIX Timestamp
 var getCurrentUnixTimestamp = function() {
 
@@ -35,18 +38,49 @@ var addNewUser = function(username, phoneNumber, email, password) {
     auth.createUserWithEmailAndPassword(email, password).then(function() {
         console.log("Registering Complete");
 
-        updateProfile(username, email, password, "", "", phoneNumber, true);
+        _username = username;
+        _phoneNumber = phoneNumber;
 
+        signIn(email, password, true);
+        
     }).catch(function(error) {
         console.log("Error while Registering New User");
         console.log(error.code);
     });
 }
 
+//Sign In Using Username
+var getEmailFromUsername = function(username) {
+    var ref = db.ref("users");
+    var snapValue = [];
+
+    ref.once("value", function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+        
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+
+            if(childData.username == username()) {
+                return childData.email;
+            }
+        });
+
+    }, function(error) {
+        console.log("Error while retriving Reservation");
+        console.log(error.code);
+
+        return null;
+    });
+}
+
 //Sign In
-var signIn = function(email, password) {
+var signIn = function(email, password, isComingFromRegister) {
     auth.signInWithEmailAndPassword(email, password).then(function() {
         console.log("Signed In");
+
+        if(isComingFromRegister) {
+            updateProfile(_username, email, password, "", "", _phoneNumber, true);            
+        }
 
     }).catch(function(error) {
         console.log("Error while Signing In");

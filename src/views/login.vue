@@ -90,7 +90,7 @@ export default {
       addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
     },
     signIn(){
-      signIn("test@jongja.com", "testjongja");
+      signIn("test@jongja.com", "testjongja", false);
     },
     signOut(){
       signOut();
