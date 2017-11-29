@@ -196,32 +196,46 @@ var getCurrentQueueNumber = function(sid) {
 var addQueue = function(sid) {
     
     var currentQueue = getCurrentQueueNumber(sid);
-    
-    var ref = db.ref("queues");
-    ref.child(getCurrentUnixTimestamp()).set({
-        waiting: true,
-        shop_id: sid,
-        user_id: getUserID(),
-        queue_number: currentQueue + 1
+    var currentTime = getCurrentUnixTimestamp();
 
-    }).then(function() {
-        console.log("Add Queue Complete");
+    var ref = db.ref("shops/" + sid);
+    ref.on("value", function(snapshot) {
+        var snapValue = snapshot.val();
+        if(checkShouldBeHistory(snapValue.current_queue_time)) {
+            currentQueue = 0;
+        }
         
-        var ref = db.ref("shops/" + sid);
-        ref.update({
-            "current_queue": currentQueue + 1
-            
+        var ref = db.ref("queues");
+        ref.child(currentTime).set({
+            waiting: true,
+            shop_id: sid,
+            user_id: getUserID(),
+            queue_number: currentQueue + 1
+    
         }).then(function() {
-            console.log("Update Shop's Current Queue Number Complete");
+            console.log("Add Queue Complete");
+            
+            var ref = db.ref("shops/" + sid);
+            ref.update({
+                "current_queue": currentQueue + 1,
+                "current_queue_time": currentTime
+                
+            }).then(function() {
+                console.log("Update Shop's Current Queue Complete");
+        
+            }).catch(function(error) {
+                console.log("Error while Updating Shop's Current Queue");
+        
+            });
     
         }).catch(function(error) {
-            console.log("Error while Updating Shop's Current Queue Number");
+            console.log("Error while Adding Queue");
     
         });
 
-    }).catch(function(error) {
-        console.log("Error while Adding Queue");
-
+    }, function(error) {
+        console.log("Error while Adding Queues")
+        console.log(error.code);
     });
 }
 

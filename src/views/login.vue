@@ -4,7 +4,7 @@
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <a href="#" class="button transparent">Register</a>
-      <a href="#" class="button" @click="getUserHistory">Login</a>
+      <a href="#" class="button" @click="addQueue">Login</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -86,7 +86,7 @@ export default {
       addQueue("-L-10WCvFxAdpCl0D5OJ");
     },
     updateQueue(){
-      updateQueue("1511811329","accept");
+      updateQueue("1511962120","accept");
     },
     updateProfile(){
       updateProfile("tester@jongja.com", "testerjongja", "Tester", "JongJa", "01 2345 6789", true);
