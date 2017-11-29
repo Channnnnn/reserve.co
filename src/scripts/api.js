@@ -108,15 +108,21 @@ var getUserReservation = function() {
 var getUserHistory = function() {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
+    var keyForExpired = [];
 
     ref.on("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
-
+            
             if(childData.user_id == getUserID() && checkShouldBeHistory(key)) {
-                snapValue.push(childData)
+
+                if(childData.accepted == null && childData.expired == null) {
+                    childData.expired = true;
+                }
+                
+                snapValue.push(childData);
             }
         });
 

@@ -4,7 +4,7 @@
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <a href="#" class="button transparent">Register</a>
-      <a href="#" class="button" @click="getUserReservation">Login</a>
+      <a href="#" class="button" @click="getUserHistory">Login</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -48,7 +48,7 @@ export default {
       addNewUser("tester@jongja.com", "testerjongja");
     },
     signIn(){
-      signIn("tester@jongja.com", "testerjongja");
+      signIn("test@jongja.com", "testjongja");
     },
     signOut(){
       signOut();
