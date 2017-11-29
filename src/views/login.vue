@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="addNewUser">Login</a>
+          <a class="button blue" @click="getUserID">Login</a>
         </div>
       </div>
       </transition>
@@ -69,6 +69,7 @@
 import {
             addNewUser,
             signIn,
+            signInUsingUsername,
             signOut,
             getUserID,
             getUserInfo, 
@@ -91,6 +92,9 @@ export default {
     },
     signIn(){
       signIn("test@jongja.com", "testjongja", false);
+    },
+    signInUsingUsername(){
+      signInUsingUsername("mekmekja", "mekmekja");
     },
     signOut(){
       signOut();

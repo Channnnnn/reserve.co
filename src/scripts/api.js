@@ -49,27 +49,24 @@ var addNewUser = function(username, phoneNumber, email, password) {
     });
 }
 
-//Sign In Using Username
-var getEmailFromUsername = function(username) {
+//Sign In With Username
+var signInWithUsername = function(username, password) {
     var ref = db.ref("users");
-    var snapValue = [];
 
-    ref.once("value", function(snapshot) {
+    ref.once("value").then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
-        
+
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
 
-            if(childData.username == username()) {
-                return childData.email;
+            if(childData.username == username) {
+                signIn(childData.email, password, false);
             }
         });
 
-    }, function(error) {
-        console.log("Error while retriving Reservation");
+    }).catch(function(error) {
+        console.log("Error while retriving Username");
         console.log(error.code);
-
-        return null;
     });
 }
 
@@ -414,6 +411,7 @@ var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity,
 export {
             addNewUser,
             signIn,
+            signInWithUsername,
             signOut,
             getUserID,
             getUserInfo, 
