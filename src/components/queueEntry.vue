@@ -1,17 +1,29 @@
 <template>
     <div class="queue rounded">
-        <span class="q-num">27</span>
-        <a class="detail" href="queue4.html">
-            <span class="q-name">Shop 7</span>
-            <span class="q-status waiting"></span>
+        <span class="q-num">{{data.number}}</span>
+        <router-link :to="{path: 'queue'+ data.id}" class="detail" href="#">
+            <span class="q-name">{{data.shopName}}</span>
+            <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
-        </a>
+        </router-link>
+        <a @click="queueAccept" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="accept button"></a>
+        <a @click="queueDecline" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="decline button"></a>
+        <!-- <a @click="queueDismiss" v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button"></a> -->
     </div>
 </template>
 
 <script>
 export default {
-
+    name: 'queue',
+    props: ['data'],
+    methods: {
+        queueAccept(){
+            this.data.status = 'accepted'
+        },
+        queueDecline(){
+            this.data.status = 'expired'
+        },
+    }
 }
 </script>
 
@@ -19,6 +31,7 @@ export default {
 @import "~@/assets/variable";
 
 .queue{
+    min-width: 300px;
     display: grid;
     margin: 5px 0;
     border-radius: 6px;
@@ -26,6 +39,9 @@ export default {
     line-height: 3em;
     grid-template-areas: "num detail action1 action2";
     grid-template-columns: 2.5em auto min-content min-content ;
+    * {
+        border-radius: 0;
+    }
     :first-child {
         border-radius: 5px 0 0 5px !important;
     }
@@ -66,21 +82,21 @@ a.detail{
     padding: 0 .5em 0 .5em;
     line-height: 1.1em;
     /* Status Text */
-    &.servicing::after{
-        content: "SERVICING";
-        color: $color-blue;
-    }
-    &.checkedout::after{
-        content: "CHECKED OUT";
+    // &.servicing::after{
+    //     content: "SERVICING";
+    //     color: $color-blue;
+    // }
+    // &.checkedout::after{
+    //     content: "CHECKED OUT";
+    //     color: $color-green;
+    // }
+    &.accepted::after{
+        content: "ACCEPTED";
         color: $color-green;
-    }
-    &.ready::after{
-        content: "READY";
-        color: $color-blue;
     }
     &.waiting::after{
         content: "WAITING";
-        color: black;
+        color: $color-blue;
     }
     &.expired::after{
         content: "EXPIRED";
@@ -98,6 +114,42 @@ a.detail{
     color: $color-grey50;
     font-size: 1.2em !important;
     transition: all .15s;
+}
+
+.button{
+    line-height: unset;
+    padding: 0;
+    width: 3.25rem;
+    min-width: unset;
+    &.accept{
+        background-color: $color-blue85;
+        border-right: 1px solid $color-grey;
+        &::before {
+            content: "\f00c";
+            font-family: 'FontAwesome';
+            display: block;
+            font-size: 1.3em;
+        }
+    }
+    &.decline{
+        background-color: $color-red85;
+        &::before{
+            content: "\f00d";
+            font-family: 'FontAwesome';
+            display: block;
+            font-size: 1.3em;
+        }
+    }
+    &.dismiss{
+        background-color: $color-grey85;
+        width: 5.9em;
+        &::before{
+            content: "DISMISS";
+            font-family: 'Kanit','Arial', sans-serif;
+            display: block;
+            font-size: 1em;
+        }
+    }
 }
 
 </style>
