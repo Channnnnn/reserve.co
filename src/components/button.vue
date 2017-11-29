@@ -1,10 +1,10 @@
 <template>
-  <a class="button"><slot></slot></a>
+  <router-link :to="link" class="button"><slot></slot></router-link>
 </template>
 
 <script>
 export default {
-  props: ['data'],
+  props: ['data', 'link'],
 }
 </script>
 
@@ -20,6 +20,9 @@ a.button{
     color: white;
     background-color: $color-grey;
     opacity: $opacity-link;
+    &:hover{
+        opacity: 1;
+    }
     &.blue{
         background-color: $color-blue !important;
     }
@@ -28,6 +31,9 @@ a.button{
     }
     &.green{
         background-color: $color-green !important;
+    }
+    &.orange{
+        background-color: $color-orange !important;
     }
     &.disabled, &.disabled:hover{
         background-color: $color-grey !important;
@@ -49,6 +55,11 @@ a.button{
         &.blue{
             border-color: $color-blue !important;
             color: $color-blue !important;
+            background-color: transparent !important;
+        }
+        &.orange{
+            border-color: $color-orange !important;
+            color: $color-orange !important;
             background-color: transparent !important;
         }
         &.disabled, &.disabled:hover{

@@ -26,7 +26,7 @@ export default {
               id: 1231,
               number: 14,
               shopName: 'Shop8',
-              status: 'ready',
+              status: 'accepted',
               detail: ''
           },
           {
@@ -47,14 +47,14 @@ export default {
               id: 1223,
               number: 14,
               shopName: 'Shop8',
-              status: 'ready',
+              status: 'accepted',
               detail: ''
           },
           {
               id: 2312,
               number: 10,
               shopName: 'Shop86',
-              status: 'expired',
+              status: 'canceled',
               detail: ''
           },
           {
@@ -68,7 +68,7 @@ export default {
               id: 523123,
               number: 14,
               shopName: 'Shop8',
-              status: 'ready',
+              status: 'accepted',
               detail: ''
           },
           {
@@ -89,7 +89,7 @@ export default {
               id: 23,
               number: 14,
               shopName: 'Shop8',
-              status: 'ready',
+              status: 'accepted',
               detail: ''
           },
           {
@@ -110,7 +110,7 @@ export default {
               id: 903123,
               number: 14,
               shopName: 'Shop8',
-              status: 'ready',
+              status: 'accepted',
               detail: ''
           },
           {
@@ -129,8 +129,6 @@ export default {
 
 <style lang="scss">
 @import "~@/assets/variable";
-$btn-blue: hsl(193, 66%, 45%);
-
 
 html,body{
   margin: 0;
@@ -173,7 +171,7 @@ li {
 }
 
 a {
-  color: $btn-blue;
+  color: $color-blue;
   text-decoration: none;
 }
 
@@ -184,11 +182,28 @@ a.button{
   font-size: 1.1em;
   line-height: 1em;
   color: white;
-  background-color: $btn-blue;
+  background-color: $color-blue;
   border: 1px solid transparent;
   opacity: .85;
   &:hover{
     opacity: 1;
+  }
+  &.green{
+    background-color: $color-green !important;
+  }
+  &.orange{
+    background-color: $color-orange !important;
+  }
+  &.transparent{
+    background-color: transparent;
+    color: $color-blue;
+    border: 1px solid $color-blue;
+    &.blue:hover{
+        box-shadow: 0 0px 3px $color-blue;
+    }
+    &.red:hover{
+        box-shadow: 0 0px 3px $color-red;
+    }
   }
 }
 a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
@@ -269,11 +284,72 @@ li.lite{
     text-align: center;
 }
 
+.nav{
+    top: 0;
+    box-sizing: border-box;
+    min-width: 300px;
+    width: 100%;
+    display: flex;
+    position: fixed;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 .75em;
+    height: 3em;
+    background-color: white;
+    z-index: 2;
+    &.ghost{
+        position: absolute;
+        background-color: transparent;
+        .button.transparent{
+            border-color: white !important;
+            border-width: 2px !important;
+            color: white !important;
+            font-weight: $font-bold;
+            text-transform: uppercase;
+            &:hover{
+                border: 2px solid white !important;
+                background-color: white !important;
+                color: $color-blue85 !important;
+                filter: none !important;
+            }
+        }
+    }
+    .menu{
+        font-size: 1.2em;
+        user-select: none;
+    }
+    .right{
+        margin-left: auto !important;
+    }
+    &.blue{
+        .link {
+            color: $color-blue;
+        }
+    }
+    &.orange{
+        .link {
+            color: $color-orange;
+        }
+    }
+}
+
+
+.rightspaced{
+    margin-left: .25em;
+    margin-right: .75em;
+}
+
 .nav + *{
   margin-top: 3em !important;
 }
+.nav.ghost + *{
+    margin-top: 0 !important;
+}
 .panel + *{
-  margin-top: 17em !important; 
+  margin-top: 17em !important;
+}
+.panel.shop + *{
+  margin-top: 9.5em !important;
 }
 
 /* SPACERS */

@@ -6,6 +6,9 @@
             <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
         </router-link>
+        <a v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="accept button" href="#"></a>
+        <a v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="decline button" href="#"></a>
+        <a v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button" href="#"></a>
     </div>
 </template>
 
@@ -28,6 +31,9 @@ export default {
     line-height: 3em;
     grid-template-areas: "num detail action1 action2";
     grid-template-columns: 2.5em auto min-content min-content ;
+    * {
+        border-radius: 0;
+    }
     :first-child {
         border-radius: 5px 0 0 5px !important;
     }
@@ -68,21 +74,21 @@ a.detail{
     padding: 0 .5em 0 .5em;
     line-height: 1.1em;
     /* Status Text */
-    &.servicing::after{
-        content: "SERVICING";
-        color: $color-blue;
-    }
-    &.checkedout::after{
-        content: "CHECKED OUT";
+    // &.servicing::after{
+    //     content: "SERVICING";
+    //     color: $color-blue;
+    // }
+    // &.checkedout::after{
+    //     content: "CHECKED OUT";
+    //     color: $color-green;
+    // }
+    &.accepted::after{
+        content: "ACCEPTED";
         color: $color-green;
-    }
-    &.ready::after{
-        content: "READY";
-        color: $color-blue;
     }
     &.waiting::after{
         content: "WAITING";
-        color: black;
+        color: $color-blue;
     }
     &.expired::after{
         content: "EXPIRED";
@@ -100,6 +106,41 @@ a.detail{
     color: $color-grey50;
     font-size: 1.2em !important;
     transition: all .15s;
+}
+
+.button{
+    line-height: unset;
+    padding: 0;
+    width: 3.25rem;
+    &.accept{
+        background-color: $color-blue85;
+        border-right: 1px solid $color-grey;
+        &::before {
+            content: "\f00c";
+            font-family: 'FontAwesome';
+            display: block;
+            font-size: 1.3em;
+        }
+    }
+    &.decline{
+        background-color: $color-red85;
+        &::before{
+            content: "\f00d";
+            font-family: 'FontAwesome';
+            display: block;
+            font-size: 1.3em;
+        }
+    }
+    &.dismiss{
+        background-color: $color-grey85;
+        width: 5.9em;
+        &::before{
+            content: "DISMISS";
+            font-family: 'Kanit','Arial', sans-serif;
+            display: block;
+            font-size: 1em;
+        }
+    }
 }
 
 </style>

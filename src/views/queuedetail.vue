@@ -1,37 +1,35 @@
 <template>
   <div>
-    <div class="queueheader">
-      <div class="column group nomargin">
-        <div class="q-date">11/Sep/2017</div>
-        <div class="q-label">Queue</div>
-        <div class="q-order">{{queue.number}}</div>
-      </div>
+    <Navbar :hasBack='true' :link="'/account'"></Navbar>
+    <div class="queueheader" :class="[queue.status]">
+      <div class="q-date">11/Sep/2017</div>
+      <div class="q-label">Queue</div>
+      <div class="q-order">{{queue.number}}</div>
+      <div class="q-status">{{queue.status}}</div>
     </div>
-    <div class="q-band servicing">{{queue.status}}</div>
-    <div class="main">
-      <div class="column group">
-        <li class="lite em xspaced">{{queue.shopName}}</li>
-        <li class="lite xspaced">Shop Descriptions</li>
-        <!-- <span class="invisible mini divider"></span> -->
-        <div class=" q-action a1row group buttons">          
-          <vButton href="#" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
-          <vButton href="#" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</vButton>
-        </div>
-        <div class="big divider">Queue Timestamp</div>
-        <div class="q-time">
-          <span>12:12 PM</span><span>Registered queue</span>
-          <span>12:15 PM</span><span>Queue Ready</span>
-          <span>12:16 PM</span><span>Checked in</span>
-        </div>
+    <div class="q-detail">
+      <div class="shopname">{{queue.shopName}}</div>
+      <div class="shopdesc">Shop Descriptions</div>
+      <div class="q-action group">          
+        <vButton :link="'#'" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
+        <vButton :link="'#'" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</vButton>
+      </div>
+      <div class="big divider">Queue Timestamp</div>
+      <div class="q-time">
+        <span>12:12 PM</span><span>Registered queue</span>
+        <span>12:15 PM</span><span>Queue Ready</span>
+        <span>12:16 PM</span><span>Checked in</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Navbar from '@/components/navigationbar.vue'
 import vButton from "@/components/button.vue"
 export default {
   components: {
+    Navbar,
     vButton
   },
   props: ['data'],
@@ -59,13 +57,40 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/variable";
 .queueheader{
-  display: flex;
-  margin: 1em 0;
+  width: 100%;
   align-items: center;
   justify-content: center;
-  .q-date{
-    line-height: 2em;
-    color: unset !important
+  &.ready{
+    .q-date, .q-label, .q-order{
+      color: $color-blue;
+    }
+    .q-status{
+      background-color: $color-blue;
+    }
+  }
+  &.canceled{
+    .q-date, .q-label, .q-order{
+      color: $color-grey;
+    }
+    .q-status{
+      background-color: $color-grey;
+    }
+  }
+  &.expired{
+    .q-date, .q-label, .q-order{
+      color: $color-red;
+    }
+    .q-status{
+      background-color: $color-red;
+    }
+  }
+  &.accepted{
+    .q-date, .q-label, .q-order{
+      color: $color-green;
+    }
+    .q-status{
+      background-color: $color-green;
+    }
   }
   .q-label{
     line-height: 1em;
@@ -74,13 +99,13 @@ export default {
     user-select: none;
   }
   .q-order {
-    line-height: .8em;
+    line-height: 1em;
     font-size: 8em;
     font-weight: $font-bold;
     user-select: none;
   }
 }
-.q-band {
+.q-status {
   width: 100%;
   line-height: 1.75em;
   height: 1.75em;
@@ -89,20 +114,23 @@ export default {
   color: white;
   background-color: #2c3e50;
 }
-.main{
+.q-detail{
   width: -webkit-fill-available;
-  min-width: 300px;
-  margin: 0 25% 0 25%;
-  padding: 1em 0;
+  max-width: 400px;
+  margin: 0 1em;
+  margin-top: .5em; 
+  .shopname{
+    font-size: 1.75em;
+    text-align: left;
+  }
+  .shopdesc{
+    text-align: left;
+  }
 }
 .q-action{
-  display: flex;
-  flex-direction: row;
-  margin: 1em ($gutter * (-1)) !important;
-  > * {
-    // font-size: .8em;
-    margin: 0 $gutter/2;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: $gutter;
 }
 .q-time{
   display: grid;

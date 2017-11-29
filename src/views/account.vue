@@ -1,16 +1,37 @@
 <template>
     <div>
-        <Navbar :hasBack='false' :link="'/settings'"></Navbar>
+        <div class="nav">
+            <a class="menu link" @click="toggleAside">
+                <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
+            </a>
+            <vButton :link="'/shop1'" class="mini transparent button right">Switch to Shop</vButton>
+        </div>
+        <!-- <Navbar :hasBack='false' :link="'/settings'"> -->
+            <!-- <vButton :link="'/shop' + '1'" class="mini blue transparent button right">Manage Shop</vButton> -->
+        <!-- </Navbar> -->
         <AccountPanel class="panel">
             <div class="row group tab">
-                <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab">Reservation</a>
-                <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab">History</a>
+                <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
+                <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
         <div class="reservation account">
             <queue-item v-for="queue in data.queues" :key="queue.number" :data="queue"></queue-item>
         </div>
-        <vButton class="before-after-space huge blue transparent button" href="#">Make Reservation</vButton>
+        <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
+        <transition name="slide">
+        <div class="aside" v-if="showAside">
+            <a class="menu link" @click="toggleAside">
+                <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
+            </a>
+            <router-link :to="'/settings'" class="list link">Settings</router-link>
+            <router-link :to="'/setupshop'" class="list orange button transparent">Setup a Shop</router-link>
+            <span class="mini divider"></span>
+            <div class="list header">Shop list</div>
+            <router-link :to="'/shop1'" class="list link">Shop 1</router-link>    
+            <div class="aside-hide" @mousedown.left="closeAside"></div>
+        </div>
+        </transition>
     </div>
 </template>
 
@@ -28,37 +49,133 @@ export default {
     },
     props: ['data'],
     methods: {
-        SwitchTab(){
-            this.showingHistory = !this.showingHistory;
-            this.showingReservation = !this.showingReservation;
-        },
-    },
-    data() {
-        return {
-            showingReservation: true,
-            showingHistory: false,
+      SwitchTab(input){
+        if (input === "reservation"){
+          this.showingReservation = true;
+          this.showingHistory = false;
         }
-    },
+        else if (input === "history") {
+          this.showingReservation = false;
+          this.showingHistory = true;
+        }
+      },
+      toggleAside(){
+          this.showAside = !this.showAside
+      },
+      closeAside(){
+          this.showAside = false;
+      }
+  },
+  data() {
+      return {
+          showingReservation: true,
+          showingHistory: false,
+          showAside: false
+      }
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 @import "~@/assets/variable";
+.slide-enter-active, .slide-leave-active{
+  transition: transform .3s;
+}
+.slide-enter, .slide-leave-to{
+  transform: translateX(-275px);
+}
+.aside{
+  position: absolute;
+  display: flex;
+  flex-flow: column;
+  align-items: left;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: rgba(255,255,255,.95);
+  // background-color: rgba(64,64,64,0.9);
+  // color: white;
+  box-shadow: 0 0 12px $color-grey;
+  width: 275px;
+  height: 100%;
+  text-align: left;
+  padding: 0 .75em;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+  .button{
+    font-size: 1.2rem;
+    &.orange{
+        border-color: $color-orange;
+        color: $color-orange;
+        &.transparent{
+            background-color: transparent !important;
+        }
+        &:hover{
+            box-shadow: 0 0 3px;
+        }
+    }
+    width: 100%;
+    padding-top: .325em;
+    padding-bottom: .325em;
+    margin: .325em 0;
+    text-align: center;
+  }
+  .divider{
+    // background-color: rgba(255,255,255,.5);
+    background-color: $color-grey25;
+    width: 100%;
+  }
+  .link{
+    color: $color-blue;
+    &.orange{
+        color: $color-orange;
+    }
+  }
+  .menu{
+    color: unset;
+    display: inline-block;
+    line-height: 3.1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    user-select: none;
+    .rightspaced{
+      margin-right: .75em;
+    }
+  }
+  .list{
+    &.header{
+      font-weight: $font-bold;
+    }
+  }
+}
+.aside-hide{
+  content: "";
+  width: calc(100vw - 275px);
+  height: 100%;
+  position: absolute;
+  left: 275px;
+  // background-color: $color-grey10;
+}
+
 .panel{
     min-width: 300px;
     width: 100%;
     position: fixed;
-    // border-bottom: 1px solid $color-grey50;
     background-color: white;
     box-shadow: 0 0 10px $color-grey50;
+    z-index: 1;
+}
+.panel .tab{
+    margin: 0 auto;
+    max-width: 500px;
 }
 
 /* SECTION PROPERTIES : for text layout */
 .reservation{
+    max-width: 500px;
     width: calc(100% - 1em);
-    &.shop{
-        margin-top: 7em !important;
-    }
 }
 
 /* 
@@ -150,12 +267,6 @@ a.tab:hover{
  *  Shop Elements
  *
 */
-.cover{
-    width: 100%;
-    min-height: 200px;
-    background-color: $color-grey;
-}
-
 .main{
     width: -webkit-fill-available;
     min-width: 300px;
@@ -191,33 +302,6 @@ a.link{
     width: min-content;
     margin: auto;
     border-radius: 6px;
-}
-
-.row.group > a.copy.button{
-    margin: 0 !important;
-    width: max-content;
-    min-width: unset !important;
-    font-weight: $font-bold;
-    font-size: .9em;
-    line-height: 2rem !important;
-    padding: 0 .5rem !important;
-    cursor: pointer;
-}
-
-.shopurl{
-    min-width: calc(275px - 5.4rem);
-    border: none;
-    color: $color-grey !important;
-    background-color: $color-grey10;
-    font-size: .8em !important;
-    font-family: 'Kanit' !important;
-    font-weight: $font-normal;
-    line-height: 2rem;
-    padding: 0 .25rem;
-    cursor: text;
-}
-.shopurl:focus{
-    box-shadow: inset 0 0 3px $color-blue;
 }
 
 .queue{
@@ -296,32 +380,6 @@ a.detail:hover .q-more{
     color: $color-grey50;
     font-size: 1.2em !important;
     transition: all .15s;
-}
-
-.bubble{
-    color: white !important;
-    border: 1px solid $color-green;
-    background-color: $color-green10;
-    font-size: .85em;
-    border-radius: 5px;
-    padding: 0 .49em;
-    height: 1.62em;
-}
-.bubble.pointleft:before {
-    content: "";
-    z-index: 0;
-    position: absolute;
-    height: .5em;
-    width: .5em;
-    background-color: $color-green;
-    border: 1px solid $color-green;
-    border-top: none;
-    border-right: none;
-    transform: translate(-.75em,.5em) rotate(45deg);
-}
-
-.right.bubble{
-    margin-left: auto;
 }
 
 /* Queue Action Button Reformat */
@@ -418,80 +476,6 @@ a.dismiss.button{
         grid-column: 2 span;
     }
 }
-
-.group.form{
-    width: calc(100% - .125rem);
-    display: grid;
-    grid-template-columns: 1fr max-content;
-    position: relative;
-    text-align: left;
-}
-
-input.lite{
-    width: -webkit-fill-available;
-    box-sizing: border-box;
-    border: 0;
-    box-shadow: 0 1px $color-grey50;
-    outline: none;
-    color: $color-grey;
-    font-family: 'Kanit', sans-serif;
-    font-weight: $font-normal;
-    font-size: 1em;
-    transition: all .15s;
-}
-input.lite:focus, input.lite:valid{
-    box-shadow: 0 2px $color-red50;
-}
-input.lite:focus + label, input.lite:valid + label{
-    font-size: .8em;
-    top: -1.25em;
-    color: $color-red;
-}
-input[type=checkbox].lite {
-    display: none !important;
-}
-input[type=checkbox].lite + label{
-    border-radius: 5px;
-    border: 1px solid $color-red;
-    color: $color-red;
-    display: inline-block;
-    line-height: 3rem;
-    text-align: center;
-    width: 2.125rem;
-    position: unset;
-    margin: .75rem .125rem;
-    opacity: .5;
-}
-input[type=checkbox].lite:focus + label, input[type=checkbox].lite:valid + label{
-    font-size: 1.1em;
-    top: unset;
-    color: white;
-    background-color: $color-red;
-    border-color: transparent;
-    opacity: 1;
-}
-
-input.s-time{
-    font-size: 1.75em;
-    width: 4.2em;
-}
-
-.s-day{
-    display: block;
-    position: absolute;
-    color: $color-red;
-    font-size: .8em;
-    top: -1.25em;
-}
-
-label{
-    display: block;
-    position: absolute;
-    color: $color-grey;
-    transition: all .15s;
-    top: 0em;
-}
-
 
 /* 
  *
