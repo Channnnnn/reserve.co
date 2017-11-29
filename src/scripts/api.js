@@ -21,7 +21,7 @@ var checkShouldBeHistory = function(timestamp) {
 var getUserID = function() {
 
     if(auth.currentUser) {
-        console.log(auth.currentUser.uid)
+        //console.log(auth.currentUser.uid)
         return auth.currentUser.uid
     }
     else {
@@ -65,8 +65,8 @@ var signOut = function() {
 }
 
 //Get User's Info
-var getUserInfo = function(uid) { 
-    var ref = db.ref("users/" + uid);
+var getUserInfo = function() { 
+    var ref = db.ref("users/" + getUserID());
     var snapValue;
     
     ref.on("value", function(snapshot) {
@@ -81,7 +81,7 @@ var getUserInfo = function(uid) {
 }
 
 //Get Current Queuing
-var getUserReservation = function(uid) {
+var getUserReservation = function() {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
@@ -91,7 +91,7 @@ var getUserReservation = function(uid) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
 
-            if(childData.user_id == uid && !checkShouldBeHistory(key)) {
+            if(childData.user_id == getUserID() && !checkShouldBeHistory(key)) {
                 snapValue.push(childData)
             }
         });
@@ -105,7 +105,7 @@ var getUserReservation = function(uid) {
 }
 
 //Get Queuing History
-var getUserHistory = function(uid) {
+var getUserHistory = function() {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
@@ -115,7 +115,7 @@ var getUserHistory = function(uid) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
 
-            if(childData.user_id == uid && checkShouldBeHistory(key)) {
+            if(childData.user_id == getUserID() && checkShouldBeHistory(key)) {
                 snapValue.push(childData)
             }
         });
@@ -173,10 +173,10 @@ var getCurrentQueueNumber = function(sid) {
 
     var currentQueue;
     
-    var ref = db.ref("shops/" + sid);    
+    var ref = db.ref("shops/" + sid + "/current_queue");    
     ref.on("value", function(snapshot) {
         var snapValue = snapshot.val();
-        currentQueue = snapValue.current_queue;
+        currentQueue = snapValue;
 
     }, function(error) {
         console.log("Error while retriving Shop's Current Queue Number")
@@ -187,7 +187,7 @@ var getCurrentQueueNumber = function(sid) {
 }
 
 //Add Queue
-var addQueue = function(uid, sid) {
+var addQueue = function(sid) {
     
     var currentQueue = getCurrentQueueNumber(sid);
     
@@ -195,26 +195,26 @@ var addQueue = function(uid, sid) {
     ref.child(getCurrentUnixTimestamp()).set({
         waiting: true,
         shop_id: sid,
-        user_id: uid,
+        user_id: getUserID(),
         queue_number: currentQueue + 1
 
     }).then(function() {
         console.log("Add Queue Complete");
+        
+        var ref = db.ref("shops/" + sid);
+        ref.update({
+            "current_queue": currentQueue + 1
+            
+        }).then(function() {
+            console.log("Update Shop's Current Queue Number Complete");
+    
+        }).catch(function(error) {
+            console.log("Error while Updating Shop's Current Queue Number");
+    
+        });
 
     }).catch(function(error) {
         console.log("Error while Adding Queue");
-
-    });
-    
-    var ref = db.ref("shops/" + sid);
-    ref.update({
-        "current_queue": currentQueue + 1
-        
-    }).then(function() {
-        console.log("Update Shop's Current Queue Number Complete");
-
-    }).catch(function(error) {
-        console.log("Error while Updating Shop's Current Queue Number");
 
     });
 }
@@ -266,11 +266,11 @@ var updateQueue = function(qid, action) {
 }
 
 //Update Profile
-var updateProfile = function(uid, email, password, firstName, lastName, phoneNumber, pushNotification) {
+var updateProfile = function(email, password, firstName, lastName, phoneNumber, pushNotification) {
 
     var ref = db.ref("users");
 
-    ref.child(uid).update({
+    ref.child(getUserID()).update({
         "email": email,
         "password": password,
         "first_name": firstName,
@@ -280,54 +280,54 @@ var updateProfile = function(uid, email, password, firstName, lastName, phoneNum
 
     }).then(function() {
         console.log("Update Profile on FRTDB Complete");
+        
+            var user = auth.currentUser;
+        
+            //Update Profile
+            user.updateProfile({
+                displayName: firstName + " " + lastName,
+                photoURL: ""
+            }).then(function() {
+                console.log("Update Profile on FAuth Complete");
+                
+                    //Update Email
+                    user.updateEmail(email).then(function() {
+                        console.log("Update Email on FAuth Complete");
+                        
+                            //Update Password
+                            user.updatePassword(password).then(function() {
+                                console.log("Update Password on FAuth Complete");
+                        
+                            }).catch(function(error) {
+                                console.log("Error while Updating Password on FAuth");
+                                
+                            });
+                
+                    }).catch(function(error) {
+                        console.log("Error while Updating Email on FAuth");
+                        
+                    });
+        
+            }).catch(function(error) {
+                console.log("Error while Updating Profile on FAuth");
+                
+            });
 
     }).catch(function(error) {
         console.log("Error while Updating Profile on FRTDB");
 
     });
-
-    var user = auth.currentUser;
-
-    //Update Profile
-    user.updateProfile({
-        displayName: firstName + " " + lastName,
-        photoURL: ""
-    }).then(function() {
-        console.log("Update Profile on FAuth Complete");
-
-    }).catch(function(error) {
-        console.log("Error while Updating Profile on FAuth");
-        
-    });
-
-    //Update Email
-    user.updateEmail(email).then(function() {
-        console.log("Update Email on FAuth Complete");
-
-    }).catch(function(error) {
-        console.log("Error while Updating Email on FAuth");
-        
-    });
-
-    //Update Password
-    user.updatePassword(password).then(function() {
-        console.log("Update Password on FAuth Complete");
-
-    }).catch(function(error) {
-        console.log("Error while Updating Password on FAuth");
-        
-    });
 }
 
 //Update Shop's Info
-var updateShopInfo = function(sid, name, description, owner, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
  
     var ref = db.ref("shops");
     
     ref.child(sid).update({
         "name": name,
         "description": description,
-        "owner": owner,
+        "owner": getUserID(),
         "staffs": staffs,
         "phone_number": phoneNumber,
         "capacity": capacity,
@@ -345,14 +345,14 @@ var updateShopInfo = function(sid, name, description, owner, staffs, phoneNumber
 }
 
 //Add New Shop
-var addNewShop = function(uid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var addNewShop = function(name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
 
     var ref = db.ref("shops");
 
     ref.push().set({
         "name": name,
         "description": description,
-        "owner": uid,
+        "owner": getUserID(),
         "staffs": staffs,
         "phone_number": phoneNumber,
         "capacity": capacity,
