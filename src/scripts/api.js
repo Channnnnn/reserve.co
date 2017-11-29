@@ -420,7 +420,7 @@ var checkUserUsernameAvailability = function(username, callback) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
     
-            if(childData.username == username) {
+            if(childData.username.toLowerCase() == username.toLowerCase()) {
                 avalability = false;
             }
         });
@@ -446,7 +446,7 @@ var checkShopUsernameAvailability = function(username, callback) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
     
-            if(key == username) {
+            if(key.toLowerCase() == username.toLowerCase()) {
                 avalability = false;
             }
         });

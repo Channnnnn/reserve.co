@@ -159,7 +159,7 @@ export default {
       });
     },
     checkShopUsernameAvailability(){
-      checkShopUsernameAvailability("MekMek", function(availability) {
+      checkShopUsernameAvailability("mekmek", function(availability) {
           console.log(availability);
       });
     }
