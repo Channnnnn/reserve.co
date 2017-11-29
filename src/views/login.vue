@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="getUserID">Login</a>
+          <a class="button blue" @click="checkShopUsernameAvailability">Login</a>
         </div>
       </div>
       </transition>
@@ -69,7 +69,7 @@
 import {
             addNewUser,
             signIn,
-            signInUsingUsername,
+            signInWithUsername,
             signOut,
             getUserID,
             getUserInfo, 
@@ -81,7 +81,9 @@ import {
             updateQueue,
             updateProfile,
             updateShopInfo,
-            addNewShop
+            addNewShop,
+            checkUserUsernameAvailability,
+            checkShopUsernameAvailability
 } from "@/scripts/api.js"
 
 export default {
@@ -93,8 +95,8 @@ export default {
     signIn(){
       signIn("test@jongja.com", "testjongja", false);
     },
-    signInUsingUsername(){
-      signInUsingUsername("mekmekja", "mekmekja");
+    signInWithUsername(){
+      signInWithUsername("mekmekja", "mekmekja");
     },
     signOut(){
       signOut();
@@ -151,6 +153,16 @@ export default {
       this.login = true;
       this.register = false;
     },
+    checkUserUsernameAvailability(){
+      checkUserUsernameAvailability("mekmekja", function(availability) {
+          console.log(availability);
+      });
+    },
+    checkShopUsernameAvailability(){
+      checkShopUsernameAvailability("MekMek", function(availability) {
+          console.log(availability);
+      });
+    }
   },
   data(){
     return{

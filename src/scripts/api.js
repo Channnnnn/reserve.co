@@ -408,6 +408,58 @@ var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity,
     });
 }
 
+//Check Existing User's Username
+var checkUserUsernameAvailability = function(username, callback) {
+    
+    var ref = db.ref("users");
+    
+    ref.once("value").then(function(snapshot) {
+        let avalability = true;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(childData.username == username) {
+                avalability = false;
+            }
+        });
+
+        callback(avalability);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving User's Username");
+        console.log(error.code);
+        callback(false);
+    });
+}
+
+//Check Existing Shop's Username
+var checkShopUsernameAvailability = function(username, callback) {
+    
+    var ref = db.ref("shops");
+    
+    ref.once("value").then(function(snapshot) {
+        let avalability = true;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(key == username) {
+                avalability = false;
+            }
+        });
+
+        callback(avalability);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving Shop's Username");
+        console.log(error.code);
+        callback(false);
+    });
+}
+
 export {
             addNewUser,
             signIn,
@@ -423,5 +475,7 @@ export {
             updateQueue,
             updateProfile,
             updateShopInfo,
-            addNewShop
+            addNewShop,
+            checkUserUsernameAvailability,
+            checkShopUsernameAvailability
 }
