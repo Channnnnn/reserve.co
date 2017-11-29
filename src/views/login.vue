@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="getUserHistory">Login</a>
+          <a class="button blue" @click="addNewUser">Login</a>
         </div>
       </div>
       </transition>
@@ -87,7 +87,7 @@ export default {
   name: 'login',
   methods: {
     addNewUser(){
-      addNewUser("tester@jongja.com", "testerjongja");
+      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
     },
     signIn(){
       signIn("test@jongja.com", "testjongja");
@@ -131,13 +131,13 @@ export default {
       updateQueue("1511962120","accept");
     },
     updateProfile(){
-      updateProfile("tester@jongja.com", "testerjongja", "Tester", "JongJa", "01 2345 6789", true);
+      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true);
     },
     updateShopInfo(){
       updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     },
     addNewShop(){
-      addNewShop("Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     },
     registerDialog(){
       this.register = true;

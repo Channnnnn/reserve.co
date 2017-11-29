@@ -31,9 +31,11 @@ var getUserID = function() {
 }
 
 //Register New User
-var addNewUser = function(email, password) {
+var addNewUser = function(username, phoneNumber, email, password) {
     auth.createUserWithEmailAndPassword(email, password).then(function() {
         console.log("Registering Complete");
+
+        updateProfile(username, email, password, "", "", phoneNumber, true);
 
     }).catch(function(error) {
         console.log("Error while Registering New User");
@@ -270,13 +272,13 @@ var updateQueue = function(qid, action) {
 }
 
 //Update Profile
-var updateProfile = function(email, password, firstName, lastName, phoneNumber, pushNotification) {
+var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification) {
 
     var ref = db.ref("users");
 
     ref.child(getUserID()).update({
+        "username": username,
         "email": email,
-        "password": password,
         "first_name": firstName,
         "last_name": lastName,
         "phone_number": phoneNumber,
@@ -349,11 +351,11 @@ var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capac
 }
 
 //Add New Shop
-var addNewShop = function(name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
 
     var ref = db.ref("shops");
 
-    ref.push().set({
+    ref.child(sid).set({
         "name": name,
         "description": description,
         "owner": getUserID(),
