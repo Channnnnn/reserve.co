@@ -1,6 +1,16 @@
 <template>
   <div>
-    <Navbar :hasBack='true' :link="'/account'"></Navbar>
+    <div v-if="routeType==='shop'" class="nav orange">
+        <router-link :to="'/managequeue'" class="menu link">
+            <div class="fa fa-arrow-left rightspaced"></div>ALL RESERVATIONS
+        </router-link>
+    </div>
+    <div v-if="routeType==='user'" class="nav blue">
+        <router-link :to="'/account'" class="menu link">
+            <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
+        </router-link>
+    </div>
+    <!-- <Navbar :hasBack='true' :link="'/account'"></Navbar> -->
     <div class="queueheader" :class="[queue.status]">
       <div class="q-date">11/Sep/2017</div>
       <div class="q-label">Queue</div>
@@ -8,12 +18,25 @@
       <div class="q-status">{{queue.status}}</div>
     </div>
     <div class="q-detail">
-      <div class="shopname">{{queue.shopName}}</div>
-      <div class="shopdesc">Shop Descriptions</div>
-      <div class="q-action group">          
-        <vButton :link="'#'" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
-        <vButton :link="'#'" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</vButton>
+      <div v-if="routeType==='user'" class="shopname">{{queue.shopName}}</div>
+      <div v-if="routeType==='user'" class="shopdesc">Shop Descriptions</div>
+      <div v-if="routeType==='user' && queue.status === 'waiting'" class="q-action">          
+        <vButton :link="'/shop2'" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
+        <a @click="queueCancel" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</a>
       </div>
+      <div v-if="routeType==='user' && (['accepted', 'expired', 'canceled'].includes(queue.status))" class="q-action">          
+        <vButton :link="'/shop2'" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
+      </div>
+
+      <div v-if="routeType==='shop'" class="username">User's name</div>
+      <div v-if="routeType==='shop'" class="userphone">User's phone no.</div>
+      <div v-if="routeType==='shop' && queue.status === 'waiting'" class="q-action">          
+        <a @click="queueAccept" class="green button fullwidth"><div class="fa fa-check rightspaced"></div>Accept</a>
+        <a @click="queueDecline" class="red button fullwidth"><div class="fa fa-times rightspaced"></div>Decline</a>
+      </div>
+      <!-- <div v-if="routeType==='shop' && (['accepted', 'expired', 'canceled'].includes(queue.status))" class="q-action">          
+        <vButton :link="'/shop2'" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
+      </div> -->
       <div class="big divider">Queue Timestamp</div>
       <div class="q-time">
         <span>12:12 PM</span><span>Registered queue</span>
@@ -35,6 +58,7 @@ export default {
   props: ['data'],
   data(){
     return{
+      routeType: 'user',
       queue: null,
     }
   },
@@ -46,6 +70,27 @@ export default {
           this.queue = q;
         }
       });
+    },
+    queueCancel(){
+      this.queue.status = 'canceled'
+    },
+    queueAccept(){
+      this.queue.status = 'accepted'
+    },
+    queueDecline(){
+      this.queue.status = 'expired'
+    }
+  },
+  beforeRouteEnter(to,from,next){
+    if (from.name === 'account' || from.name === 'shop') {
+      next(vm => {
+        vm.routeType = 'user';
+      })
+    }
+    else if (from.name === 'managequeue'){
+      next(vm => {
+        vm.routeType = 'shop';  
+      })
     }
   },
   beforeMount(){
@@ -119,18 +164,20 @@ export default {
   max-width: 400px;
   margin: 0 1em;
   margin-top: .5em; 
-  .shopname{
+  .shopname, .username{
     font-size: 1.75em;
     text-align: left;
   }
-  .shopdesc{
+  .shopdesc, .userphone{
     text-align: left;
   }
 }
 .q-action{
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column; 
+  grid-template-columns: auto;
   grid-gap: $gutter;
+  margin: 1em 0;
 }
 .q-time{
   display: grid;

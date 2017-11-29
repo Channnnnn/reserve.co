@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="nav">
+        <div class="nav blue">
             <a class="menu link" @click="toggleAside">
                 <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
             </a>
@@ -24,13 +24,15 @@
             <a class="menu link" @click="toggleAside">
                 <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
             </a>
-            <router-link :to="'/settings'" class="list link">Settings</router-link>
+            <router-link :to="'/settings'" class="list blue link">Settings</router-link>
             <router-link :to="'/setupshop'" class="list orange button transparent">Setup a Shop</router-link>
             <span class="mini divider"></span>
             <div class="list header">Shop list</div>
-            <router-link :to="'/shop1'" class="list link">Shop 1</router-link>    
-            <div class="aside-hide" @mousedown.left="closeAside"></div>
+            <router-link :to="'/shop1'" class="list blue link">Shop 1</router-link>    
         </div>
+        </transition>
+        <transition name="fade">
+            <div v-if="showAside" class="aside-hide" @mousedown.left="closeAside" key="not-aside"></div>
         </transition>
     </div>
 </template>
@@ -149,14 +151,6 @@ export default {
       font-weight: $font-bold;
     }
   }
-}
-.aside-hide{
-  content: "";
-  width: calc(100vw - 275px);
-  height: 100%;
-  position: absolute;
-  left: 275px;
-  // background-color: $color-grey10;
 }
 
 .panel{

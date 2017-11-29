@@ -1,6 +1,10 @@
 <template>
   <div>
-    <Navbar :link="'/shop1'" class="orange" :hasBack="true"></Navbar>
+    <div class="nav orange">
+        <router-link :to="'/shop1'" class="menu link">
+            <div class="fa fa-arrow-left rightspaced"></div>MY SHOP
+        </router-link>
+    </div>
     <div class="panel shop">
       <h2>Shop Name Reservation</h2>
       <div class="row group tab">

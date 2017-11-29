@@ -3,7 +3,7 @@
     <div v-if="!auth" class="ghost nav">
       <vButton :link="'/login'" class="mini transparent button right">Login</vButton>
     </div>
-    <div v-if="!owner && auth" class="nav"><!-- Show this instead if not owner -->
+    <div v-if="!owner && auth" class="nav blue"><!-- Show this instead if not owner -->
       <router-link :to="'/account'" class="menu link">
         <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
       </router-link>
@@ -49,8 +49,10 @@
       <router-link :to="'/shop2'" @click.native="closeAside" class="list link orange">Shop 1</router-link>
       <!-- <span class="mini divider"></span> -->
       <!-- <router-link :to="'/account'" class="list link blue">Return to Account</router-link> -->
-      <div class="aside-hide" @mousedown.left="closeAside"></div>
     </div>
+    </transition>
+    <transition name="fade">
+      <div v-if="showAside" class="aside-hide" @mousedown.left="closeAside" key="not-aside"></div>
     </transition>
   </div>
 </template>
@@ -74,7 +76,7 @@ export default {
   data() {
     return{
       auth: true,
-      owner: false,
+      owner: true,
       s: 'Shop descriptions',
       showAside: false
     }
@@ -265,14 +267,6 @@ export default {
       font-weight: $font-bold;
     }
   }
-}
-.aside-hide{
-  content: "";
-  width: calc(100vw - 275px);
-  height: 100%;
-  position: absolute;
-  left: 275px;
-  // background-color: $color-grey10;
 }
 </style>
 

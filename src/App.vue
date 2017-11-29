@@ -207,7 +207,36 @@ a.button{
   }
 }
 a.link:hover, a.button:hover, input[type=checkbox].lite + label:hover{
-    opacity: 1;
+  opacity: 1;
+}
+a.link{
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: background-color .15s;
+  &.blue:hover{
+    background-color: $color-blue10;
+  }
+  &.red:hover{
+    background-color: $color-red10;
+  }
+  &.orange:hover{
+    background-color: $color-orange10;
+  }
+  &.greed:hover{
+    background-color: $color-green10;
+  }
+}
+.orange .link:hover{
+  background-color: $color-orange10;
+}
+.blue .link:hover{
+  background-color: $color-blue10;
+}
+.red .link:hover{
+  background-color: $color-red10;
+}
+.green .link:hover{
+  background-color: $color-green10;
 }
 /* 
  *  TAB COMPONENTS
@@ -258,6 +287,100 @@ a {
         opacity: .1;
         cursor: unset;
     }
+}
+a.button{
+    display: inline-block;
+    border-radius: 5px;
+    padding: .6em 1em;
+    box-sizing: border-box;
+    min-width: 150px;
+    line-height: 0.9;
+    color: white;
+    background-color: $color-grey;
+    opacity: $opacity-link;
+    &:hover{
+        opacity: 1;
+    }
+    &.blue{
+        background-color: $color-blue !important;
+    }
+    &.red{
+        background-color: $color-red !important;
+    }
+    &.green{
+        background-color: $color-green !important;
+    }
+    &.orange{
+        background-color: $color-orange !important;
+    }
+    &.disabled, &.disabled:hover{
+        background-color: $color-grey !important;
+        opacity: .25;
+        cursor: unset;
+    }
+    &.transparent{
+        border: 1px solid $color-blue !important;
+        color: $color-blue !important;
+        background-color: transparent !important;
+        &:hover{
+            filter: brightness(.75) saturate(1.5);
+        }
+        &.red{
+            border-color: $color-red !important;
+            color: $color-red !important;
+            background-color: transparent !important;
+        }
+        &.blue{
+            border-color: $color-blue !important;
+            color: $color-blue !important;
+            background-color: transparent !important;
+        }
+        &.orange{
+            border-color: $color-orange !important;
+            color: $color-orange !important;
+            background-color: transparent !important;
+        }
+        &.disabled, &.disabled:hover{
+            border-color: $color-grey !important;
+            color: $color-grey !important;
+            background-color: transparent !important;
+            opacity: .25;
+            cursor: unset;
+        }
+    }
+    &.em{
+        font-size: 1.1rem;
+    }
+    &.wide{
+        display: block !important;
+    }
+    &.micro { /* Single Icon button */
+        font-size: inherit;
+        height: 2em;
+        min-width: 2em;
+        margin: 0;
+        text-align: center;
+        align-self: center;
+    }
+    &.mini { /* Navbar Button */
+        font-size: .8em;
+        padding: .5em .75em;
+        min-width: 100px;
+        & .fa:first-child {
+            margin: -.1em .25em 0 0;
+        }
+    }
+    &.huge{
+        font-size: 1.5em;
+        font-weight: $font-bold;
+        margin: .5em 0 .5em 0;
+        &.transparent{
+            font-weight:  $font-normal;
+        }
+    }    
+}
+.fullwidth {
+    width: 100% !important;
 }
 
 li.lite{
@@ -333,6 +456,25 @@ li.lite{
     }
 }
 
+.aside-hide{
+  @media screen and (max-width: 450px) {
+    background-color: rgba(0,0,0,.5);
+  }
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  mix-blend-mode: multiply;
+}
+.fade-enter-active, .fade-leave-active{
+  transition: opacity .15s;
+}
+
+.fade-enter, .fade-leave-to{
+  opacity: 0;
+}
 
 .rightspaced{
     margin-left: .25em;

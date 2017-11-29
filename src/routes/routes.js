@@ -3,7 +3,7 @@ import Account from '@/views/account'
 import Queue from '@/views/queuedetail'
 import Settings from '@/views/setting'
 import Shop from '@/views/shop'
-import EditShop from '@/views/shopedit'
+import FormShop from '@/views/shopform'
 import QueueShop from '@/views/shopqueue'
 
 export default [
@@ -39,11 +39,16 @@ export default [
   {
     path: '/editshop',
     name: 'editshop',
-    component: EditShop
+    component: FormShop
   },
   {
     path: '/managequeue',
     name: 'managequeue',
     component: QueueShop
+  },
+  {
+    path: '/setupshop',
+    name: 'setupshop',
+    component: FormShop
   }
 ]

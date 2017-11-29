@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="nav">
+    <div class="nav blue">
         <router-link :to="'/account'" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
         </router-link>
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div class="section">
-      <vButton :link="'#'" class="orange transparent button">
+      <vButton :link="'/setupshop'" class="orange transparent button">
         <div class="fa fa-shopping-bag"></div>
       Setup a Shop</vButton>
     </div>

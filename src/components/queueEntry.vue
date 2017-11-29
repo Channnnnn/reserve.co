@@ -6,16 +6,24 @@
             <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
         </router-link>
-        <a v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="accept button" href="#"></a>
-        <a v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="decline button" href="#"></a>
-        <a v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button" href="#"></a>
+        <a @click="queueAccept" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="accept button"></a>
+        <a @click="queueDecline" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="decline button"></a>
+        <!-- <a @click="queueDismiss" v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button"></a> -->
     </div>
 </template>
 
 <script>
 export default {
     name: 'queue',
-    props: ['data']
+    props: ['data'],
+    methods: {
+        queueAccept(){
+            this.data.status = 'accepted'
+        },
+        queueDecline(){
+            this.data.status = 'expired'
+        },
+    }
 }
 </script>
 
@@ -112,6 +120,7 @@ a.detail{
     line-height: unset;
     padding: 0;
     width: 3.25rem;
+    min-width: unset;
     &.accept{
         background-color: $color-blue85;
         border-right: 1px solid $color-grey;
