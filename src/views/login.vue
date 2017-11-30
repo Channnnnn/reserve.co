@@ -227,13 +227,11 @@ export default {
           console.log('Submitting registeration...');
           
           var payload = this.register;
-          addNewUser(payload.username, payload.phone, payload.email, payload.passward1);
-          
-          var uid = getUserID();
-          if (uid){
-
-            this.$router.push({name: 'account'});
-          }
+          addNewUser(payload.username, payload.phone, payload.email, payload.passward1, function(result){
+            if (result.status){
+              this.$router.push({name: 'account'});
+            }
+          });
         }
         else {  
           alert('Please correct all errors and try again.');

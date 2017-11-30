@@ -38,7 +38,7 @@ var getUserID = function() {
 }
 
 //Register New User
-var addNewUser = function(username, phoneNumber, email, callback) {
+var addNewUser = function(username, phoneNumber, email, password, callback) {
     auth.createUserWithEmailAndPassword(email, password).then(function() {
         console.log("Registering Complete");
 
