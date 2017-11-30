@@ -98,16 +98,18 @@ var signOut = function() {
 }
 
 //Get User's Info
-var getUserInfo = function() { 
+var getUserInfo = function(trash, callback) { 
     var ref = db.ref("users/" + getUserID());
     var snapValue;
     
     ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
+        callback({data: snapValue});
 
     }, function(error) {
         console.log("Error while retriving User's Info");
         console.log(error.code);
+        callback(null);
     });
 
     return {data: snapValue};
