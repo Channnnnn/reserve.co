@@ -38,87 +38,108 @@ var getUserID = function() {
 }
 
 //Register New User
-var addNewUser = function(username, phoneNumber, email, password) {
+var addNewUser = function(username, phoneNumber, email, callback) {
     auth.createUserWithEmailAndPassword(email, password).then(function() {
         console.log("Registering Complete");
 
         _username = username;
         _phoneNumber = phoneNumber;
 
-        signIn(email, password, true);
+        signIn(email, password, true, function(result) {
+            callback({status: result.status});
+        });
         
     }).catch(function(error) {
         console.log("Error while Registering New User");
         console.log(error.code);
+        callback({status: false});
     });
 }
 
 //Sign In With Username
-var signInWithUsername = function(username, password) {
+var signInWithUsername = function(username, password, callback) {
     var ref = db.ref("users");
+    var processedCount = 0;
+    var found = false;
 
     ref.once("value").then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
+            processedCount++;
 
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
 
             if(childData.username == username) {
-                signIn(childData.email, password, false);
+                found = true;
+                signIn(childData.email, password, false, function(result) {
+                    callback({status: result.status});
+                });
+            }
+            if(processedCount == snapshot.numChildren() && !found) {
+                callback({status: false});
             }
         });
 
     }).catch(function(error) {
         console.log("Error while retrieving Username");
         console.log(error.code);
+        callback({status: false});
     });
 }
 
 //Sign In
-var signIn = function(email, password, isComingFromRegister) {
+var signIn = function(email, password, isComingFromRegister, callback) {
     auth.signInWithEmailAndPassword(email, password).then(function() {
         console.log("Signed In");
 
         if(isComingFromRegister) {
-            updateProfile(_username, email, password, "", "", _phoneNumber, true);            
+            updateProfile(_username, email, password, "", "", _phoneNumber, true, function(result) {
+                callback({status: result.status});
+            });            
+        }
+        else {
+            callback({status: true});
         }
 
     }).catch(function(error) {
         console.log("Error while Signing In");
         console.log(error.code);
+        callback({status: false});
     });
 
 }
 
 //Sign Out
-var signOut = function() {
+var signOut = function(trash, callback) {
     auth.signOut().then(function() {
         console.log("Signed Out");
+        callback({status: true});
 
     }).catch(function(error) {
         console.log("Error while Signing Out");
         console.log(error.code);
+        callback({status: false});
     });
 }
 
 //Get User's Info
-var getUserInfo = function() { 
+var getUserInfo = function(trash, callback) { 
     var ref = db.ref("users/" + getUserID());
     var snapValue;
     
     ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
+        callback({status: true, data: snapValue});
 
     }, function(error) {
         console.log("Error while retrieving User's Info");
         console.log(error.code);
+        callback({status: false});
     });
-
-    return {data: snapValue};
 }
 
 //Get Current Queuing
-var getUserReservation = function() {
+var getUserReservation = function(trash, callback) {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
@@ -132,17 +153,17 @@ var getUserReservation = function() {
                 snapValue.push(childData)
             }
         });
+        callback({status: true, data: snapValue});
 
     }, function(error) {
         console.log("Error while retrieving Reservation");
         console.log(error.code);
+        callback({status: false});
     });
-
-    return {data: snapValue};
 }
 
 //Get Queuing History
-var getUserHistory = function() {
+var getUserHistory = function(trash, callback) {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
     var keyForExpired = [];
@@ -162,33 +183,33 @@ var getUserHistory = function() {
                 snapValue.push(childData);
             }
         });
+        callback({status: true, data: snapValue});
 
     }, function(error) {
         console.log("Error while retrieving History")
         console.log(error.code);
+        callback({status: false});
     });
-
-    return {data: snapValue};
 }
 
 //Get Shop's Info
-var getShopInfo = function(sid) {
+var getShopInfo = function(sid, callback) {
     var ref = db.ref("shops/" + sid);
     var snapValue;
     
     ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
+        callback({status: true, data: snapValue});
 
     }, function(error) {
         console.log("Error while retrieving Shop's Info")
         console.log(error.code);
+        callback({status: false});
     });
-
-    return {data: snapValue};
 }
 
 //Get Shop's Queues
-var getShopQueues = function(sid) {
+var getShopQueues = function(sid, callback) {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
@@ -202,16 +223,16 @@ var getShopQueues = function(sid) {
                 snapValue.push(childData)
             }
         });
+        callback({status: true, data: snapValue});
 
     }, function(error) {
         console.log("Error while retrieving Shop's Queues")
         console.log(error.code);
+        callback({status: false});
     });
-
-    return {data: snapValue};
 }
 //Add Queue
-var addQueue = function(sid) {
+var addQueue = function(sid, callback) {
     
     var currentQueue;
     var currentTime = getCurrentUnixTimestamp();
@@ -243,25 +264,29 @@ var addQueue = function(sid) {
                 
             }).then(function() {
                 console.log("Update Shop's Current Queue Complete");
+                callback({status: true});
         
             }).catch(function(error) {
                 console.log("Error while Updating Shop's Current Queue");
+                callback({status: false});
         
             });
     
         }).catch(function(error) {
             console.log("Error while Adding Queue");
+            callback({status: false});
     
         });
 
     }, function(error) {
         console.log("Error while Adding Queues")
         console.log(error.code);
+        callback({status: false});
     });
 }
 
 //Update Queue
-var updateQueue = function(qid, action) {
+var updateQueue = function(qid, action, callback) {
     
     var ref = db.ref("queues");
     var actionValid = true
@@ -298,11 +323,16 @@ var updateQueue = function(qid, action) {
             
         }).then(function() {
             console.log("Update Queue's Data Complete");
+            callback({status: true});
     
         }).catch(function(error) {
             console.log("Error while Updating Queue's Data");
+            callback({status: false});
     
         });
+    }
+    else {
+        callback({status: false});
     }
 }
 
@@ -314,7 +344,7 @@ var updateQueue = function(qid, action) {
 
 
 //Update Profile
-var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification) {
+var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification, callback) {
 
     var ref = db.ref("users");
 
@@ -345,30 +375,35 @@ var updateProfile = function(username, email, password, firstName, lastName, pho
                             //Update Password
                             user.updatePassword(password).then(function() {
                                 console.log("Update Password on FAuth Complete");
+                                callback({status: true});
                         
                             }).catch(function(error) {
                                 console.log("Error while Updating Password on FAuth");
+                                callback({status: false});
                                 
                             });
                 
                     }).catch(function(error) {
                         console.log("Error while Updating Email on FAuth");
+                        callback({status: false});
                         
                     });
         
             }).catch(function(error) {
                 console.log("Error while Updating Profile on FAuth");
+                callback({status: false});
                 
             });
 
     }).catch(function(error) {
         console.log("Error while Updating Profile on FRTDB");
+        callback({status: false});
 
     });
 }
 
 //Update Shop's Info
-var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays, callback) {
  
     var ref = db.ref("shops");
     
@@ -385,15 +420,17 @@ var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capac
         
     }).then(function() {
         console.log("Update Shop's Info Complete");
+        callback({status: true});
 
     }).catch(function(error) {
         console.log("Error while Updating Shop's Info");
+        callback({status: false});
 
     });
 }
 
 //Add New Shop
-var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays, callback) {
 
     var ref = db.ref("shops");
 
@@ -412,9 +449,11 @@ var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity,
         
     }).then(function() {
         console.log("Add New Shop Complete");
+        callback({status: true});
 
     }).catch(function(error) {
         console.log("Error while Adding New Shop");
+        callback({status: false});
 
     });
 }

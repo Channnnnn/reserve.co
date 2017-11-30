@@ -3,7 +3,7 @@
     <div class="header">RESERVE.CO</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
-      <transition-group name="fade" mode="out-in">
+      <transition name="fade" mode="out-in">
       <div v-if="isRegister" class="registerDialog" key="reg">
         <h2>Create new account</h2>
         <div class="form">
@@ -78,7 +78,7 @@
           <a class="button blue" @click="loginAuthentacation">Login</a>
         </div>
       </div>
-      </transition-group>
+      </transition>
       <a @click="registerDialog" class="button green" v-if="!isRegister && !isLogin">Register</a>
       <a @click="registerDialog" class="button transparent green" v-if="!isRegister && isLogin">or Register new account</a>
       <a @click="loginDialog" class="button blue" v-if="!isRegister && !isLogin">Login</a>
@@ -130,7 +130,7 @@ import {
 } from "@/scripts/api.js"
 
 const config = {
-    errorBagName: 'errors', // change if property conflicts
+    errorBagName: 'errors',
     fieldsBagName: 'fields',
     delay: 0,
     locale: 'en',
@@ -150,6 +150,7 @@ const config = {
     validity: false,
     aria: true
 };
+
 Vue.use(vee,config);
 
 export default {
@@ -252,60 +253,84 @@ export default {
     },
     
     addNewUser(){
-      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
+      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja", function(result) {
+          console.log(result);
+      });
     },
     signIn(){
-      signIn("test@jongja.com", "testjongja", false);
+      signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
+          console.log(result);
+      });
+      // signIn("test@jongja.com", "testjongja", false, function(result) {
+      //     console.log(result);
+      // });
     },
     signInWithUsername(){
-      signInWithUsername("mekmekja", "mekmekja");
+      signInWithUsername("chanchai", "ch@nch.ai", function(result) {
+          console.log(result);
+      });
+      // signInWithUsername("mekmekja", "mekmekja", function(result) {
+      //     console.log(result);
+      // });
     },
     signOut(){
-      signOut();
+      signOut("trash", function(result) {
+          console.log(result);
+      });
     },
     getUserID(){
       var uid = getUserID();
       console.log(uid);
     },
     getUserInfo(){
-      var result = getUserInfo();
-
-      console.log(result.data)
+      getUserInfo("trash", function(result) {
+          console.log(result);
+      });
     },
     getUserReservation(){
-      var result = getUserReservation();
-
-      console.log(result.data)
+      getUserReservation("trash", function(result) {
+          console.log(result);
+      });
     },
     getUserHistory(){
-      var result = getUserHistory();
-
-      console.log(result.data)
+      getUserHistory("trash", function(result) {
+          console.log(result);
+      });
     },
     getShopInfo(){
-      var result = getShopInfo("-L-10WCvFxAdpCl0D5OJ");
-
-      console.log(result.data)
+      getShopInfo("MekMek", function(result) {
+          console.log(result);
+      });
     },
     getShopQueues(){
-      var result = getShopQueues("-L-10WCvFxAdpCl0D5OJ");
-
-      console.log(result.data)
+      getShopQueues("MekMek", function(result) {
+          console.log(result);
+      });
     },
     addQueue(){
-      addQueue("MekMek");
+      addQueue("MekMek", function(result) {
+          console.log(result);
+      });
     },
     updateQueue(){
-      updateQueue("1511971409","accept");
+      updateQueue("1511971409","accept", function(result) {
+          console.log(result);
+      });
     },
     updateProfile(){
-      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true);
+      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true, function(result) {
+          console.log(result);
+      });
     },
     updateShopInfo(){
-      updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
+          console.log(result);
+      });
     },
     addNewShop(){
-      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
+          console.log(result);
+      });
     },
     registerDialog(){
       this.isRegister = true;
@@ -472,11 +497,11 @@ export default {
         top: -1.25em;
         color: $color-blue;
       }
-      &.invalid{
-        box-shadow: 0 2px $color-orange;
-        & + label{
-          color: $color-orange;
-        }
+    }
+    &.invalid{
+      box-shadow: 0 2px $color-orange;
+      & + label{
+        color: $color-orange;
       }
     }
     label{
