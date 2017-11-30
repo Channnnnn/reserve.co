@@ -36,7 +36,7 @@
             <input required type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="getUserInfo">Login</a>
+          <a class="button blue" @click="getShopInfo">Login</a>
         </div>
       </div>
       </transition>
@@ -91,60 +91,84 @@ export default {
   name: 'login',
   methods: {
     addNewUser(){
-      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
+      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja", function(result) {
+          console.log(result);
+      });
     },
     signIn(){
-      signIn("ch@nch.ai", "ch@nch.ai", false);
+      signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
+          console.log(result);
+      });
+      // signIn("test@jongja.com", "testjongja", false, function(result) {
+      //     console.log(result);
+      // });
     },
     signInWithUsername(){
-      signInWithUsername("mekmekja", "mekmekja");
+      signInWithUsername("chanchai", "ch@nch.ai", function(result) {
+          console.log(result);
+      });
+      // signInWithUsername("mekmekja", "mekmekja", function(result) {
+      //     console.log(result);
+      // });
     },
     signOut(){
-      signOut();
+      signOut("trash", function(result) {
+          console.log(result);
+      });
     },
     getUserID(){
       var uid = getUserID();
       console.log(uid);
     },
     getUserInfo(){
-      getUserInfo("value", function(result) {
-          console.log(result.data);
+      getUserInfo("trash", function(result) {
+          console.log(result);
       });
     },
     getUserReservation(){
-      var result = getUserReservation();
-
-      console.log(result.data)
+      getUserReservation("trash", function(result) {
+          console.log(result);
+      });
     },
     getUserHistory(){
-      var result = getUserHistory();
-
-      console.log(result.data)
+      getUserHistory("trash", function(result) {
+          console.log(result);
+      });
     },
     getShopInfo(){
-      var result = getShopInfo("-L-10WCvFxAdpCl0D5OJ");
-
-      console.log(result.data)
+      getShopInfo("MekMek", function(result) {
+          console.log(result);
+      });
     },
     getShopQueues(){
-      var result = getShopQueues("-L-10WCvFxAdpCl0D5OJ");
-
-      console.log(result.data)
+      getShopQueues("MekMek", function(result) {
+          console.log(result);
+      });
     },
     addQueue(){
-      addQueue("MekMek");
+      addQueue("MekMek", function(result) {
+          console.log(result);
+      });
     },
     updateQueue(){
-      updateQueue("1511971409","accept");
+      updateQueue("1511971409","accept", function(result) {
+          console.log(result);
+      });
     },
     updateProfile(){
-      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true);
+      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true, function(result) {
+          console.log(result);
+      });
     },
     updateShopInfo(){
-      updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
+          console.log(result);
+      });
     },
     addNewShop(){
-      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
+          console.log(result);
+      });
     },
     registerDialog(){
       this.register = true;
