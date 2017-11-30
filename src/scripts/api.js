@@ -1,5 +1,8 @@
 import {db, auth} from "@/scripts/firebase_config.js"
 
+var _username;
+var _phoneNumber;
+
 //Get Current UNIX Timestamp
 var getCurrentUnixTimestamp = function() {
 
@@ -31,20 +34,50 @@ var getUserID = function() {
 }
 
 //Register New User
-var addNewUser = function(email, password) {
+var addNewUser = function(username, phoneNumber, email, password) {
     auth.createUserWithEmailAndPassword(email, password).then(function() {
         console.log("Registering Complete");
 
+        _username = username;
+        _phoneNumber = phoneNumber;
+
+        signIn(email, password, true);
+        
     }).catch(function(error) {
         console.log("Error while Registering New User");
         console.log(error.code);
     });
 }
 
+//Sign In With Username
+var signInWithUsername = function(username, password) {
+    var ref = db.ref("users");
+
+    ref.once("value").then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+
+            if(childData.username == username) {
+                signIn(childData.email, password, false);
+            }
+        });
+
+    }).catch(function(error) {
+        console.log("Error while retriving Username");
+        console.log(error.code);
+    });
+}
+
 //Sign In
-var signIn = function(email, password) {
+var signIn = function(email, password, isComingFromRegister) {
     auth.signInWithEmailAndPassword(email, password).then(function() {
         console.log("Signed In");
+
+        if(isComingFromRegister) {
+            updateProfile(_username, email, password, "", "", _phoneNumber, true);            
+        }
 
     }).catch(function(error) {
         console.log("Error while Signing In");
@@ -69,7 +102,7 @@ var getUserInfo = function() {
     var ref = db.ref("users/" + getUserID());
     var snapValue;
     
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
 
     }, function(error) {
@@ -85,7 +118,7 @@ var getUserReservation = function() {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -110,7 +143,7 @@ var getUserHistory = function() {
     var snapValue = [];
     var keyForExpired = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -139,7 +172,7 @@ var getShopInfo = function(sid) {
     var ref = db.ref("shops/" + sid);
     var snapValue;
     
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapValue = snapshot.val();
 
     }, function(error) {
@@ -155,7 +188,7 @@ var getShopQueues = function(sid) {
     var ref = db.ref("queues").orderByKey();
     var snapValue = [];
 
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
         
             var key = childSnapshot.key;
@@ -173,36 +206,20 @@ var getShopQueues = function(sid) {
 
     return {data: snapValue};
 }
-
-//Get Current Shop's Queue Number
-var getCurrentQueueNumber = function(sid) {
-
-    var currentQueue;
-    
-    var ref = db.ref("shops/" + sid + "/current_queue");    
-    ref.on("value", function(snapshot) {
-        var snapValue = snapshot.val();
-        currentQueue = snapValue;
-
-    }, function(error) {
-        console.log("Error while retriving Shop's Current Queue Number")
-        console.log(error.code);
-    });
-
-    return currentQueue
-}
-
 //Add Queue
 var addQueue = function(sid) {
     
-    var currentQueue = getCurrentQueueNumber(sid);
+    var currentQueue;
     var currentTime = getCurrentUnixTimestamp();
 
     var ref = db.ref("shops/" + sid);
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
         var snapValue = snapshot.val();
         if(checkShouldBeHistory(snapValue.current_queue_time)) {
             currentQueue = 0;
+        }
+        else {
+            currentQueue = snapValue.current_queue;
         }
         
         var ref = db.ref("queues");
@@ -286,13 +303,13 @@ var updateQueue = function(qid, action) {
 }
 
 //Update Profile
-var updateProfile = function(email, password, firstName, lastName, phoneNumber, pushNotification) {
+var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification) {
 
     var ref = db.ref("users");
 
     ref.child(getUserID()).update({
+        "username": username,
         "email": email,
-        "password": password,
         "first_name": firstName,
         "last_name": lastName,
         "phone_number": phoneNumber,
@@ -365,11 +382,11 @@ var updateShopInfo = function(sid, name, description, staffs, phoneNumber, capac
 }
 
 //Add New Shop
-var addNewShop = function(name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
+var addNewShop = function(sid, name, description, staffs, phoneNumber, capacity, openTime, closeTime, serviceDays) {
 
     var ref = db.ref("shops");
 
-    ref.push().set({
+    ref.child(sid).set({
         "name": name,
         "description": description,
         "owner": getUserID(),
@@ -378,7 +395,9 @@ var addNewShop = function(name, description, staffs, phoneNumber, capacity, open
         "capacity": capacity,
         "open_time": openTime,
         "close_time": closeTime,
-        "service_days": serviceDays
+        "service_days": serviceDays,
+        "current_queue": 0,
+        "current_queue_time": 0
         
     }).then(function() {
         console.log("Add New Shop Complete");
@@ -389,9 +408,88 @@ var addNewShop = function(name, description, staffs, phoneNumber, capacity, open
     });
 }
 
+//Check Existing User's Username
+var checkUserUsernameAvailability = function(username, callback) {
+    
+    var ref = db.ref("users");
+    
+    ref.once("value").then(function(snapshot) {
+        let avalability = true;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(childData.username.toLowerCase() == username.toLowerCase()) {
+                avalability = false;
+            }
+        });
+
+        callback(avalability);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving User's Username");
+        console.log(error.code);
+        callback(false);
+    });
+}
+
+//Check Existing Shop's Username
+var checkShopUsernameAvailability = function(username, callback) {
+    
+    var ref = db.ref("shops");
+    
+    ref.once("value").then(function(snapshot) {
+        let avalability = true;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(key.toLowerCase() == username.toLowerCase()) {
+                avalability = false;
+            }
+        });
+
+        callback(avalability);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving Shop's Username");
+        console.log(error.code);
+        callback(false);
+    });
+}
+
+//Check If Already in Queue
+var checkAlreadyInQueue = function(sid, callback) {
+    
+    var ref = db.ref("queues");
+    
+    ref.once("value").then(function(snapshot) {
+        let alreadyInQueue = false;
+
+        snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            var childData = childSnapshot.val();
+    
+            if(childData.user_id == getUserID() && childData.shop_id == sid && !checkShouldBeHistory(key)) {
+                alreadyInQueue = true;
+            }
+        });
+
+        callback(alreadyInQueue);
+    
+    }).catch(function(error) {
+        console.log("Error while retriving Shop's Username");
+        console.log(error.code);
+        callback(true);
+    });
+}
+
 export {
             addNewUser,
             signIn,
+            signInWithUsername,
             signOut,
             getUserID,
             getUserInfo, 
@@ -403,5 +501,8 @@ export {
             updateQueue,
             updateProfile,
             updateShopInfo,
-            addNewShop
+            addNewShop,
+            checkUserUsernameAvailability,
+            checkShopUsernameAvailability,
+            checkAlreadyInQueue
 }

@@ -53,7 +53,7 @@
             <input required v-model="login.password" type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue">Login</a>
+          <a class="button blue" @click="checkAlreadyInQueue">Login</a>
         </div>
       </div>
       </transition-group>
@@ -88,6 +88,7 @@ import vee from 'vee-validate'
 import {
             addNewUser,
             signIn,
+            signInWithUsername,
             signOut,
             getUserID,
             getUserInfo, 
@@ -99,7 +100,10 @@ import {
             updateQueue,
             updateProfile,
             updateShopInfo,
-            addNewShop
+            addNewShop,
+            checkUserUsernameAvailability,
+            checkShopUsernameAvailability,
+            checkAlreadyInQueue
 } from "@/scripts/api.js"
 
 const config = {
@@ -184,10 +188,13 @@ export default {
 
     },
     addNewUser(){
-      addNewUser("tester@jongja.com", "testerjongja");
+      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
     },
     signIn(){
-      signIn("test@jongja.com", "testjongja");
+      signIn("test@jongja.com", "testjongja", false);
+    },
+    signInWithUsername(){
+      signInWithUsername("mekmekja", "mekmekja");
     },
     signOut(){
       signOut();
@@ -222,19 +229,19 @@ export default {
       console.log(result.data)
     },
     addQueue(){
-      addQueue("-L-10WCvFxAdpCl0D5OJ");
+      addQueue("MekMek");
     },
     updateQueue(){
-      updateQueue("1511962120","accept");
+      updateQueue("1511971409","accept");
     },
     updateProfile(){
-      updateProfile("tester@jongja.com", "testerjongja", "Tester", "JongJa", "01 2345 6789", true);
+      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true);
     },
     updateShopInfo(){
       updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     },
     addNewShop(){
-      addNewShop("Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
+      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     },
     registerDialog(){
       this.isRegister = true;
@@ -244,6 +251,21 @@ export default {
       this.isLogin = true;
       this.isRegister = false;
     },
+    checkUserUsernameAvailability(){
+      checkUserUsernameAvailability("mekmekja", function(result) {
+          console.log(result);
+      });
+    },
+    checkShopUsernameAvailability(){
+      checkShopUsernameAvailability("mekmek", function(result) {
+          console.log(result);
+      });
+    },
+    checkAlreadyInQueue(){
+      checkAlreadyInQueue("MekMek", function(result) {
+          console.log(result);
+      });
+    }
   },
 }
 
