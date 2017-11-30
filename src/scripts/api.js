@@ -93,7 +93,7 @@ var signIn = function(email, password, isComingFromRegister, callback) {
         console.log("Signed In");
 
         if(isComingFromRegister) {
-            updateProfile(_username, email, password, "", "", _phoneNumber, true, function(result) {
+            updateProfile(_username, email, password, _username, "", _phoneNumber, true, function(result) {
                 callback({status: result.status});
             });            
         }
