@@ -3,47 +3,64 @@
     <div class="header">RESERVE.CO</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
-      <transition name="fade" mode="out-in">
-      <div v-if="register" class="registerDialog" key="reg">
+      <transition-group name="fade" mode="out-in">
+      <div v-if="isRegister" class="registerDialog" key="reg">
         <h2>Create new account</h2>
         <div class="form">
           <div class="bundle">
-            <input required type="text" id="u-name" value="" />
-            <label for="u-name">Username</label>
+            <input v-model.lazy="register.username" v-validate="'required|alpha_num'" 
+            :class="{'invalid' : (fields.username.invalid && fields.username.touched) || this.warnReg.validUsername.length > 1}" type="text" name="username" ref="username" required />
+            
+            <label for="username">Username</label>
+            <span v-show="(errors.has('username') || this.warnReg.validUsername.length > 1)" class="notifier">{{errors.first('username') || this.warnReg.validUsername}}</span>
           </div>
           <div class="bundle">
-            <input required type="text" id="u-phone" value="" />
-            <label for="u-phone">Phone No.</label>
+            <input v-model.lazy="register.email" v-validate="'required|email'" 
+            :class="{'invalid' : fields.email.invalid && fields.email.touched}" type="text" name="email" ref="email" required />
+            
+            <label for="email">Email</label>
+            <span v-show="errors.has('email')" class="notifier">{{errors.first('email')}}</span>
           </div>
           <div class="bundle">
-            <input required type="text" id="u-pass" value="" />
-            <label for="u-pass">Password</label>
+            <input v-model.lazy="register.phone" v-validate="'required'" 
+            :class="{'invalid' : (fields.phone.invalid && fields.phone.touched) || this.warnReg.validPhone.length > 1}" type="text" name="phone" ref="phone" required />
+            
+            <label for="phone">Phone No.</label>
+            <span v-show="errors.has('phone') || this.warnReg.validPhone.length > 1" class="notifier">{{errors.first('phone') || this.warnReg.validPhone}}</span>
           </div>
           <div class="bundle">
-            <input required type="text" id="u-passconfirm" value=""/>
-            <label for="u-passconfirm">Confirm Password</label>
+            <input v-model.lazy="register.passward1" v-validate="'required'"
+            :class="{'invalid' : (fields.Password.invalid && fields.Password.touched) || this.warnReg.validPassword.length > 1}" type="password" name="Password" ref="Password" required />
+            <label for="Password">Password</label>
+            <span v-show="errors.has('Password') || this.warnReg.validPassword.length > 1" class="notifier">{{errors.first('Password') || this.warnReg.validPassword}}</span>
           </div>
-          <a class="button green">Register</a>
+          <div class="bundle">
+            <input v-model.lazy="register.password2" v-validate="'required'"
+            :class="{'invalid' : (fields.password.invalid && fields.password.touched) || this.warnReg.matchPassword.length > 1}" type="password" name="password" ref="password" required />
+            <label for="password">Confirm Password</label>
+            <span v-show="errors.has('password') || this.warnReg.matchPassword.length > 1" class="notifier">{{errors.first('password') || this.warnReg.matchPassword}}</span>
+          </div>
+          <a @click="validateRegister" class="button green">Register</a>
         </div>
       </div>
-      <div v-if="login" class="loginDialog"  key="log">
+      <div v-if="isLogin" class="loginDialog" key="log">
         <div class="form">
           <div class="bundle">
-            <input required type="text" id="u-name" value="" />
+            <input required v-model="login.username" type="text" id="u-name" value="" />
             <label for="u-name">Username</label>
           </div>
           <div class="bundle">
-            <input required type="text" id="u-pass" value="" />
+            <input required v-model="login.password" type="text" id="u-pass" value="" />
             <label for="u-pass">Password</label>
           </div>
           <a class="button blue">Login</a>
         </div>
       </div>
-      </transition>
-      <a @click="registerDialog" class="button green" v-if="!register && !login">Register</a>
-      <a @click="registerDialog" class="button transparent green" v-if="!register && login">or Register new account</a>
-      <a @click="loginDialog" class="button blue" v-if="!register && !login">Login</a>
-      <a @click="loginDialog" class="button transparent blue" v-if="register && !login">or Login with your account</a>
+      </transition-group>
+      <a @click="registerDialog" class="button green" v-if="!isRegister && !isLogin">Register</a>
+      <a @click="registerDialog" class="button transparent green" v-if="!isRegister && isLogin">or Register new account</a>
+      <a @click="loginDialog" class="button blue" v-if="!isRegister && !isLogin">Login</a>
+      <a @click="loginDialog" class="button transparent blue" v-if="isRegister && !isLogin">or Login with your account</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
         <a href="#" class="button facebook">Facebook</a>
@@ -66,6 +83,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import vee from 'vee-validate'
 import {
             addNewUser,
             signIn,
@@ -83,9 +102,87 @@ import {
             addNewShop
 } from "@/scripts/api.js"
 
+const config = {
+    errorBagName: 'errors', // change if property conflicts
+    fieldsBagName: 'fields',
+    delay: 0,
+    locale: 'en',
+    dictionary: null,
+    strict: true,
+    classes: false,
+    classNames: {
+        touched: 'touched',
+        untouched: 'untouched',
+        valid: 'valid',
+        invalid: 'invalid',
+        pristine: 'pristine',
+        dirty: 'dirty'
+    },
+    events: 'input|blur',
+    inject: true,
+    validity: false,
+    aria: true
+};
+Vue.use(vee,config);
+
 export default {
   name: 'login',
+  data() {
+    return{
+      isRegister: false,
+      isLogin: false,
+      register: {
+        username: '',
+        email: '',
+        phone: '',
+        passward1: '',
+        password2: '',
+      },
+      login: {
+        username: '',
+        password: '',
+      },
+      warnReg:{
+        validUsername: '',
+        validPhone: '',
+        validPassword: '',
+        matchPassword: '',
+      }
+    }
+  },
+  watch: {
+    'register.username': function(){
+      var regex = /^[a-zA-Z0-9]{4,25}$/
+      if(!this.register.username.match(regex)){
+        this.warnReg.validUsername = 'Password length must be 4-25 characters.';
+      } else { this.warnReg.validUsername = '';}
+    },
+    'register.phone': function(){
+      if (this.register.phone === '') {
+        this.warnReg.validPhone = 'Phone number required';
+        return;
+      }
+      var regex = /^(0[0-9]{9})$/
+      if (!this.register.phone.match(regex) && this.register.phone){
+        this.warnReg.validPhone = 'Phone number must be 10-digits format.';
+      } else { this.warnReg.validPhone = ''; }
+    },
+    'register.passward1': function(){
+      var regex = /^[a-zA-Z0-9_]{6,25}$/
+      if( !this.register.passward1.match(regex) && this.register.passward1){
+        this.warnReg.validPassword = 'Password length must be 6-25 characters.';
+      } else { this.warnReg.validPassword = '';}
+    },
+    'register.password2': function(){
+      var match = (this.register.passward1 === this.register.password2);
+      if (match) this.warnReg.matchPassword = '';
+      else this.warnReg.matchPassword = 'Password confirmation does not match.';
+    }
+  },
   methods: {
+    validateRegister(){
+
+    },
     addNewUser(){
       addNewUser("tester@jongja.com", "testerjongja");
     },
@@ -140,19 +237,13 @@ export default {
       addNewShop("Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true});
     },
     registerDialog(){
-      this.register = true;
-      this.login = false;
+      this.isRegister = true;
+      this.isLogin = false;
     },
     loginDialog(){
-      this.login = true;
-      this.register = false;
+      this.isLogin = true;
+      this.isRegister = false;
     },
-  },
-  data(){
-    return{
-      register: false,
-      login:false,
-    }
   },
 }
 
@@ -295,6 +386,12 @@ export default {
         top: -1.25em;
         color: $color-blue;
       }
+      &.invalid{
+        box-shadow: 0 2px $color-orange;
+        & + label{
+          color: $color-orange;
+        }
+      }
     }
     label{
       display: block;
@@ -302,6 +399,15 @@ export default {
       color: $color-grey;
       transition: all .15s;
       top: 0em;
+    }
+    .notifier{
+      display: block;
+      position: absolute;
+      font-size: .8em;
+      color: $color-orange;
+      transition: all .15s;
+      top: 2.25em;
+      text-align: center;
     }
   }
 }
