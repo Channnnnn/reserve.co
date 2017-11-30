@@ -20,6 +20,10 @@ var checkShouldBeHistory = function(timestamp) {
     }
 }
 
+var getCurrentUser = function() {
+    return auth.currentUser;
+}
+
 //Get User Data
 var getUserID = function() {
 
@@ -65,7 +69,7 @@ var signInWithUsername = function(username, password) {
         });
 
     }).catch(function(error) {
-        console.log("Error while retriving Username");
+        console.log("Error while retrieving Username");
         console.log(error.code);
     });
 }
@@ -106,7 +110,7 @@ var getUserInfo = function() {
         snapValue = snapshot.val();
 
     }, function(error) {
-        console.log("Error while retriving User's Info");
+        console.log("Error while retrieving User's Info");
         console.log(error.code);
     });
 
@@ -130,7 +134,7 @@ var getUserReservation = function() {
         });
 
     }, function(error) {
-        console.log("Error while retriving Reservation");
+        console.log("Error while retrieving Reservation");
         console.log(error.code);
     });
 
@@ -160,7 +164,7 @@ var getUserHistory = function() {
         });
 
     }, function(error) {
-        console.log("Error while retriving History")
+        console.log("Error while retrieving History")
         console.log(error.code);
     });
 
@@ -176,7 +180,7 @@ var getShopInfo = function(sid) {
         snapValue = snapshot.val();
 
     }, function(error) {
-        console.log("Error while retriving Shop's Info")
+        console.log("Error while retrieving Shop's Info")
         console.log(error.code);
     });
 
@@ -200,7 +204,7 @@ var getShopQueues = function(sid) {
         });
 
     }, function(error) {
-        console.log("Error while retriving Shop's Queues")
+        console.log("Error while retrieving Shop's Queues")
         console.log(error.code);
     });
 
@@ -301,6 +305,13 @@ var updateQueue = function(qid, action) {
         });
     }
 }
+
+/*
+*
+* TODO: REFRACTOR PROMISE https://stackoverflow.com/questions/35805603/are-nested-promises-normal-in-node-js
+*
+*/
+
 
 //Update Profile
 var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification) {
@@ -414,21 +425,21 @@ var checkUserUsernameAvailability = function(username, callback) {
     var ref = db.ref("users");
     
     ref.once("value").then(function(snapshot) {
-        let avalability = true;
+        let availability = true;
 
         snapshot.forEach(function(childSnapshot) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
     
             if(childData.username.toLowerCase() == username.toLowerCase()) {
-                avalability = false;
+                availability = false;
             }
         });
 
-        callback(avalability);
+        callback(availability);
     
     }).catch(function(error) {
-        console.log("Error while retriving User's Username");
+        console.log("Error while retrieving User's Username");
         console.log(error.code);
         callback(false);
     });
@@ -440,21 +451,21 @@ var checkShopUsernameAvailability = function(username, callback) {
     var ref = db.ref("shops");
     
     ref.once("value").then(function(snapshot) {
-        let avalability = true;
+        let availability = true;
 
         snapshot.forEach(function(childSnapshot) {
             var key = childSnapshot.key;
             var childData = childSnapshot.val();
     
             if(key.toLowerCase() == username.toLowerCase()) {
-                avalability = false;
+                availability = false;
             }
         });
 
-        callback(avalability);
+        callback(availability);
     
     }).catch(function(error) {
-        console.log("Error while retriving Shop's Username");
+        console.log("Error while retrieving Shop's Username");
         console.log(error.code);
         callback(false);
     });
@@ -480,7 +491,7 @@ var checkAlreadyInQueue = function(sid, callback) {
         callback(alreadyInQueue);
     
     }).catch(function(error) {
-        console.log("Error while retriving Shop's Username");
+        console.log("Error while retrieving Shop's Username");
         console.log(error.code);
         callback(true);
     });
@@ -491,6 +502,7 @@ export {
             signIn,
             signInWithUsername,
             signOut,
+            getCurrentUser,
             getUserID,
             getUserInfo, 
             getUserReservation, 

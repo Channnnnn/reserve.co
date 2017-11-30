@@ -8,52 +8,74 @@
         <h2>Create new account</h2>
         <div class="form">
           <div class="bundle">
-            <input v-model.lazy="register.username" v-validate="'required|alpha_num'" 
-            :class="{'invalid' : (fields.username.invalid && fields.username.touched) || this.warnReg.validUsername.length > 1}" type="text" name="username" ref="username" required />
+            <input v-model="register.username" v-validate="'required|alpha_num'" data-vv-delay=delay
+            :class="{'invalid' : (fields.username.invalid && fields.username.touched) || this.warnReg.validUsername.length > 1}" 
+            type="text" name="username" id="username" required />
             
             <label for="username">Username</label>
-            <span v-show="(errors.has('username') || this.warnReg.validUsername.length > 1)" class="notifier">{{errors.first('username') || this.warnReg.validUsername}}</span>
+            <span v-show="(errors.has('username') || this.warnReg.validUsername.length > 1)" class="notifier">
+              {{errors.first('username') || this.warnReg.validUsername}}
+            </span>
           </div>
+          <!--  -->
           <div class="bundle">
-            <input v-model.lazy="register.email" v-validate="'required|email'" 
-            :class="{'invalid' : fields.email.invalid && fields.email.touched}" type="text" name="email" ref="email" required />
+            <input v-model="register.email" v-validate="'required|email'" data-vv-delay=delay
+            :class="{'invalid' : fields.email.invalid && fields.email.touched}" 
+            type="text" name="email" id="email" required />
             
             <label for="email">Email</label>
-            <span v-show="errors.has('email')" class="notifier">{{errors.first('email')}}</span>
+            <span v-show="errors.has('email')" class="notifier">
+              {{errors.first('email')}}
+            </span>
           </div>
+          <!--  -->
           <div class="bundle">
-            <input v-model.lazy="register.phone" v-validate="'required'" 
-            :class="{'invalid' : (fields.phone.invalid && fields.phone.touched) || this.warnReg.validPhone.length > 1}" type="text" name="phone" ref="phone" required />
+            <input v-model="register.phone" v-validate="'required'" data-vv-delay=delay
+            :class="{'invalid' : (fields.phone.invalid && fields.phone.touched) || this.warnReg.validPhone.length > 1}" 
+            type="text" name="phone" id="phone" required />
             
             <label for="phone">Phone No.</label>
-            <span v-show="errors.has('phone') || this.warnReg.validPhone.length > 1" class="notifier">{{errors.first('phone') || this.warnReg.validPhone}}</span>
+            <span v-show="errors.has('phone') || this.warnReg.validPhone.length > 1" class="notifier">
+              {{errors.first('phone') || this.warnReg.validPhone}}
+            </span>
           </div>
+          <!--  -->
           <div class="bundle">
-            <input v-model.lazy="register.passward1" v-validate="'required'"
-            :class="{'invalid' : (fields.Password.invalid && fields.Password.touched) || this.warnReg.validPassword.length > 1}" type="password" name="Password" ref="Password" required />
-            <label for="Password">Password</label>
-            <span v-show="errors.has('Password') || this.warnReg.validPassword.length > 1" class="notifier">{{errors.first('Password') || this.warnReg.validPassword}}</span>
+            <input v-model="register.passward1" v-validate="'required'" data-vv-delay=delay
+            :class="{'invalid' : (fields.Password.invalid && fields.Password.touched) || this.warnReg.validPassword.length > 1}" 
+            type="password" name="Password" id="password1" required />
+            
+            <label for="password1">Password</label>
+            <span v-show="errors.has('Password') || this.warnReg.validPassword.length > 1" class="notifier">
+              {{errors.first('Password') || this.warnReg.validPassword}}
+            </span>
           </div>
+          <!--  -->
           <div class="bundle">
-            <input v-model.lazy="register.password2" v-validate="'required'"
-            :class="{'invalid' : (fields.password.invalid && fields.password.touched) || this.warnReg.matchPassword.length > 1}" type="password" name="password" ref="password" required />
-            <label for="password">Confirm Password</label>
-            <span v-show="errors.has('password') || this.warnReg.matchPassword.length > 1" class="notifier">{{errors.first('password') || this.warnReg.matchPassword}}</span>
+            <input v-model="register.password2" v-validate="'required'" data-vv-delay=delay
+            :class="{'invalid' : (fields.password.invalid && fields.password.touched) || this.warnReg.matchPassword.length > 1}" 
+            type="password" name="password" id="password2" required />
+            
+            <label for="password2">Confirm Password</label>
+            <span v-show="errors.has('password') || this.warnReg.matchPassword.length > 1" class="notifier">
+              {{errors.first('password') || this.warnReg.matchPassword}}
+            </span>
           </div>
-          <a @click="validateRegister" class="button green">Register</a>
+          <a @click="validateBeforeRegister" class="button green">Register</a>
         </div>
       </div>
+
       <div v-if="isLogin" class="loginDialog" key="log">
         <div class="form">
           <div class="bundle">
-            <input required v-model="login.username" type="text" id="u-name" value="" />
+            <input required v-model="login.username" type="text" id="u-name" name="username" />
             <label for="u-name">Username</label>
           </div>
           <div class="bundle">
-            <input required v-model="login.password" type="text" id="u-pass" value="" />
+            <input required v-model="login.password" type="text" id="u-pass" name="password" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="checkAlreadyInQueue">Login</a>
+          <a class="button blue" @click="loginAuthentacation">Login</a>
         </div>
       </div>
       </transition-group>
@@ -83,6 +105,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import Vue from 'vue'
 import vee from 'vee-validate'
 import {
@@ -133,6 +156,7 @@ export default {
   name: 'login',
   data() {
     return{
+      delay: 1000,
       isRegister: false,
       isLogin: false,
       register: {
@@ -146,7 +170,7 @@ export default {
         username: '',
         password: '',
       },
-      warnReg:{
+      warnReg: {
         validUsername: '',
         validPhone: '',
         validPassword: '',
@@ -155,13 +179,14 @@ export default {
     }
   },
   watch: {
-    'register.username': function(){
+    'register.username': _.debounce(function(){
       var regex = /^[a-zA-Z0-9]{4,25}$/
       if(!this.register.username.match(regex)){
         this.warnReg.validUsername = 'Password length must be 4-25 characters.';
       } else { this.warnReg.validUsername = '';}
     },
-    'register.phone': function(){
+    this.delay),
+    'register.phone': _.debounce(function(){
       if (this.register.phone === '') {
         this.warnReg.validPhone = 'Phone number required';
         return;
@@ -171,22 +196,61 @@ export default {
         this.warnReg.validPhone = 'Phone number must be 10-digits format.';
       } else { this.warnReg.validPhone = ''; }
     },
-    'register.passward1': function(){
-      var regex = /^[a-zA-Z0-9_]{6,25}$/
+    this.delay),
+    'register.passward1': _.debounce(function(){
+      var regex = /^.{6,}$/
       if( !this.register.passward1.match(regex) && this.register.passward1){
-        this.warnReg.validPassword = 'Password length must be 6-25 characters.';
+        this.warnReg.validPassword = 'Password length must be at least 6 characters.';
       } else { this.warnReg.validPassword = '';}
     },
-    'register.password2': function(){
+    this.delay),
+    'register.password2': _.debounce(function(){
       var match = (this.register.passward1 === this.register.password2);
       if (match) this.warnReg.matchPassword = '';
       else this.warnReg.matchPassword = 'Password confirmation does not match.';
+    },
+    this.delay),
+  },
+  computed: {
+    warnRegClean: function(){
+      var allwarn = this.warnReg.validUsername + this.warnReg.validPhone + this.warnReg.validPassword + this.warnReg.matchPassword;
+      if (allwarn.length === 0) { return true; }
+      else return false;
     }
   },
   methods: {
-    validateRegister(){
+    validateBeforeRegister(){
+      this.$validator.validateAll().then((result) => {
+        if (result && this.warnRegClean){
+          
+          console.log('Submitting registeration...');
+          
+          var payload = this.register;
+          addNewUser(payload.username, payload.phone, payload.email, payload.passward1);
+          
+          var uid = getUserID();
+          if (uid){
 
+            this.$router.push({name: 'account'});
+          }
+        }
+        else {  
+          alert('Please correct all errors and try again.');
+        }
+      });
     },
+
+    loginAuthentacation(){
+      
+      signInWithUsername(this.login.username, this.login.password);
+      
+      var uid = getUserID();
+      if (uid){
+
+        this.$router.push({name: 'account'});
+      }
+    },
+    
     addNewUser(){
       addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja");
     },

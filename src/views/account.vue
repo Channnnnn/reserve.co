@@ -9,14 +9,14 @@
         <!-- <Navbar :hasBack='false' :link="'/settings'"> -->
             <!-- <vButton :link="'/shop' + '1'" class="mini blue transparent button right">Manage Shop</vButton> -->
         <!-- </Navbar> -->
-        <AccountPanel class="panel">
+        <AccountPanel :name="currentUser.info.data" class="panel">
             <div class="row group tab">
                 <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
-                <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab('history')">History</a>
+                <a href="#" class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
         <div class="reservation account">
-            <queue-item v-for="queue in data.queues" :key="queue.number" :data="queue"></queue-item>
+            <QueueItem v-for="queue in (showingReservation ? currentUser.reservation: currentUser.history)" v-if="queue.id" :key="queue.id" :data="queue"></QueueItem>
         </div>
         <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
         <transition name="slide">
@@ -42,6 +42,13 @@ import Navbar from '@/components/navigationbar.vue'
 import vButton from "@/components/button.vue"
 import AccountPanel from "@/components/accountPanel.vue"
 import QueueItem from '@/components/queueEntry.vue'
+import {
+    getUserID,
+    getUserInfo, 
+    getUserReservation, 
+    getUserHistory,
+} from "@/scripts/api.js"
+
 export default {
     components: {
         Navbar,
@@ -50,31 +57,47 @@ export default {
         vButton
     },
     props: ['data'],
+    computed:{
+        currentUser: function(){
+            return {
+                id: getUserID(),
+                info: getUserInfo(),
+                reservation: getUserReservation(),
+                history: getUserHistory(),
+            }
+        }
+    },
     methods: {
-      SwitchTab(input){
-        if (input === "reservation"){
-          this.showingReservation = true;
-          this.showingHistory = false;
+        
+        SwitchTab(input){
+            if (input === "reservation"){
+            this.showingReservation = true;
+            // this.showingHistory = false;
+            }
+            else if (input === "history") {
+            this.showingReservation = false;
+            // this.showingHistory = true;
+            }
+        },
+        toggleAside(){
+            this.showAside = !this.showAside
+        },
+        closeAside(){
+            this.showAside = false;
         }
-        else if (input === "history") {
-          this.showingReservation = false;
-          this.showingHistory = true;
+    },
+    data() {
+        return {
+            showingReservation: true,
+            // showingHistory: false,
+            showAside: false
         }
-      },
-      toggleAside(){
-          this.showAside = !this.showAside
-      },
-      closeAside(){
-          this.showAside = false;
-      }
-  },
-  data() {
-      return {
-          showingReservation: true,
-          showingHistory: false,
-          showAside: false
-      }
-  },
+    },
+    // beforeRouteEnter(to, from, next){
+    //     if(getUserID()){
+            
+    //     }
+    // }
 }
 </script>
 

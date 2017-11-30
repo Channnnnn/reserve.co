@@ -1,7 +1,7 @@
 <template>
     <div class="queue rounded">
         <span class="q-num">{{data.number}}</span>
-        <router-link :to="{path: 'queue'+ data.id}" class="detail" href="#">
+        <router-link :to="{path: 'queue'+ data.id}" class="detail">
             <span class="q-name">{{data.shopName}}</span>
             <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>

@@ -5,8 +5,11 @@ import Settings from '@/views/setting'
 import Shop from '@/views/shop'
 import FormShop from '@/views/shopform'
 import QueueShop from '@/views/shopqueue'
+import NotFound from '@/views/404'
+import Session from '@/views/session'
 
 export default [
+  { path: '*', component: NotFound},
   {
     path: '/',
     name: 'home'
@@ -19,7 +22,8 @@ export default [
   {
     path: '/account',
     name: 'account',
-    component: Account
+    component: Account,
+    meta: { requiresAuth: true }
   },
   {
     path: '/queue:id',
@@ -50,5 +54,10 @@ export default [
     path: '/setupshop',
     name: 'setupshop',
     component: FormShop
+  },
+  {
+    path: '/timeout',
+    name: 'session',
+    component: Session
   }
 ]

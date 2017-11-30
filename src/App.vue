@@ -7,129 +7,152 @@
 <script>
 import Navbar from '@/components/navigationbar.vue'
 export default {
-  name: 'app',
-  components: {
-    Navbar,
-  },
-  data () {
-    return {
-      data:{
-        queues:[
-          {
-              id: 123123,
-              number: 27,
-              shopName: 'Shop27',
-              status: 'waiting',
-              detail: ''
-          },
-          {
-              id: 1231,
-              number: 14,
-              shopName: 'Shop8',
-              status: 'accepted',
-              detail: ''
-          },
-          {
-              id: 13123,
-              number: 10,
-              shopName: 'Shop86',
-              status: 'expired',
-              detail: ''
-          },
-          {
-              id: 23123,
-              number: 27,
-              shopName: 'Shop27',
-              status: 'waiting',
-              detail: ''
-          },
-          {
-              id: 1223,
-              number: 14,
-              shopName: 'Shop8',
-              status: 'accepted',
-              detail: ''
-          },
-          {
-              id: 2312,
-              number: 10,
-              shopName: 'Shop86',
-              status: 'canceled',
-              detail: ''
-          },
-          {
-              id: 183123,
-              number: 27,
-              shopName: 'Shop27',
-              status: 'waiting',
-              detail: ''
-          },
-          {
-              id: 523123,
-              number: 14,
-              shopName: 'Shop8',
-              status: 'accepted',
-              detail: ''
-          },
-          {
-              id: 13,
-              number: 10,
-              shopName: 'Shop86',
-              status: 'expired',
-              detail: ''
-          },
-          {
-              id: 2323,
-              number: 27,
-              shopName: 'Shop27',
-              status: 'waiting',
-              detail: ''
-          },
-          {
-              id: 23,
-              number: 14,
-              shopName: 'Shop8',
-              status: 'accepted',
-              detail: ''
-          },
-          {
-              id: 32,
-              number: 10,
-              shopName: 'Shop86',
-              status: 'expired',
-              detail: ''
-          },
-          {
-              id: 17823,
-              number: 27,
-              shopName: 'Shop27',
-              status: 'waiting',
-              detail: ''
-          },
-          {
-              id: 903123,
-              number: 14,
-              shopName: 'Shop8',
-              status: 'accepted',
-              detail: ''
-          },
-          {
-              id: 113123,
-              number: 10,
-              shopName: 'Shop86',
-              status: 'expired',
-              detail: ''
-          },
-        ]
-      }
-    }
-  },
+    name: 'app',
+    components: {
+        Navbar,
+    },
+    computed:{
+
+        currentUser: function(){
+
+            return {
+                id: getUserID(),
+                info: getUserInfo(),
+                reservation: getUserReservation(),
+                history: getUserHistory(),
+            }
+        }
+    },
+    data () {
+        return {
+        data:{
+            queues:[
+            {
+                id: 123123,
+                number: 27,
+                shopName: 'Shop27',
+                status: 'waiting',
+                detail: ''
+            },
+            {
+                id: 1231,
+                number: 14,
+                shopName: 'Shop8',
+                status: 'accepted',
+                detail: ''
+            },
+            {
+                id: 13123,
+                number: 10,
+                shopName: 'Shop86',
+                status: 'expired',
+                detail: ''
+            },
+            {
+                id: 23123,
+                number: 27,
+                shopName: 'Shop27',
+                status: 'waiting',
+                detail: ''
+            },
+            {
+                id: 1223,
+                number: 14,
+                shopName: 'Shop8',
+                status: 'accepted',
+                detail: ''
+            },
+            {
+                id: 2312,
+                number: 10,
+                shopName: 'Shop86',
+                status: 'canceled',
+                detail: ''
+            },
+            {
+                id: 183123,
+                number: 27,
+                shopName: 'Shop27',
+                status: 'waiting',
+                detail: ''
+            },
+            {
+                id: 523123,
+                number: 14,
+                shopName: 'Shop8',
+                status: 'accepted',
+                detail: ''
+            },
+            {
+                id: 13,
+                number: 10,
+                shopName: 'Shop86',
+                status: 'expired',
+                detail: ''
+            },
+            {
+                id: 2323,
+                number: 27,
+                shopName: 'Shop27',
+                status: 'waiting',
+                detail: ''
+            },
+            {
+                id: 23,
+                number: 14,
+                shopName: 'Shop8',
+                status: 'accepted',
+                detail: ''
+            },
+            {
+                id: 32,
+                number: 10,
+                shopName: 'Shop86',
+                status: 'expired',
+                detail: ''
+            },
+            {
+                id: 17823,
+                number: 27,
+                shopName: 'Shop27',
+                status: 'waiting',
+                detail: ''
+            },
+            {
+                id: 903123,
+                number: 14,
+                shopName: 'Shop8',
+                status: 'accepted',
+                detail: ''
+            },
+            {
+                id: 113123,
+                number: 10,
+                shopName: 'Shop86',
+                status: 'expired',
+                detail: ''
+            },
+            ]
+        }
+        }
+    },
 }
 </script>
 
 <style lang="scss">
 @import "~@/assets/variable";
-
+@font-face{
+    font-family: 'Kanit';
+    font-style: normal;
+    font-weight: 300;
+    src: url(./assets/Kanit-Light.ttf) format('truetype');
+}
+@font-face{
+    font-family: 'Kanit';
+    font-style: bold;
+    font-weight: 500;
+    src: url(./assets/Kanit-Medium.ttf) format('truetype');
+}
 html,body{
   margin: 0;
 }

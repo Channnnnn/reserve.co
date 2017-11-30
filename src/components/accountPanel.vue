@@ -1,14 +1,15 @@
 <template>
     <div>
         <div class="avatar"></div>
-        <h2>Thomas Carpenter</h2>
+        <h2>{{name ? name: '#'}}</h2>
         <slot></slot>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'accountPanel'
+    name: 'accountPanel',
+    props: ['avatar', 'name']
 }
 </script>
 
