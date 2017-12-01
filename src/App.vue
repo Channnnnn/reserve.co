@@ -1,27 +1,28 @@
 <template>
-  <div id="app">
-    <router-view :data="data"  class="container"></router-view>
-  </div>
+    <div id="app">
+        <Loader :loading="loading"></Loader>
+        <transition name="fade-half" mode="in-out">
+        <router-view :data="data" class="app-div" :class="{'container': $route.name != 'login', 'app-div100': $route.name == 'managequeue'}"></router-view>
+        </transition>
+    </div>
 </template>
 
 <script>
+import {db,auth} from '@/scripts/firebase_config';
 import Navbar from '@/components/navigationbar.vue'
+import Loader from '@/components/rotateloader.vue';
 export default {
     name: 'app',
     components: {
         Navbar,
+        Loader
     },
     computed:{
-
-        currentUser: function(){
-
-            return {
-                id: getUserID(),
-                info: getUserInfo(),
-                reservation: getUserReservation(),
-                history: getUserHistory(),
-            }
+        loading: function(){
+            return this.$store.getters.isLoading
         }
+    },
+    methods: {
     },
     data () {
         return {
@@ -163,6 +164,48 @@ html,body{
   font-weight: lighter;
   text-align: center;
   color: #2c3e50;
+}
+
+.app-div{
+    position: absolute;
+    width: 100vw;
+    background-color: white;
+    overflow-x: hidden;
+}
+.app-div100{
+    width: 100% !important;
+}
+.v-back{
+    left: 50%;
+    transform: translateX(-50%) scale(.75);
+}
+.v-spinner{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%) scale(0.5);
+    z-index: 30;
+}
+.fade-enter-active, .fade-leave-active{
+  transition: opacity .15s;
+}
+
+.fade-enter, .fade-leave-to{
+  opacity: 0;
+}
+
+.fade-half-enter-active, .fade-half-leave-active{
+  transition: all .1s;
+}
+
+.fade-half-enter, .fade-half-leave-to{
+  opacity: 0.25;
+//   background-color: rgba(255,255,255,0.25);
+}
+.fade-half-enter-active,.fade-half-enter-to{
+    z-index: 10;
+}
+.fade-half-leave-active,.fade-half-leave-to{
+    z-index: -10;
 }
 
 h1, h2 {
@@ -434,7 +477,7 @@ li.lite{
     top: 0;
     box-sizing: border-box;
     min-width: 300px;
-    width: 100%;
+    width: 100vw;
     display: flex;
     position: fixed;
     justify-content: flex-start;
@@ -490,13 +533,6 @@ li.lite{
   left: 0;
   z-index: 5;
   mix-blend-mode: multiply;
-}
-.fade-enter-active, .fade-leave-active{
-  transition: opacity .15s;
-}
-
-.fade-enter, .fade-leave-to{
-  opacity: 0;
 }
 
 .rightspaced{

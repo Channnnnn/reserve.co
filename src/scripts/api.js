@@ -123,18 +123,20 @@ var signOut = function(trash, callback) {
 }
 
 //Get User's Info
-var getUserInfo = function(trash, callback) { 
+var getUserInfo = function() { 
     var ref = db.ref("users/" + getUserID());
     var snapValue;
     
     ref.once("value", function(snapshot) {
+        // console.log('ID:' + getUserID() +"\n"+
+        // "data:" + snapshot.val()
+        // );
         snapValue = snapshot.val();
-        callback({status: true, data: snapValue});
+        return snapValue;
 
     }, function(error) {
         console.log("Error while retrieving User's Info");
         console.log(error.code);
-        callback({status: false});
     });
 }
 
@@ -154,6 +156,7 @@ var getUserReservation = function(trash, callback) {
             }
         });
         callback({status: true, data: snapValue});
+        return snapValue
 
     }, function(error) {
         console.log("Error while retrieving Reservation");

@@ -1,19 +1,19 @@
 <template>
   <div>
-    <div v-if="routeType==='setup'" class="nav blue">
+    <div v-if="routeType==='setupshop'" class="nav blue">
         <router-link :to="'/settings'" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>DISCARD
         </router-link>
     </div>
-    <div v-if="routeType==='edit'" class="nav orange">
+    <div v-if="routeType==='editshop'" class="nav orange">
         <router-link :to="'/shop1'" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>DISCARD CHANGES
         </router-link>
     </div>
-    <div class="cover">{{routeType==='edit' ? 'Change Brand Image':''}}{{routeType==='setup' ? 'Choose Brand Image':''}}</div>
+    <div class="cover">{{routeType==='editshop' ? 'Change Brand Image':''}}{{routeType==='setupshop' ? 'Choose Brand Image':''}}</div>
     <div class="s-detail">
-      <h2 v-if="routeType==='setup'">Setup Shop</h2>
-      <h2 v-if="routeType==='edit'">Edit Shop</h2>
+      <h2 v-if="routeType==='setupshop'">Setup Shop</h2>
+      <h2 v-if="routeType==='editshop'">Edit Shop</h2>
       <div class="shopform">
         <div class="fa fa-pencil"></div>
         <div class="form group">
@@ -61,8 +61,8 @@
         </div>
       </div>
       <div class="column group">
-        <a v-if="routeType==='setup'" @click="CommitSave" class="wide orange button">Create Shop</a>
-        <a v-if="routeType==='edit'" @click="CommitSave" class="wide orange button">Confirm Changes</a>
+        <a v-if="routeType==='setupshop'" @click="CommitSave" class="wide orange button">Create Shop</a>
+        <a v-if="routeType==='editshop'" @click="CommitSave" class="wide orange button">Confirm Changes</a>
       </div>
     </div>
   </div>
@@ -82,32 +82,37 @@ export default {
       this.$router.push('/shop1')
     }
   },
-  beforeRouteEnter (to, from, next){
-    console.log(from.name);
-    if (from.name === 'account' || from.name === 'settings') { 
-      // this.routeType = 'setup'; 
-      // console.log(this.routeType); 
-      next(vm => {
-        vm.routeType = 'setup';
-        console.log(vm.routeType);
-      });
+  computed:{
+    routeType: function() {
+      return this.$route.name;
     }
-    else if (from.name === 'shop') { 
-      // this.routeType = 'edit'; 
-      // console.log(this.routeType); 
-      next(vm => { 
-        vm.routeType = 'edit';
-        console.log(vm.routeType);
-      });
-    }
-  }
-  ,
+  },
+  // beforeRouteEnter (to, from, next){
+  //   console.log(from.name);
+  //   if (from.name === 'account' || from.name === 'settings') { 
+  //     // this.routeType = 'setup'; 
+  //     // console.log(this.routeType); 
+  //     next(vm => {
+  //       vm.routeType = 'setup';
+  //       console.log(vm.routeType);
+  //     });
+  //   }
+  //   else if (from.name === 'shop') { 
+  //     // this.routeType = 'edit'; 
+  //     // console.log(this.routeType); 
+  //     next(vm => { 
+  //       vm.routeType = 'edit';
+  //       console.log(vm.routeType);
+  //     });
+  //   }
+  // }
+  // ,
   beforeRouteLeave (to, from, next){
     if (this.commitSave) { next(); }
     else {
       var msg = ''
-      if (this.routeType === 'setup') msg = 'Abort shop setup and return to your account?';
-      else if (this.routeType === 'edit') msg = 'Discard changes and return to shop page?';
+      if (this.routeType === 'setupshop') msg = 'Abort shop setup and return to your account?';
+      else if (this.routeType === 'editshop') msg = 'Discard changes and return to shop page?';
       else msg = 'Error occurred, please start over again.'
       var confirm = window.confirm(msg);
       if (confirm){
@@ -119,7 +124,7 @@ export default {
   },
   data() {
     return{
-      routeType: 'setup',
+      // routeType: 'setup',
       commitSave: false
     }
   }

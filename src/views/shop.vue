@@ -47,6 +47,8 @@
       <span class="mini divider"></span>
       <div class="list header">Shop list</div>
       <router-link :to="'/shop2'" @click.native="closeAside" class="list link orange">Shop 1</router-link>
+      <Logout></Logout>
+      <!-- <a class="list red button"><div class="fa fa-sign-out"></div>Sign out</a> -->
       <!-- <span class="mini divider"></span> -->
       <!-- <router-link :to="'/account'" class="list link blue">Return to Account</router-link> -->
     </div>
@@ -60,10 +62,12 @@
 <script>
 import Navbar from '@/components/navigationbar.vue'
 import vButton from "@/components/button.vue"
+import Logout from "@/components/logoutButton.vue"
 export default {
   components: {
     Navbar,
-    vButton
+    vButton,
+    Logout
   },
   methods: {
     toggleAside: function() {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="avatar"></div>
-        <h2>{{name ? name: '#'}}</h2>
+        <h2>{{data.displayName}}</h2>
         <slot></slot>
     </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
 export default {
     name: 'accountPanel',
-    props: ['avatar', 'name']
+    props: ['data']
 }
 </script>
 
@@ -23,5 +23,8 @@ export default {
     background-color: lightgrey;
     margin: 0 auto;
     margin-top: 1em;
+}
+h2{
+    height: 1.5em;
 }
 </style>

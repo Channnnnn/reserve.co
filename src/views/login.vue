@@ -3,68 +3,83 @@
     <div class="header">RESERVE.CO</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
-      <transition name="fade" mode="out-in">
+      <keep-alive><transition name="fade" mode="out-in">
       <div v-if="isRegister" class="registerDialog" key="reg">
         <h2>Create new account</h2>
         <div class="form">
           <div class="bundle">
-            <input v-model="register.username" v-validate="'required|alpha_num'" data-vv-delay=delay
-            :class="{'invalid' : (fields.username.invalid && fields.username.touched) || this.warnReg.validUsername.length > 1}" 
+            <input v-model="register.username" v-validate="'required|alpha_num'" data-vv-delay="1000"
+            :class="{'invalid' : !fields.username.pending &&
+              ((fields.username.invalid && (fields.username.dirty||fields.username.touched)) || 
+              this.warnReg.validUsername.length > 1)}" 
             type="text" name="username" id="username" required />
             
             <label for="username">Username</label>
-            <span v-show="(errors.has('username') || this.warnReg.validUsername.length > 1)" class="notifier">
+            <span v-show="!fields.username.pending && ((errors.has('username') ||
+              this.warnReg.validUsername.length > 1))" class="notifier">
               {{errors.first('username') || this.warnReg.validUsername}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
-            <input v-model="register.email" v-validate="'required|email'" data-vv-delay=delay
-            :class="{'invalid' : fields.email.invalid && fields.email.touched}" 
+            <input v-model="register.email" v-validate="'required|email'"
+            :class="{'invalid' : !fields.email.pending &&
+              ((fields.email.invalid && (fields.email.dirty||fields.email.touched)) ||
+              this.warnReg.validEmail)}" 
             type="text" name="email" id="email" required />
             
             <label for="email">Email</label>
-            <span v-show="errors.has('email')" class="notifier">
-              {{errors.first('email')}}
+            <span v-show="!fields.email.pending && (errors.has('email') ||
+              this.warnReg.validEmail)" class="notifier">
+              {{errors.first('email') || this.warnReg.validEmail}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
-            <input v-model="register.phone" v-validate="'required'" data-vv-delay=delay
-            :class="{'invalid' : (fields.phone.invalid && fields.phone.touched) || this.warnReg.validPhone.length > 1}" 
+            <input v-model="register.phone" v-validate="'required'" data-vv-delay="1000"
+            :class="{'invalid' : !fields.phone.pending &&
+              ((fields.phone.invalid && (fields.phone.dirty||fields.phone.touched)) || 
+              this.warnReg.validPhone.length > 1)}" 
             type="text" name="phone" id="phone" required />
             
             <label for="phone">Phone No.</label>
-            <span v-show="errors.has('phone') || this.warnReg.validPhone.length > 1" class="notifier">
+            <span v-show="!fields.phone.pending && (errors.has('phone') ||
+              this.warnReg.validPhone.length > 1)" class="notifier">
               {{errors.first('phone') || this.warnReg.validPhone}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
-            <input v-model="register.passward1" v-validate="'required'" data-vv-delay=delay
-            :class="{'invalid' : (fields.Password.invalid && fields.Password.touched) || this.warnReg.validPassword.length > 1}" 
+            <input v-model="register.password1" v-validate="'required'" data-vv-delay="1000"
+            :class="{'invalid' : !fields.Password.pending &&
+              ((fields.Password.invalid && (fields.Password.dirty||fields.Password.touched)) || 
+              this.warnReg.validPassword.length > 1)}" 
             type="password" name="Password" id="password1" required />
             
             <label for="password1">Password</label>
-            <span v-show="errors.has('Password') || this.warnReg.validPassword.length > 1" class="notifier">
+            <span v-show="!fields.Password.pending && (errors.has('Password') || 
+              this.warnReg.validPassword.length > 1)" class="notifier">
               {{errors.first('Password') || this.warnReg.validPassword}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
-            <input v-model="register.password2" v-validate="'required'" data-vv-delay=delay
-            :class="{'invalid' : (fields.password.invalid && fields.password.touched) || this.warnReg.matchPassword.length > 1}" 
+            <input v-model="register.password2" v-validate="'required|confirmed:Password'" data-vv-delay="1000"
+            :class="{'invalid' : !fields.password.pending &&
+              ((fields.password.invalid && (fields.password.dirty||fields.password.touched)) ||
+              this.warnReg.matchPassword.length > 1)}" 
             type="password" name="password" id="password2" required />
             
             <label for="password2">Confirm Password</label>
-            <span v-show="errors.has('password') || this.warnReg.matchPassword.length > 1" class="notifier">
+            <span v-show="!fields.password.pending && (errors.has('password') ||
+              this.warnReg.matchPassword.length > 1)" class="notifier">
               {{errors.first('password') || this.warnReg.matchPassword}}
             </span>
           </div>
           <a @click="validateBeforeRegister" class="button green">Register</a>
         </div>
       </div>
-
+      
       <div v-if="isLogin" class="loginDialog" key="log">
         <div class="form">
           <div class="bundle">
@@ -75,10 +90,10 @@
             <input required v-model="login.password" type="text" id="u-pass" name="password" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="loginAuthentacation">Login</a>
+          <a class="button blue" @click="loginAuthentication">Login</a>
         </div>
       </div>
-      </transition>
+      </transition></keep-alive>
       <a @click="registerDialog" class="button green" v-if="!isRegister && !isLogin">Register</a>
       <a @click="registerDialog" class="button transparent green" v-if="!isRegister && isLogin">or Register new account</a>
       <a @click="loginDialog" class="button blue" v-if="!isRegister && !isLogin">Login</a>
@@ -128,6 +143,7 @@ import {
             checkShopUsernameAvailability,
             checkAlreadyInQueue
 } from "@/scripts/api.js"
+import {db,auth} from '@/scripts/firebase_config';
 
 const config = {
     errorBagName: 'errors',
@@ -164,7 +180,7 @@ export default {
         username: '',
         email: '',
         phone: '',
-        passward1: '',
+        password1: '',
         password2: '',
       },
       login: {
@@ -173,6 +189,7 @@ export default {
       },
       warnReg: {
         validUsername: '',
+        validEmail: '',
         validPhone: '',
         validPassword: '',
         matchPassword: '',
@@ -182,95 +199,195 @@ export default {
   watch: {
     'register.username': _.debounce(function(){
       var regex = /^[a-zA-Z0-9]{4,25}$/
-      if(!this.register.username.match(regex)){
+      if(!this.register.username.match(regex) && this.register.username){
         this.warnReg.validUsername = 'Password length must be 4-25 characters.';
       } else { this.warnReg.validUsername = '';}
     },
     this.delay),
     'register.phone': _.debounce(function(){
-      if (this.register.phone === '') {
-        this.warnReg.validPhone = 'Phone number required';
-        return;
-      }
       var regex = /^(0[0-9]{9})$/
       if (!this.register.phone.match(regex) && this.register.phone){
-        this.warnReg.validPhone = 'Phone number must be 10-digits format.';
+        this.warnReg.validPhone = 'Phone number must be 10-digits format. (0XXXXXXXXX)';
       } else { this.warnReg.validPhone = ''; }
     },
     this.delay),
-    'register.passward1': _.debounce(function(){
+    'register.password1': _.debounce(function(){
       var regex = /^.{6,}$/
-      if( !this.register.passward1.match(regex) && this.register.passward1){
+      if( !this.register.password1.match(regex) && this.register.password1){
         this.warnReg.validPassword = 'Password length must be at least 6 characters.';
       } else { this.warnReg.validPassword = '';}
     },
     this.delay),
-    'register.password2': _.debounce(function(){
-      var match = (this.register.passward1 === this.register.password2);
-      if (match) this.warnReg.matchPassword = '';
-      else this.warnReg.matchPassword = 'Password confirmation does not match.';
+    'register.email': _.debounce(function(){
+      if ( this.fields.email.invalid && this.register.email ){
+        this.warnReg.validEmail = this.errors.first('email');
+      } else { this.warnReg.validEmail = ''; }
     },
     this.delay),
   },
   computed: {
     warnRegClean: function(){
-      var allwarn = this.warnReg.validUsername + this.warnReg.validPhone + this.warnReg.validPassword + this.warnReg.matchPassword;
+      var allwarn = this.warnReg.validUsername + this.warnReg.validEmail + this.warnReg.validPhone + this.warnReg.validPassword + this.warnReg.matchPassword;
       if (allwarn.length === 0) { return true; }
       else return false;
     }
   },
   methods: {
     validateBeforeRegister(){
+      let self = this;
+      var payload = this.register;
+      self.$store.dispatch('onLoadingAsync',true);
       this.$validator.validateAll().then((result) => {
         if (result && this.warnRegClean){
-          
           console.log('Submitting registeration...');
-          
-          var payload = this.register;
-          addNewUser(payload.username, payload.phone, payload.email, payload.passward1, function(result){
-            if (result.status){
-              this.$router.push({name: 'account'});
-            }
-          });
+          self._CreateNewUser(payload.username, payload.email, payload.password1, payload.phone)
         }
         else {  
+          self.$store.dispatch('onLoadingAsync',false);
           alert('Please correct all errors and try again.');
         }
       });
     },
 
-    loginAuthentacation(){
-      
-      signInWithUsername(this.login.username, this.login.password);
-      
-      var uid = getUserID();
-      if (uid){
-
-        this.$router.push({name: 'account'});
-      }
+    loginAuthentication(){
+      let self = this;
+      var payload = this.login;
+      var ref = db.ref("users");
+      self.$store.dispatch('onLoadingAsync',true);
+      ref.once("value")
+        .then((snapshot) => {
+          snapshot.forEach((childSnapshot) => {
+            if(childSnapshot.val().username == payload.username) {
+              self._SignInThenRedirect(childSnapshot.val().email, payload.password);
+            }
+          });
+        })
+        .catch((error) => {
+          self.$store.dispatch('onLoadingAsync',false);
+          console.log("Error while retrieving Username\n" + error);
+        });
     },
+
+    /**
+     * 
+     * Internal methods
+     * 
+     * **/
     
+    _CreateNewUser(username, email, password, phone){
+      let self = this;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          console.log("User created");
+          auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+              self._CreateNewDatabase(username, email, phone);
+              self._CreateNewProfileThenRedirect(username);
+            })
+            .catch(error => {
+              self.$store.dispatch('onLoadingAsync',false);
+              console.log("Unable to Signing In\n" + error);
+            });
+        })
+        .catch(err=>{
+          self.$store.dispatch('onLoadingAsync',false);
+          console.log("Error while Registering New User\n" + error);
+        });
+    },
+    _SignInThenRedirect(email, password){
+      let self = this;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(function() {
+          self.$store.dispatch('onAuthChanged');
+          self.$store.dispatch('onLoadingAsync',false);
+          console.log("Auth change");
+
+          if (self.$store.getters.GetRedirectPath){
+            var redirect = self.$store.getters.GetRedirectPath;
+            self.$store.dispatch('completedRedirect');
+            self.$router.push(redirect);
+          }
+          else{
+            self.$router.push({name: 'account'});
+          }
+        })
+        .catch(function(error) {
+          self.$store.dispatch('onLoadingAsync',false);
+          console.log("Error while Signing In\n" + error);
+        });
+    },
+
+    _CreateNewDatabase(newUsername, newEmail, newPhoneNumber){
+      var ref = db.ref('users');
+      ref.child(auth.currentUser.uid)
+        .update(
+          {
+            "username": newUsername,
+            "email": newEmail,
+            "first_name": "",
+            "last_name": "",
+            "phone_number": newPhoneNumber,
+            "push_notification": true
+        })
+        .then(() => { console.log("Profile on Realtime-DB Created"); })
+        .catch(err => { console.error("Creating profile in Realtime-DB failed\n" + err) });
+    },
+    _CreateNewProfileThenRedirect(newName){
+      var self = this;
+      auth.currentUser.updateProfile({
+        displayName: newName,
+        photoURL: ""
+        })
+        .then(()=>{ 
+          console.log('Profile Created');
+          self.$store.dispatch('onLoadingAsync',false);
+          self.$store.dispatch('onAuthChanged');
+          self.$router.push({name: 'account'});
+        })
+        .catch(err => { 
+          console.log('Createing profile in FAuth failed\n' + err); 
+          self._RollbackRegisteration(auth.currentUser.uid);
+        });
+    },
+    _RollbackRegisteration(userUID){
+      var ref = db.ref('users/' + userUID);
+      ref.remove()
+        .then(() => { 
+          console.log('Rollback registeration'); 
+          self.$store.dispatch('onLoadingAsync',false);
+        })
+        .catch((err) => { 
+          console.log('Rollback failed\n' + err);
+          self.$store.dispatch('onLoadingAsync',false);
+        });
+    },
+
+
+
+
+
+
     addNewUser(){
       addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja", function(result) {
           console.log(result);
       });
     },
-    signIn(){
-      signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
-          console.log(result);
-      });
+    // signIn(){
+    //   signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
+    //       console.log(result);
+    //   });
       // signIn("test@jongja.com", "testjongja", false, function(result) {
       //     console.log(result);
       // });
-    },
-    signInWithUsername(){
-      signInWithUsername("chanchai", "ch@nch.ai", function(result) {
-          console.log(result);
-      });
+    // },
+    // signInWithUsername(){
+    //   signInWithUsername("chanchai", "ch@nch.ai", function(result) {
+    //       console.log(result);
+    //   });
       // signInWithUsername("mekmekja", "mekmekja", function(result) {
       //     console.log(result);
       // });
-    },
+    // },
     signOut(){
       signOut("trash", function(result) {
           console.log(result);
@@ -281,9 +398,7 @@ export default {
       console.log(uid);
     },
     getUserInfo(){
-      getUserInfo("trash", function(result) {
-          console.log(result);
-      });
+      getUserInfo();
     },
     getUserReservation(){
       getUserReservation("trash", function(result) {
@@ -372,10 +487,13 @@ export default {
   display: flex;
   flex-flow: column;
   height: 100vh;
-  width: fit-content;
   margin: auto;
   align-items: center;
   justify-content: center;
+  @media screen and (max-height: 880px) {
+    height: 100%;
+    margin-top: 3em;
+  }
   .header{
     margin-top: auto;
     font-size: 3.45em;
@@ -387,8 +505,10 @@ export default {
   }
   .button-group{
     display: grid;
-    margin: 2em;
-    width: 100%;
+    box-sizing: border-box;
+    margin: 2em 0;
+    padding: 0 1em;
+    // width: 100%;
     grid-template-rows: auto;
     align-items: center;
     grid-gap: 10px;
@@ -495,13 +615,14 @@ export default {
         top: -1.25em;
         color: $color-blue;
       }
-    }
-    &.invalid{
-      box-shadow: 0 2px $color-orange;
-      & + label{
-        color: $color-orange;
+      &.invalid{
+        box-shadow: 0 2px $color-orange;
+        & + label{
+          color: $color-orange;
+        }
       }
     }
+    
     label{
       display: block;
       position: absolute;

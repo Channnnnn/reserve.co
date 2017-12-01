@@ -1,13 +1,13 @@
 <template>
     <div class="queue rounded">
-        <span class="q-num">{{data.number}}</span>
-        <router-link :to="{path: 'queue'+ data.id}" class="detail">
-            <span class="q-name">{{data.shopName}}</span>
-            <span class="q-status" :class="[data.status]"></span>
+        <span class="q-num">{{data.queue_number}}</span>
+        <router-link :to="{path: 'queue'+ data.key}" class="detail">
+            <span class="q-name">{{data.shop_id}}</span>
+            <span class="q-status" :class="[data.waiting ? 'waiting':'waiting']"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
         </router-link>
-        <a @click="queueAccept" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="accept button"></a>
-        <a @click="queueDecline" v-if="$route.path==='/managequeue' && data.status === 'waiting'" class="decline button"></a>
+        <a @click="queueAccept" v-if="$route.path==='/managequeue' && data.waiting === 'waiting'" class="accept button"></a>
+        <a @click="queueDecline" v-if="$route.path==='/managequeue' && data.waiting === 'waiting'" class="decline button"></a>
         <!-- <a @click="queueDismiss" v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button"></a> -->
     </div>
 </template>
@@ -18,10 +18,10 @@ export default {
     props: ['data'],
     methods: {
         queueAccept(){
-            this.data.status = 'accepted'
+            // this.data.status = 'accepted'
         },
         queueDecline(){
-            this.data.status = 'expired'
+            // this.data.status = 'expired'
         },
     }
 }
@@ -81,15 +81,6 @@ a.detail{
     font-weight: $font-bold;
     padding: 0 .5em 0 .5em;
     line-height: 1.1em;
-    /* Status Text */
-    // &.servicing::after{
-    //     content: "SERVICING";
-    //     color: $color-blue;
-    // }
-    // &.checkedout::after{
-    //     content: "CHECKED OUT";
-    //     color: $color-green;
-    // }
     &.accepted::after{
         content: "ACCEPTED";
         color: $color-green;

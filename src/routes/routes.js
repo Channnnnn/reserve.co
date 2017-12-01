@@ -33,27 +33,31 @@ export default [
   {
     path: '/settings',
     name: 'settings',
-    component: Settings
+    component: Settings,
+    meta: { requiresAuth: true }
   },
   {
     path: '/shop:id',
     name: 'shop',
-    component: Shop
+    component: Shop,
   },
   {
     path: '/editshop',
     name: 'editshop',
-    component: FormShop
+    component: FormShop,
+    meta: { requiresAuth: true }
   },
   {
     path: '/managequeue',
     name: 'managequeue',
-    component: QueueShop
+    component: QueueShop,
+    meta: { requiresAuth: true }
   },
   {
     path: '/setupshop',
     name: 'setupshop',
-    component: FormShop
+    component: FormShop,
+    meta: { requiresAuth: true }
   },
   {
     path: '/timeout',

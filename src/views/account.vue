@@ -9,14 +9,16 @@
         <!-- <Navbar :hasBack='false' :link="'/settings'"> -->
             <!-- <vButton :link="'/shop' + '1'" class="mini blue transparent button right">Manage Shop</vButton> -->
         <!-- </Navbar> -->
-        <AccountPanel :name="currentUser.info.data" class="panel">
+        <AccountPanel :data="user" class="panel">
             <div class="row group tab">
                 <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
                 <a href="#" class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
         <div class="reservation account">
-            <QueueItem v-for="queue in (showingReservation ? currentUser.reservation: currentUser.history)" v-if="queue.id" :key="queue.id" :data="queue"></QueueItem>
+            <keep-alive>
+            <QueueItem v-for="queue in currentView" :key="queue.key" :data="queue"></QueueItem>
+            </keep-alive>
         </div>
         <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
         <transition name="slide">
@@ -28,7 +30,9 @@
             <router-link :to="'/setupshop'" class="list orange button transparent">Setup a Shop</router-link>
             <span class="mini divider"></span>
             <div class="list header">Shop list</div>
-            <router-link :to="'/shop1'" class="list blue link">Shop 1</router-link>    
+            <router-link :to="'/shop1'" class="list blue link">Shop 1</router-link>
+            <Logout></Logout>
+            <!-- <a class="list red button"><div class="fa fa-sign-out"></div>Sign out</a> -->
         </div>
         </transition>
         <transition name="fade">
@@ -38,10 +42,12 @@
 </template>
 
 <script>
+import {db,auth} from '@/scripts/firebase_config';
 import Navbar from '@/components/navigationbar.vue'
 import vButton from "@/components/button.vue"
 import AccountPanel from "@/components/accountPanel.vue"
 import QueueItem from '@/components/queueEntry.vue'
+import Logout from '@/components/logoutButton.vue';
 import {
     getUserID,
     getUserInfo, 
@@ -54,29 +60,29 @@ export default {
         Navbar,
         QueueItem,
         AccountPanel,
-        vButton
+        vButton,
+        Logout
     },
-    props: ['data'],
+    // props: ['data'],
     computed:{
-        currentUser: function(){
-            return {
-                id: getUserID(),
-                info: getUserInfo(),
-                reservation: getUserReservation(),
-                history: getUserHistory(),
-            }
+        user: function(){
+            return this.$store.getters.HasAuth;
+        },
+        reservations: function(){
+            return this.$store.getters.GetUserReservation;
+        },
+        currentView: function(){
+            if (this.showingReservation) return this._FilterReservations();
+            else return this._FilterHistory();
         }
     },
     methods: {
-        
         SwitchTab(input){
             if (input === "reservation"){
-            this.showingReservation = true;
-            // this.showingHistory = false;
+                this.showingReservation = true;
             }
             else if (input === "history") {
-            this.showingReservation = false;
-            // this.showingHistory = true;
+                this.showingReservation = false;
             }
         },
         toggleAside(){
@@ -84,20 +90,76 @@ export default {
         },
         closeAside(){
             this.showAside = false;
+        },
+
+        _FilterReservations(){
+            let self = this;
+            var filtered = [];
+            this.reservations.forEach((item)=>{
+                if (!self._CheckShouldBeHistory(item.key)){
+                    filtered.push(item);
+                }
+            });
+            return filtered;
+        },
+        _FilterHistory(){
+            let self = this;
+            var filtered = [];
+            this.reservations.forEach((item)=>{
+                if (self._CheckShouldBeHistory(item.key)){
+                    filtered.push(item);
+                }
+            });
+            return filtered;
+        },
+        _GetUserAllReservation(){
+            console.log('Getting Reservations');
+            let self = this;
+            self.$store.dispatch('onLoadingAsync',true);
+            var ref = db.ref("queues").orderByKey();
+            let snapValue = [];
+
+            ref.on("value", function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    console.log(childSnapshot.val().user_id == self.user.uid);
+                    var key = childSnapshot.key;
+                    var childData = childSnapshot.val();
+
+                    if(childData.user_id == self.user.uid) {
+                        var queue = Object.assign({key: key},childData,);
+                        console.log(queue);
+                        snapValue.push(queue)
+                    }
+                });
+                // console.log('Try set reservation with ' + snapValue);
+                self.$store.dispatch('onLoadingAsync',false);
+                self.$store.dispatch('onSyncAllReservations', snapValue);
+            }, function(error) {
+                console.log("Error while retrieving Reservation\n" + error.code);
+                self.$store.dispatch('onLoadingAsync',false);
+                return [];
+            });
+        },
+
+        _CheckShouldBeHistory(timestamp){
+            if (!timestamp){
+                return false;
+            }
+            else {
+                let unixTime = parseInt(Date.now()/1000);
+                return unixTime - timestamp > 86400;
+            }
         }
     },
     data() {
         return {
             showingReservation: true,
-            // showingHistory: false,
-            showAside: false
+            showAside: false,
         }
     },
-    // beforeRouteEnter(to, from, next){
-    //     if(getUserID()){
-            
-    //     }
-    // }
+    created(){
+        this._GetUserAllReservation();
+    }
 }
 </script>
 
@@ -235,10 +297,10 @@ a.tab:hover{
     margin-right: .5rem;
 }
 
-.button .fa:first-child{
-    margin-right: .25em;
-    margin-bottom: .25em;
-}
+// .button .fa:first-child{
+//     margin-right: .25em;
+//     margin-bottom: .25em;
+// }
 .mini .fa:last-child{
     margin: -.1em 0 0 .25em;
 }

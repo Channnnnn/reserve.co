@@ -7,7 +7,7 @@
         <!-- <vButton :link="'/shop1'" class="mini transparent button right">Switch to Shop</vButton> -->
     </div>
     <!-- <Navbar :hasBack='true' :link="'/account'"></Navbar> -->
-    <AccountPanel>
+    <AccountPanel :data="user">
       <h3>Settings</h3>
     </AccountPanel>
     <div class="column group">
@@ -48,6 +48,11 @@ export default {
     Navbar,
     AccountPanel,
     vButton,
+  },
+  computed:{
+      user: function(){
+          return this.$store.getters.HasAuth
+      },
   },
   data(){
     return{
