@@ -1,7 +1,9 @@
 var path = require('path')
 var webpack = require('webpack')
 
-module.exports = {
+module.exports = {node: {
+  fs: 'empty'
+},
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
