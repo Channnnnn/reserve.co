@@ -27,7 +27,7 @@ export default [
     meta: { requiresAuth: true }
   },
   {
-    path: '/queue/:id',
+    path: '/queue/:qid',
     name: 'queue',
     component: Queue
   },

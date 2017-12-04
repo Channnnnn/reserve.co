@@ -1,7 +1,7 @@
 <template>
     <div class="queue rounded">
         <span class="q-num">{{data.queue_number}}</span>
-        <router-link :to="{name: 'queue', params: {id: data.key}}" class="detail">
+        <router-link :to="{name: 'queue', params: {qid: data.key}}" class="detail">
             <span class="q-name" v-if="$route.name === 'account'">{{data.shop_name}}</span>
             <span class="q-name" v-if="$route.name === 'managequeue'">{{data.user_display_name}}</span>
             <span class="q-status" :class="[data.status]"></span>

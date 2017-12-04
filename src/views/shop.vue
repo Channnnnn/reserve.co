@@ -36,6 +36,7 @@
         <a @click="copyURL" class="copy button">{{copyButton}}</a>
         <input ref="shopURL" class="shopurl" type="text" :value=shopURL readonly="readonly" />
       </div>
+      {{shopOpening}}
     </div>
     <transition name="slide">
     <div class="aside" v-if="showAside">
@@ -58,6 +59,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import {db,auth} from '@/scripts/firebase_config';
 import NotFound from '@/views/404'
 import Navbar from '@/components/navigationbar.vue'
@@ -113,6 +115,24 @@ export default {
         return notion;
       }
     },
+    shopOpening: function(){
+      var day = this.shopdata.service_days;
+      var open_time = this.shopdata.open_time;
+      var close_time = this.shopdata.close_time;
+      var openDays = [ (day.sun? 0:null) , 
+        (day.mon? 1:null),
+        (day.tue? 2:null),
+        (day.wed? 3:null),
+        (day.thu? 4:null),
+        (day.fri? 5:null),
+        (day.sat? 6:null), ].filter(Number);
+      console.log(openDays);
+      var currentDay = new Date().getDay();
+      var openToday = openDays.includes(currentDay);
+      var openMoment = moment().format('YYYY-MM-DD HH:mm')+" "+open_time;
+      var closeMoment = moment().format('YYYY-MM-DD HH:mm')+" "+close_time;
+      return console.log(moment(moment().format('YYYY-MM-DD HH:mm')).format('YYYY-MM-DD HH:mm')+"\n"+moment().format('YYYY-MM-DD HH:mm'));
+    }
   },
   watch: {
     '$route': '_FetchShopData',
@@ -177,7 +197,7 @@ export default {
             });
 
           console.log('Booked reservation');
-          self.$router.push({name: 'queue', params: {id: bookTime}});
+          self.$router.push({name: 'queue', params: {qid: bookTime}});
 
         }).catch(err => {
           //Fail to add queue

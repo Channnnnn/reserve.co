@@ -287,25 +287,26 @@ export default {
       let self = this;
       auth.signInWithEmailAndPassword(email, password)
         .then(function() {
-          console.log(auth.currentUser);
           self.$store.dispatch('onAuthChanged');
           //Signed in Fetch data
-          // var userDataRef = db.ref('users/' + self.$store.getters.HasAuth.uid);
-          // userDataRef.on("value", function(snap){
+          var userDataRef = db.ref('users/' + self.$store.getters.HasAuth.uid);
+          userDataRef.on("value", function(snap){
             //Fetch complete
-            // self.$store.dispatch('onSyncUserData', snap.val());
+            self.$store.dispatch('onSyncUserData', snap.val());
             self.$store.dispatch('onLoadingAsync',false);
 
             if (self.$store.getters.GetRedirectPath){
               var redirect = self.$store.getters.GetRedirectPath;
+              console.log('Redirect to ' + redirect);
               self.$store.dispatch('completedRedirect');
               self.$router.push(redirect);
             }
             else{
+              console.log('Entering account');
               self.$router.push({name: 'account'});
             }
 
-          // }), function(err) { console.log('Error getting user data\n' + err.code) }
+          }), function(err) { console.log('Error getting user data\n' + err.code) }
 
         })
         .catch(function(error) {

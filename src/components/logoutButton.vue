@@ -17,6 +17,9 @@ export default {
                 console.log('Signed Out');
                 self.$store.dispatch('onAuthChanged');
                 self.$store.dispatch('onSignOut');
+                self.$store.dispatch('onFetchCurrentShopData', null);
+                self.$store.dispatch('onFetchCurrentQueueData', null);
+                self.$store.dispatch('onFetchCurrentQueueUserData', null);
                 self.$router.push({name: 'login'})
             })
             .catch(err => { console.log('Error while signing out\n' + err);})

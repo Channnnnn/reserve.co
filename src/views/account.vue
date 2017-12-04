@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="user && userdata">
         <div class="nav blue">
             <a class="menu link" @click="toggleAside">
                 <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
@@ -8,8 +8,8 @@
         </div>
         <AccountPanel :data="user" class="panel">
             <div class="row group tab">
-                <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
-                <a href="#" class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
+                <a class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
+                <a class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
         <div v-if="redraw" class="reservation account">
@@ -84,8 +84,10 @@ export default {
     watch: {
         'user': function(){
             this._CheckAuth();
-            this._GetUserAllReservation();
-        }
+            this._GetUserData();
+            // this._GetUserAllReservation();
+        },
+        'userdata': '_GetUserAllReservation'
     },
     methods: {
         _CheckAuth(){
@@ -156,12 +158,11 @@ export default {
             let self = this;
             self.$store.dispatch('onLoadingAsync',true);
             var ref = db.ref("queues").orderByChild('user_id').equalTo(self.user.uid);
-
             ref.on("value", function(snapshot) {
                 self.$store.dispatch('onLoadingAsync',false);
                 self.$store.dispatch('onSyncAllReservations', snapshot.val());
             }, function(error) {
-                console.log("Error while retrieving Reservation\n" + error.code);
+                console.log("Error while retrieving Reservation\n" + error);
                 self.$store.dispatch('onLoadingAsync',false);
                 return [];
             });
@@ -185,8 +186,13 @@ export default {
         }
     },
     created(){
-        this._GetCurrentUser();
+        // this._GetCurrentUser();
+        this._GetUserAllReservation();
     },
+    destroyed(){
+        // this.$store.dispatch('onSyncUserData', null);
+        // this.$store.dispatch('onSyncAllReservations', null);
+    }
 }
 </script>
 

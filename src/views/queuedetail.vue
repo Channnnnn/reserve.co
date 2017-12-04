@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="userdata">
     <div v-if="shopOwner" class="nav orange">
-        <router-link :to="{name: 'managequeue', params: {id: queuedata.shop_id}}" class="menu link">
+        <router-link :to="{name: 'managequeue', params: {qid: queuedata.shop_id}}" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>ALL RESERVATIONS
         </router-link>
     </div>
@@ -39,7 +39,7 @@
       </div> -->
       <div class="big divider">Queue Timestamp</div>
       <div class="q-time">
-        <span>{{GetQueueTime($route.params.id)}}</span>
+        <span>{{GetQueueTime($route.params.qid)}}</span>
         <span>Registered queue</span>
         <span v-if="queuedata.timestamp_complete">{{GetQueueTime(queuedata.timestamp_complete)}}</span>
         <span v-if="queuedata.timestamp_complete">Queue {{queuedata.status}}</span>
@@ -79,7 +79,7 @@ export default {
       return Object.values(this.userdata.shop_list).includes(this.queuedata.shop_id);
     },
     queueDate: function(){
-      let date = this.UnixTimeToDate(this.$route.params.id);
+      let date = this.UnixTimeToDate(this.$route.params.qid);
       return date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear()
     }
   },
@@ -98,9 +98,9 @@ export default {
       // return date.getHours()+':'+date.getMinutes()
     },
     _FetchQueueData: function() {
-      console.log("Hello world")
       var self = this;
-      var queue_id = this.$route.params.id;
+      var queue_id = this.$route.params.qid;
+      console.log(this.$route)
       var queueRef = db.ref('queues/' + queue_id);
       queueRef.on('value', function(snap){
 
@@ -108,7 +108,7 @@ export default {
         self.$store.dispatch('onFetchCurrentQueueData', queueData);
 
         if (queueData){
-
+          console.log(queueData);
           //GET SHOP DATA
           let shopOfQueueRef = db.ref('shops/' + queueData.shop_id);
           shopOfQueueRef.once('value', function(snap){
@@ -131,6 +131,7 @@ export default {
 
         }
         else {
+          console.log('Queue does not exist');
           //queue not exist
         }
 
@@ -140,7 +141,7 @@ export default {
     },
     queueCancel(){
       // this.queue.status = 'canceled'
-      var queue_id = this.$route.params.id;
+      var queue_id = this.$route.params.qid;
       var queueRef = db.ref('queues').child(queue_id);
       queueRef.update({
         status: 'canceled',
@@ -149,7 +150,7 @@ export default {
     },
     queueAccept(){
       // this.queue.status = 'accepted'
-      var queue_id = this.$route.params.id;
+      var queue_id = this.$route.params.qid;
       var queueRef = db.ref('queues').child(queue_id);
       queueRef.update({
         status: 'accepted',
@@ -158,7 +159,7 @@ export default {
     },
     queueDecline(){
       // this.queue.status = 'expired'
-      var queue_id = this.$route.params.id;
+      var queue_id = this.$route.params.qid;
       var queueRef = db.ref('queues').child(queue_id);
       queueRef.update({
         status: 'expired',
@@ -166,21 +167,8 @@ export default {
       });
     }
   },
-  beforeRouteEnter(to,from,next){
-    if (from.name === 'account' || from.name === 'shop') {
-      next(vm => {
-        vm.routeType = 'user';
-      })
-    }
-    else if (from.name === 'managequeue'){
-      next(vm => {
-        vm.routeType = 'shop';  
-      })
-    }
-  },
   created(){
     this._FetchQueueData()
-    // console.log(this.UnixTimeToDate(this.$route.params.id));
   }
 }
 </script>
