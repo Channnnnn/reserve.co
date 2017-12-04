@@ -90,7 +90,7 @@
             <input @keyup.enter="loginAuthentication" required v-model="login.password" type="text" id="u-pass" name="password" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="uploadImage">Login</a>
+          <a class="button blue" @click="loginAuthentication">Login</a>
         </div>
       </div>
       </transition></keep-alive>
