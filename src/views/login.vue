@@ -90,7 +90,7 @@
             <input @keyup.enter="loginAuthentication" required v-model="login.password" type="text" id="u-pass" name="password" />
             <label for="u-pass">Password</label>
           </div>
-          <a class="button blue" @click="loginAuthentication">Login</a>
+          <a class="button blue" @click="uploadImage">Login</a>
         </div>
       </div>
       </transition></keep-alive>
@@ -142,7 +142,8 @@ import {
             addNewShop,
             checkUserUsernameAvailability,
             checkShopUsernameAvailability,
-            checkAlreadyInQueue
+            checkAlreadyInQueue,
+            checkIfInInterval
 } from "@/scripts/api.js"
 import {db,auth,storage} from '@/scripts/firebase_config';
 
@@ -370,14 +371,14 @@ export default {
           console.log(result);
       });
     },
-    // signIn(){
-    //   signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
-    //       console.log(result);
-    //   });
-      // signIn("test@jongja.com", "testjongja", false, function(result) {
-      //     console.log(result);
-      // });
-    // },
+    signIn(){
+      signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
+          console.log(result);
+      });
+      signIn("test@jongja.com", "testjongja", false, function(result) {
+          console.log(result);
+      });
+    },
     // signInWithUsername(){
     //   signInWithUsername("chanchai", "ch@nch.ai", function(result) {
     //       console.log(result);
@@ -464,6 +465,39 @@ export default {
     checkAlreadyInQueue(){
       checkAlreadyInQueue("MekMek", function(result) {
           console.log(result);
+      });
+    },
+    checkIfInInterval(){
+
+      var image;
+
+      checkIfInInterval(image);
+    },
+    uploadImage(){
+    
+      var destination = 'avatar/' + getUserID() + '.jpg';
+
+      //Image File From EventListener
+      var task = storage.ref(destination).put(imageFile);
+
+      task.on('state_changed', function progress(snapshot) {
+        var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+      }, function error(err) {
+        console.log("Error while retrieving Shop's Username");
+        console.log(error.code);
+
+      }, function complete() {
+        var downloadUrl = task.snapshot.downloadUrl;
+
+      });
+    },
+    getImageUrl(){
+      
+      var destination = 'avatar/' + getUserID() + '.jpg';
+
+      storage.ref(destination).getDownloadURL().then(function(url) {
+        var downloadUrl = url;
       });
     }
   },
