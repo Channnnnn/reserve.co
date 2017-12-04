@@ -2,7 +2,7 @@
     <div id="app">
         <Loader :loading="loading"></Loader>
         <transition name="fade-half" mode="in-out">
-        <router-view :data="data" class="app-div" 
+        <router-view class="app-div" 
             :class="{'container': $route.name != 'login', 
             'app-div100': $route.name == 'managequeue'}">
         </router-view>
@@ -26,119 +26,6 @@ export default {
         }
     },
     methods: {
-    },
-    data () {
-        return {
-        data:{
-            queues:[
-            {
-                id: 123123,
-                number: 27,
-                shopName: 'Shop27',
-                status: 'waiting',
-                detail: ''
-            },
-            {
-                id: 1231,
-                number: 14,
-                shopName: 'Shop8',
-                status: 'accepted',
-                detail: ''
-            },
-            {
-                id: 13123,
-                number: 10,
-                shopName: 'Shop86',
-                status: 'expired',
-                detail: ''
-            },
-            {
-                id: 23123,
-                number: 27,
-                shopName: 'Shop27',
-                status: 'waiting',
-                detail: ''
-            },
-            {
-                id: 1223,
-                number: 14,
-                shopName: 'Shop8',
-                status: 'accepted',
-                detail: ''
-            },
-            {
-                id: 2312,
-                number: 10,
-                shopName: 'Shop86',
-                status: 'canceled',
-                detail: ''
-            },
-            {
-                id: 183123,
-                number: 27,
-                shopName: 'Shop27',
-                status: 'waiting',
-                detail: ''
-            },
-            {
-                id: 523123,
-                number: 14,
-                shopName: 'Shop8',
-                status: 'accepted',
-                detail: ''
-            },
-            {
-                id: 13,
-                number: 10,
-                shopName: 'Shop86',
-                status: 'expired',
-                detail: ''
-            },
-            {
-                id: 2323,
-                number: 27,
-                shopName: 'Shop27',
-                status: 'waiting',
-                detail: ''
-            },
-            {
-                id: 23,
-                number: 14,
-                shopName: 'Shop8',
-                status: 'accepted',
-                detail: ''
-            },
-            {
-                id: 32,
-                number: 10,
-                shopName: 'Shop86',
-                status: 'expired',
-                detail: ''
-            },
-            {
-                id: 17823,
-                number: 27,
-                shopName: 'Shop27',
-                status: 'waiting',
-                detail: ''
-            },
-            {
-                id: 903123,
-                number: 14,
-                shopName: 'Shop8',
-                status: 'accepted',
-                detail: ''
-            },
-            {
-                id: 113123,
-                number: 10,
-                shopName: 'Shop86',
-                status: 'expired',
-                detail: ''
-            },
-            ]
-        }
-        }
     },
 }
 </script>
@@ -551,8 +438,11 @@ li.lite{
 .nav.ghost + *{
     margin-top: 0 !important;
 }
+.panel, .nav{
+    left: 0;
+}
 .panel + *{
-  margin-top: 17em !important;
+  margin-top: 9.5em !important;
 }
 .panel.shop + *{
   margin-top: 9.5em !important;

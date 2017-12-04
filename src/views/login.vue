@@ -257,6 +257,12 @@ export default {
         });
     },
 
+    // loginAsGuest(){
+    //   auth.signInAnonymously().catch(function(error) {
+    //     console.log(error.message);
+    //   });
+    // },
+
     /**
      * 
      * Internal methods

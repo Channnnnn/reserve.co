@@ -1,7 +1,9 @@
 <template>
-    <div>
-        <div class="avatar" :style="{backgroundImage : 'url(' +userAvatarURL+ ')'}"></div>
-        <h2 v-if="user">{{user.displayName}}</h2>
+    <div class="accountpanel">
+        <div class="profile">
+            <div class="avatar" :style="{backgroundImage : 'url(' +userAvatarURL+ ')'}"></div>
+            <h2 v-if="user">{{user.displayName}}</h2>
+        </div>
         <slot></slot>
     </div>
 </template>
@@ -40,15 +42,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.accountpanel{
+    left: 0;
+}
+.profile{
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+}
 .avatar {
     display: block;
-    height: 100px;
-    width: 100px;
+    height: 48px;
+    width: 48px;
     border-radius: 50%;
     border: none;
+    background-size: cover;
     background-color: lightgrey;
-    margin: 0 auto;
-    margin-top: 1em;
+    margin: 0 1em;
 }
 h2{
     height: 1.5em;

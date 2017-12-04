@@ -12,13 +12,19 @@
                 <a class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
-        <div v-if="redraw" class="reservation account">
-            <div>
-                <QueueItem v-if="queue.status === 'waiting' || queue.status === 'accepted'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+        <div class="reservation account" v-if="showingReservation">
+            <div class="waiting-group">
+                <QueueItem v-if="_Filter(queue) && queue.status === 'waiting'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+            </div>
+            <div class="accepted-group">
+                <QueueItem v-if="_Filter(queue) && queue.status === 'accepted'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
             </div>
             <div>
-                <QueueItem v-if="queue.status === 'canceled' || queue.status === 'expired'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+                <QueueItem v-if="_Filter(queue) && queue.status === 'canceled' || queue.status === 'expired'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
             </div>
+        </div>
+        <div class="reservation account" v-if="!showingReservation">
+            <QueueItem v-if="_Filter(queue)" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
         </div>
         <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
         <transition name="slide">
@@ -85,9 +91,11 @@ export default {
         'user': function(){
             this._CheckAuth();
             this._GetUserData();
-            // this._GetUserAllReservation();
+            if (this.notFetchedOnCreate) {
+                this._GetUserAllReservation();
+            }
         },
-        'userdata': '_GetUserAllReservation'
+        'userdata': '_GetUserAllReservation',
     },
     methods: {
         _CheckAuth(){
@@ -122,38 +130,21 @@ export default {
             }
         },
         _Reservations(){
-            var re = []
+            var reserve = []
             var reservations = this.reservations;
             for (const r in reservations){
-                re.push(Object.assign({key: r}, reservations[r]));
+                reserve.push(Object.assign({key: r}, reservations[r]));
             }
-            
-            return re;
+            return reserve.reverse();
         },
-        // _FilterReservations(){
-        //     let self = this;
-        //     var filtered = [];
-        //     if (self.reservations) {
-        //         this.reservations.forEach((item)=>{
-        //             if (!self._CheckShouldBeHistory(item.key)){
-        //                 filtered.push(item);
-        //             }
-        //         });
-        //     }
-        //     return filtered;
-        // },
-        // _FilterHistory(){
-        //     let self = this;
-        //     var filtered = [];
-        //     if (self.reservations) {
-        //         this.reservations.forEach((item)=>{
-        //             if (self._CheckShouldBeHistory(item.key)){
-        //                 filtered.push(item);
-        //             }
-        //         });
-        //     }
-        //     return filtered;
-        // },
+        _Filter(item){
+            let self = this;
+            var timeMark = item.key;
+            if (item.timestamp_complete) timeMark = item.timestamp_complete;
+            var isHistory = self._CheckShouldBeHistory(timeMark);
+            var showHistory = !self.showingReservation;
+            return (isHistory && showHistory) || (!isHistory && !showHistory);
+        },
         _GetUserAllReservation(){
             let self = this;
             self.$store.dispatch('onLoadingAsync',true);
@@ -174,7 +165,7 @@ export default {
             }
             else {
                 let unixTime = parseInt(Date.now());
-                return unixTime - timestamp > 86400000;
+                return (unixTime - timestamp) > 8640000;
             }
         }
     },
@@ -182,12 +173,17 @@ export default {
         return {
             showingReservation: true,
             showAside: false,
-            redraw: true,
+            notFetchedOnCreate: false,
         }
     },
     created(){
         // this._GetCurrentUser();
-        this._GetUserAllReservation();
+        if (this.user) {
+            this._GetUserAllReservation();
+        }
+        else {
+            this.notFetchedOnCreate = true;
+        }
     },
     destroyed(){
         // this.$store.dispatch('onSyncUserData', null);
@@ -198,6 +194,20 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/variable";
+hr{
+    border: 0;
+    border-bottom: 1px solid $color-grey25;
+}
+
+.waiting-group, .accepted-group{
+    >:last-child::after{
+        content: "";
+        margin: 1em;
+        border: 0;
+        border-bottom: 1px solid $color-grey25;
+    }
+}
+
 .slide-enter-active, .slide-leave-active{
   transition: transform .3s;
 }
@@ -213,8 +223,6 @@ export default {
   left: 0;
   z-index: 10;
   background-color: rgba(255,255,255,.95);
-  // background-color: rgba(64,64,64,0.9);
-  // color: white;
   box-shadow: 0 0 12px $color-grey;
   width: 275px;
   height: 100%;

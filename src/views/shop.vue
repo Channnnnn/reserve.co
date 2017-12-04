@@ -15,20 +15,25 @@
       <vButton :link="{name : 'account'}" class="mini orange transparent button right">Switch to Account</vButton>
     </div>
     <div class="cover"></div>
-    <div class="s-detail">
+    <div class="s-detail" v-if="shopdata.key === $route.params.id">
       <h2>{{shopdata.name}}</h2>
       <div>
         <div class="lite multiline">
           <div class="fa fa-pencil-square-o" aria-hidden="true"></div>{{shopdata.description}}</div>
         <div class="lite">
           <div class="fa fa-clock-o"></div>{{shopdata.open_time}} - {{shopdata.close_time}} · {{shopDayNotion}}
-          <div class="right bubble pointleft opening"></div>
+          <div class="right bubble pointleft" :class="[checkAvailableTime ? 'opening':'closing']"></div>
         </div>
         <div class="lite">
           <div class="fa fa-phone"></div>087 654 3210</div>
       </div>
       <div class="column-group">
-        <a @click="bookReservation" v-if="shopdata.owner != user.uid" class="huge wide green button">Book Reservation</a>
+        <a @click="bookReservation" 
+          v-if="(shopdata.owner != user.uid) && checkAvailableTime && pendingConfirmed && hasPendingReservation.status != 'waiting'" 
+          class="huge wide green button">Book Reservation</a>
+        <vButton v-if="(shopdata.owner != user.uid) && hasPendingReservation.status === 'waiting'" 
+          :link="{name: 'queue', params: {qid: hasPendingReservation.key}}" 
+          class="huge wide blue button">View Reservation</vButton>
         <vButton v-if="shopdata.owner === user.uid" :link="{name: 'managequeue'}" class="huge wide green button">Manage Reservation</vButton>
         <vButton v-if="shopdata.owner === user.uid" :link="{name: 'editshop'}" class="orange transparent button link">Edit Shop Info</vButton>
       </div>
@@ -36,7 +41,6 @@
         <a @click="copyURL" class="copy button">{{copyButton}}</a>
         <input ref="shopURL" class="shopurl" type="text" :value=shopURL readonly="readonly" />
       </div>
-      {{shopOpening}}
     </div>
     <transition name="slide">
     <div class="aside" v-if="showAside">
@@ -59,7 +63,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import {db,auth} from '@/scripts/firebase_config';
 import NotFound from '@/views/404'
 import Navbar from '@/components/navigationbar.vue'
@@ -115,27 +118,46 @@ export default {
         return notion;
       }
     },
-    shopOpening: function(){
+    checkAvailableTime: function() {
       var day = this.shopdata.service_days;
       var open_time = this.shopdata.open_time;
       var close_time = this.shopdata.close_time;
-      var openDays = [ (day.sun? 0:null) , 
-        (day.mon? 1:null),
-        (day.tue? 2:null),
-        (day.wed? 3:null),
-        (day.thu? 4:null),
-        (day.fri? 5:null),
-        (day.sat? 6:null), ].filter(Number);
-      console.log(openDays);
+      
+      var openDays = [(day.sun ? 0 : null),
+          (day.mon ? 1 : null),
+          (day.tue ? 2 : null),
+          (day.wed ? 3 : null),
+          (day.thu ? 4 : null),
+          (day.fri ? 5 : null),
+          (day.sat ? 6 : null),].filter(Number);
+      // console.log(openDays);
+
       var currentDay = new Date().getDay();
       var openToday = openDays.includes(currentDay);
-      var openMoment = moment().format('YYYY-MM-DD HH:mm')+" "+open_time;
-      var closeMoment = moment().format('YYYY-MM-DD HH:mm')+" "+close_time;
-      return console.log(moment(moment().format('YYYY-MM-DD HH:mm')).format('YYYY-MM-DD HH:mm')+"\n"+moment().format('YYYY-MM-DD HH:mm'));
-    }
+
+      // Phuwach continues here.
+
+      if (!openToday) { return false; }
+
+      // Direct string comparison.
+      var openOverNight = (open_time > close_time ? true : false);
+
+      var current_time = new Date().getHours() + ":" + new Date().getMinutes();
+      
+      if (openOverNight) {
+          if ((current_time < close_time) || (current_time > open_time)) return true;
+          else return false;
+      } else {
+          if ((current_time > open_time) && (current_time < close_time)) return true;
+          else return false;
+      }
+    },
   },
   watch: {
-    '$route': '_FetchShopData',
+    '$route': function(){
+      this._FetchShopData();
+      this._LastResevation();
+    }
   },
   methods: {
     copyURL: function(){
@@ -215,11 +237,12 @@ export default {
       var shopID = self.$route.params.id;
       var ref = db.ref('shops/' + shopID);
       ref.once('value', function(snap){
-      
+        // console.log(snap.key)
+        var shopData = Object.assign({key: snap.key}, snap.val());
         self.$store.dispatch('onLoadingAsync',false);
         if (snap.val()) self.shopNotExist = false;
         else self.shopNotExist = true;
-        self.$store.dispatch('onFetchCurrentShopData', snap.val());
+        self.$store.dispatch('onFetchCurrentShopData', shopData);
       
       }), function(err) {
       
@@ -228,6 +251,28 @@ export default {
         console.log('Error retrieving Shop Info\n' + err.code);
 
       }
+    },
+    _LastResevation(){
+      let self = this;
+      var query = db.ref('queues')
+        .orderByChild('shop_id')
+        .equalTo(self.$route.params.id)
+        .limitToLast(1);
+      query.once('value', function(snapQuery){
+        if (snapQuery.val()){
+          var Keys = Object.keys(snapQuery.val());
+          var Values = Object.values(snapQuery.val());
+          var Item = Object.assign({key: Keys[0]}, Values[0]);
+          self.hasPendingReservation = Item;
+          self.pendingConfirmed = true;
+        }
+        else {
+          self.pendingConfirmed = true;
+        }
+        // return Object.assign({key: Keys[0]}, Values[0]);
+      }, function(err) {
+        console.log("Error get last reservation\n" + err.code);
+      })
     }
   },
   data() {
@@ -235,10 +280,13 @@ export default {
       shopNotExist: false,
       showAside: false,
       copyButton: 'Copy URL',
+      hasPendingReservation: { key: '', status: '' },
+      pendingConfirmed: false,
     }
   },
   created(){
     this._FetchShopData();
+    this._LastResevation();
   }
 }
 </script>
