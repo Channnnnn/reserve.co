@@ -12,7 +12,8 @@ export default [
   { path: '*', component: NotFound},
   {
     path: '/',
-    name: 'home'
+    name: 'home',
+    component: Login,
   },
   {
     path: '/login',
@@ -26,35 +27,30 @@ export default [
     meta: { requiresAuth: true }
   },
   {
-    path: '/queue:id',
+    path: '/queue/:id',
     name: 'queue',
     component: Queue
   },
   {
-    path: '/settings',
+    path: '/account/settings',
     name: 'settings',
     component: Settings,
     meta: { requiresAuth: true }
   },
   {
-    path: '/shop:id',
-    name: 'shop',
-    component: Shop,
-  },
-  {
-    path: '/editshop',
+    path: '/:id/edit',
     name: 'editshop',
     component: FormShop,
     meta: { requiresAuth: true }
   },
   {
-    path: '/managequeue',
+    path: '/:id/managequeue',
     name: 'managequeue',
     component: QueueShop,
     meta: { requiresAuth: true }
   },
   {
-    path: '/setupshop',
+    path: '/account/setupshop',
     name: 'setupshop',
     component: FormShop,
     meta: { requiresAuth: true }
@@ -63,5 +59,10 @@ export default [
     path: '/timeout',
     name: 'session',
     component: Session
-  }
+  },
+  {
+    path: '/:id',
+    name: 'shop',
+    component: Shop,
+  },
 ]

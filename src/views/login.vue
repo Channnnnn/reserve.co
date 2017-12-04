@@ -87,7 +87,7 @@
             <label for="u-name">Username</label>
           </div>
           <div class="bundle">
-            <input required v-model="login.password" type="text" id="u-pass" name="password" />
+            <input @keyup.enter="loginAuthentication" required v-model="login.password" type="text" id="u-pass" name="password" />
             <label for="u-pass">Password</label>
           </div>
           <a class="button blue" @click="loginAuthentication">Login</a>
@@ -123,6 +123,7 @@
 import _ from 'lodash'
 import Vue from 'vue'
 import vee from 'vee-validate'
+import VeeConfig from '@/scripts/vee_config.js'
 import {
             addNewUser,
             signIn,
@@ -143,31 +144,9 @@ import {
             checkShopUsernameAvailability,
             checkAlreadyInQueue
 } from "@/scripts/api.js"
-import {db,auth} from '@/scripts/firebase_config';
+import {db,auth,storage} from '@/scripts/firebase_config';
 
-const config = {
-    errorBagName: 'errors',
-    fieldsBagName: 'fields',
-    delay: 0,
-    locale: 'en',
-    dictionary: null,
-    strict: true,
-    classes: false,
-    classNames: {
-        touched: 'touched',
-        untouched: 'untouched',
-        valid: 'valid',
-        invalid: 'invalid',
-        pristine: 'pristine',
-        dirty: 'dirty'
-    },
-    events: 'input|blur',
-    inject: true,
-    validity: false,
-    aria: true
-};
-
-Vue.use(vee,config);
+Vue.use(vee,VeeConfig);
 
 export default {
   name: 'login',
@@ -197,6 +176,7 @@ export default {
     }
   },
   watch: {
+    user: '_CheckAuth',
     'register.username': _.debounce(function(){
       var regex = /^[a-zA-Z0-9]{4,25}$/
       if(!this.register.username.match(regex) && this.register.username){
@@ -205,9 +185,9 @@ export default {
     },
     this.delay),
     'register.phone': _.debounce(function(){
-      var regex = /^(0[0-9]{9})$/
+      var regex = /^0(\d\s*){9}$/
       if (!this.register.phone.match(regex) && this.register.phone){
-        this.warnReg.validPhone = 'Phone number must be 10-digits format. (0XXXXXXXXX)';
+        this.warnReg.validPhone = 'Phone number must be 10-digits format. (0XX XXX XXXX)';
       } else { this.warnReg.validPhone = ''; }
     },
     this.delay),
@@ -226,6 +206,9 @@ export default {
     this.delay),
   },
   computed: {
+    user: function(){
+      return this.$store.getters.HasAuth;
+    },
     warnRegClean: function(){
       var allwarn = this.warnReg.validUsername + this.warnReg.validEmail + this.warnReg.validPhone + this.warnReg.validPassword + this.warnReg.matchPassword;
       if (allwarn.length === 0) { return true; }
@@ -233,14 +216,20 @@ export default {
     }
   },
   methods: {
+    _CheckAuth(){
+      if (this.user) {
+        this.$router.replace({name: 'account'});
+      }
+    },
     validateBeforeRegister(){
       let self = this;
       var payload = this.register;
+      var formattedPhone = this.register.phone.replace(/\s/g, '').replace(/^0(\d{2})(\d{3})(\d{4})$/, '0$1 $2 $3');
       self.$store.dispatch('onLoadingAsync',true);
       this.$validator.validateAll().then((result) => {
         if (result && this.warnRegClean){
           console.log('Submitting registeration...');
-          self._CreateNewUser(payload.username, payload.email, payload.password1, payload.phone)
+          self._CreateNewUser(payload.username, payload.email, payload.password1, formattedPhone)
         }
         else {  
           self.$store.dispatch('onLoadingAsync',false);
@@ -298,18 +287,26 @@ export default {
       let self = this;
       auth.signInWithEmailAndPassword(email, password)
         .then(function() {
+          console.log(auth.currentUser);
           self.$store.dispatch('onAuthChanged');
-          self.$store.dispatch('onLoadingAsync',false);
-          console.log("Auth change");
+          //Signed in Fetch data
+          // var userDataRef = db.ref('users/' + self.$store.getters.HasAuth.uid);
+          // userDataRef.on("value", function(snap){
+            //Fetch complete
+            // self.$store.dispatch('onSyncUserData', snap.val());
+            self.$store.dispatch('onLoadingAsync',false);
 
-          if (self.$store.getters.GetRedirectPath){
-            var redirect = self.$store.getters.GetRedirectPath;
-            self.$store.dispatch('completedRedirect');
-            self.$router.push(redirect);
-          }
-          else{
-            self.$router.push({name: 'account'});
-          }
+            if (self.$store.getters.GetRedirectPath){
+              var redirect = self.$store.getters.GetRedirectPath;
+              self.$store.dispatch('completedRedirect');
+              self.$router.push(redirect);
+            }
+            else{
+              self.$router.push({name: 'account'});
+            }
+
+          // }), function(err) { console.log('Error getting user data\n' + err.code) }
+
         })
         .catch(function(error) {
           self.$store.dispatch('onLoadingAsync',false);
@@ -324,10 +321,10 @@ export default {
           {
             "username": newUsername,
             "email": newEmail,
-            "first_name": "",
-            "last_name": "",
+            "display_name": newUsername,
             "phone_number": newPhoneNumber,
-            "push_notification": true
+            "push_notification": true,
+            "shop_list" : []
         })
         .then(() => { console.log("Profile on Realtime-DB Created"); })
         .catch(err => { console.error("Creating profile in Realtime-DB failed\n" + err) });
@@ -336,7 +333,7 @@ export default {
       var self = this;
       auth.currentUser.updateProfile({
         displayName: newName,
-        photoURL: ""
+        photoURL: '/user-avatar.gif'
         })
         .then(()=>{ 
           console.log('Profile Created');
@@ -487,6 +484,7 @@ export default {
   display: flex;
   flex-flow: column;
   height: 100vh;
+  width: 100% !important;
   margin: auto;
   align-items: center;
   justify-content: center;

@@ -4,21 +4,21 @@
             <a class="menu link" @click="toggleAside">
                 <div class="fa fa-bars rightspaced"></div>MY ACCOUNT
             </a>
-            <vButton :link="'/shop1'" class="mini transparent button right">Switch to Shop</vButton>
+            <vButton v-if="userdata.shop_list" :link="{name: 'shop', params: {id: firstShopInList}}" class="mini transparent button right">Switch to Shop</vButton>
         </div>
-        <!-- <Navbar :hasBack='false' :link="'/settings'"> -->
-            <!-- <vButton :link="'/shop' + '1'" class="mini blue transparent button right">Manage Shop</vButton> -->
-        <!-- </Navbar> -->
         <AccountPanel :data="user" class="panel">
             <div class="row group tab">
                 <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
                 <a href="#" class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
             </div>
         </AccountPanel>
-        <div class="reservation account">
-            <keep-alive>
-            <QueueItem v-for="queue in currentView" :key="queue.key" :data="queue"></QueueItem>
-            </keep-alive>
+        <div v-if="redraw" class="reservation account">
+            <div>
+                <QueueItem v-if="queue.status === 'waiting' || queue.status === 'accepted'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+            </div>
+            <div>
+                <QueueItem v-if="queue.status === 'canceled' || queue.status === 'expired'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+            </div>
         </div>
         <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
         <transition name="slide">
@@ -26,11 +26,11 @@
             <a class="menu link" @click="toggleAside">
                 <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
             </a>
-            <router-link :to="'/settings'" class="list blue link">Settings</router-link>
-            <router-link :to="'/setupshop'" class="list orange button transparent">Setup a Shop</router-link>
+            <router-link :to="{name: 'settings'}" class="list blue link">Settings</router-link>
+            <router-link :to="{name: 'setupshop'}" class="list orange button transparent">Setup a Shop</router-link>
             <span class="mini divider"></span>
             <div class="list header">Shop list</div>
-            <router-link :to="'/shop1'" class="list blue link">Shop 1</router-link>
+            <router-link :to="{name: 'shop', params: {id: shop}}" v-for="shop in userdata.shop_list" :key="shop" class="list blue link">{{shop}}</router-link>
             <Logout></Logout>
             <!-- <a class="list red button"><div class="fa fa-sign-out"></div>Sign out</a> -->
         </div>
@@ -63,7 +63,6 @@ export default {
         vButton,
         Logout
     },
-    // props: ['data'],
     computed:{
         user: function(){
             return this.$store.getters.HasAuth;
@@ -71,12 +70,29 @@ export default {
         reservations: function(){
             return this.$store.getters.GetUserReservation;
         },
-        currentView: function(){
-            if (this.showingReservation) return this._FilterReservations();
-            else return this._FilterHistory();
+        userdata: function(){
+            return this.$store.getters.UserData;
+        },
+        firstShopInList: function(){
+            if (this.userdata){
+                for (var first in this.userdata.shop_list){
+                    return first;
+                }
+            }
+        }
+    },
+    watch: {
+        'user': function(){
+            this._CheckAuth();
+            this._GetUserAllReservation();
         }
     },
     methods: {
+        _CheckAuth(){
+            if (!this.user) {
+                this.$router.replace({name: 'session'});
+            }
+        },
         SwitchTab(input){
             if (input === "reservation"){
                 this.showingReservation = true;
@@ -91,49 +107,59 @@ export default {
         closeAside(){
             this.showAside = false;
         },
-
-        _FilterReservations(){
-            let self = this;
-            var filtered = [];
-            this.reservations.forEach((item)=>{
-                if (!self._CheckShouldBeHistory(item.key)){
-                    filtered.push(item);
-                }
-            });
-            return filtered;
+        _GetCurrentUser(){
+            this.$store.dispatch('onFetchUser', auth.currentUser);
         },
-        _FilterHistory(){
-            let self = this;
-            var filtered = [];
-            this.reservations.forEach((item)=>{
-                if (self._CheckShouldBeHistory(item.key)){
-                    filtered.push(item);
-                }
-            });
-            return filtered;
+        _GetUserData(){
+            if (this.user){
+                let self = this;
+                var ref = db.ref('users/' + self.user.uid);
+                ref.on('value', function(snap){
+                    self.$store.dispatch('onSyncUserData', snap.val());
+                }, function(err) { console.log('Error getting user data\n' + err.code); })
+            }
         },
+        _Reservations(){
+            var re = []
+            var reservations = this.reservations;
+            for (const r in reservations){
+                re.push(Object.assign({key: r}, reservations[r]));
+            }
+            
+            return re;
+        },
+        // _FilterReservations(){
+        //     let self = this;
+        //     var filtered = [];
+        //     if (self.reservations) {
+        //         this.reservations.forEach((item)=>{
+        //             if (!self._CheckShouldBeHistory(item.key)){
+        //                 filtered.push(item);
+        //             }
+        //         });
+        //     }
+        //     return filtered;
+        // },
+        // _FilterHistory(){
+        //     let self = this;
+        //     var filtered = [];
+        //     if (self.reservations) {
+        //         this.reservations.forEach((item)=>{
+        //             if (self._CheckShouldBeHistory(item.key)){
+        //                 filtered.push(item);
+        //             }
+        //         });
+        //     }
+        //     return filtered;
+        // },
         _GetUserAllReservation(){
-            console.log('Getting Reservations');
             let self = this;
             self.$store.dispatch('onLoadingAsync',true);
-            var ref = db.ref("queues").orderByKey();
-            let snapValue = [];
+            var ref = db.ref("queues").orderByChild('user_id').equalTo(self.user.uid);
 
             ref.on("value", function(snapshot) {
-                snapshot.forEach(function(childSnapshot) {
-                    console.log(childSnapshot.val().user_id == self.user.uid);
-                    var key = childSnapshot.key;
-                    var childData = childSnapshot.val();
-
-                    if(childData.user_id == self.user.uid) {
-                        var queue = Object.assign({key: key},childData,);
-                        console.log(queue);
-                        snapValue.push(queue)
-                    }
-                });
-                // console.log('Try set reservation with ' + snapValue);
                 self.$store.dispatch('onLoadingAsync',false);
-                self.$store.dispatch('onSyncAllReservations', snapValue);
+                self.$store.dispatch('onSyncAllReservations', snapshot.val());
             }, function(error) {
                 console.log("Error while retrieving Reservation\n" + error.code);
                 self.$store.dispatch('onLoadingAsync',false);
@@ -146,8 +172,8 @@ export default {
                 return false;
             }
             else {
-                let unixTime = parseInt(Date.now()/1000);
-                return unixTime - timestamp > 86400;
+                let unixTime = parseInt(Date.now());
+                return unixTime - timestamp > 86400000;
             }
         }
     },
@@ -155,11 +181,12 @@ export default {
         return {
             showingReservation: true,
             showAside: false,
+            redraw: true,
         }
     },
     created(){
-        this._GetUserAllReservation();
-    }
+        this._GetCurrentUser();
+    },
 }
 </script>
 

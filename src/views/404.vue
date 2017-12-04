@@ -21,7 +21,7 @@ export default {
     display: flex;
     flex-flow: column;
     height: 100vh;
-    width: fit-content;
+    width: 100%;
     margin: auto;
     align-items: center;
     justify-content: center;

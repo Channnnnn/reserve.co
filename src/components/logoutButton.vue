@@ -16,6 +16,7 @@ export default {
             .then(() => { 
                 console.log('Signed Out');
                 self.$store.dispatch('onAuthChanged');
+                self.$store.dispatch('onSignOut');
                 self.$router.push({name: 'login'})
             })
             .catch(err => { console.log('Error while signing out\n' + err);})

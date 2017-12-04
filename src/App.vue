@@ -2,7 +2,10 @@
     <div id="app">
         <Loader :loading="loading"></Loader>
         <transition name="fade-half" mode="in-out">
-        <router-view :data="data" class="app-div" :class="{'container': $route.name != 'login', 'app-div100': $route.name == 'managequeue'}"></router-view>
+        <router-view :data="data" class="app-div" 
+            :class="{'container': $route.name != 'login', 
+            'app-div100': $route.name == 'managequeue'}">
+        </router-view>
         </transition>
     </div>
 </template>
@@ -279,6 +282,7 @@ a.link{
   border-radius: 4px;
   padding: 0 2px;
   transition: background-color .15s;
+  user-select: none;
   &.blue:hover{
     background-color: $color-blue10;
   }
@@ -364,6 +368,7 @@ a.button{
     color: white;
     background-color: $color-grey;
     opacity: $opacity-link;
+    transition: all .15s;
     &:hover{
         opacity: 1;
     }

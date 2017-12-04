@@ -1,65 +1,65 @@
 <template>
-  <div>
-    <div v-if="!auth" class="ghost nav">
-      <vButton :link="'/login'" class="mini transparent button right">Login</vButton>
+  <div v-if="shopdata">
+    <div v-if="!user" class="ghost nav">
+      <a @click='loginThenRedirectHere' class="mini transparent button right">Login</a>
     </div>
-    <div v-if="!owner && auth" class="nav blue"><!-- Show this instead if not owner -->
-      <router-link :to="'/account'" class="menu link">
+    <div v-if="user && shopdata && user.uid != shopdata.owner" class="nav blue"><!-- Show this instead if not owner -->
+      <router-link :to="{name : 'account'}" class="menu link">
         <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
       </router-link>
     </div>
-    <div v-if="owner && auth" class="nav orange"><!-- Show this if shop owner -->
+    <div v-if="user && shopdata && user.uid === shopdata.owner" class="nav orange"><!-- Show this if shop owner -->
       <a class="menu link" @click="toggleAside">
           <div class="fa fa-bars rightspaced"></div>MY SHOP
       </a>
-      <vButton :link="'/account'" class="mini orange transparent button right">Switch to Account</vButton>
+      <vButton :link="{name : 'account'}" class="mini orange transparent button right">Switch to Account</vButton>
     </div>
     <div class="cover"></div>
     <div class="s-detail">
-      <h2>Shop Name</h2>
+      <h2>{{shopdata.name}}</h2>
       <div>
         <div class="lite multiline">
-          <div class="fa fa-pencil-square-o" aria-hidden="true"></div>{{s}}</div>
+          <div class="fa fa-pencil-square-o" aria-hidden="true"></div>{{shopdata.description}}</div>
         <div class="lite">
-          <div class="fa fa-clock-o"></div>9:30 - 21:30 · Mon-Fri
+          <div class="fa fa-clock-o"></div>{{shopdata.open_time}} - {{shopdata.close_time}} · {{shopDayNotion}}
           <div class="right bubble pointleft opening"></div>
         </div>
         <div class="lite">
           <div class="fa fa-phone"></div>087 654 3210</div>
       </div>
       <div class="column-group">
-        <a v-if="!owner" class="huge wide green button">Book Reservation</a>
-        <vButton v-if="owner" :link="'/managequeue'" class="huge wide green button">Manage Reservation</vButton>
-        <vButton v-if="owner" :link="'/editshop'" class="orange transparent button link">Edit Shop Info</vButton>
+        <a @click="bookReservation" v-if="shopdata.owner != user.uid" class="huge wide green button">Book Reservation</a>
+        <vButton v-if="shopdata.owner === user.uid" :link="{name: 'managequeue'}" class="huge wide green button">Manage Reservation</vButton>
+        <vButton v-if="shopdata.owner === user.uid" :link="{name: 'editshop'}" class="orange transparent button link">Edit Shop Info</vButton>
       </div>
       <div class="rounded row group urlinfo">
-        <a class="copy button">Copy URL</a>
-        <input class="shopurl" type="text" value="https://reserve.co/shopURL" readonly="readonly" />
+        <a @click="copyURL" class="copy button">{{copyButton}}</a>
+        <input ref="shopURL" class="shopurl" type="text" :value=shopURL readonly="readonly" />
       </div>
     </div>
     <transition name="slide">
     <div class="aside" v-if="showAside">
       <a class="menu link" @click="toggleAside">
-        <div class="fa fa-arrow-left rightspaced"></div>SHOP NAME BLAH BLAH BLAH
+        <div class="fa fa-arrow-left rightspaced"></div>{{shopdata.name}}
       </a>
-      <router-link :to="'/editshop'" class="list link orange">Edit Shop Info</router-link>
-      <router-link :to="'/account'" class="list button blue transparent">Return to Account</router-link>
+      <router-link :to="{name: 'editshop'}" class="list link orange">Edit Shop Info</router-link>
+      <router-link :to="{name: 'account'}" class="list button blue transparent">Return to Account</router-link>
       <span class="mini divider"></span>
       <div class="list header">Shop list</div>
-      <router-link :to="'/shop2'" @click.native="closeAside" class="list link orange">Shop 1</router-link>
+      <router-link @mousedown.left="closeAside" :to="{name: 'shop', params: {id: shop}}" v-for="shop in userdata.shop_list" :key="shop" class="list orange link">{{shop}}</router-link>
       <Logout></Logout>
-      <!-- <a class="list red button"><div class="fa fa-sign-out"></div>Sign out</a> -->
-      <!-- <span class="mini divider"></span> -->
-      <!-- <router-link :to="'/account'" class="list link blue">Return to Account</router-link> -->
     </div>
     </transition>
     <transition name="fade">
       <div v-if="showAside" class="aside-hide" @mousedown.left="closeAside" key="not-aside"></div>
     </transition>
   </div>
+  <NotFound v-else-if="shopNotExist"></NotFound>
 </template>
 
 <script>
+import {db,auth} from '@/scripts/firebase_config';
+import NotFound from '@/views/404'
 import Navbar from '@/components/navigationbar.vue'
 import vButton from "@/components/button.vue"
 import Logout from "@/components/logoutButton.vue"
@@ -67,24 +67,159 @@ export default {
   components: {
     Navbar,
     vButton,
-    Logout
+    Logout,
+    NotFound
+  },
+  computed:{
+    shopURL: function(){
+      return 'http://jongja.com/' + this.$route.params.id;
+    },
+    user : function() {
+      return this.$store.getters.HasAuth;
+    },
+    userdata: function(){
+      return this.$store.getters.UserData;
+    },
+    shopdata: function() {
+      return this.$store.getters.CurrentShopData;
+    },
+    shopDayValue: function(){
+      var day = this.shopdata.service_days;
+      return (day.sun?64:0) + (day.mon?32:0) + (day.tue?16:0) + (day.wed?8:0) + (day.thu?4:0) + (day.fri?2:0) + (day.sat?1:0);
+    },
+    shopOpenDaily: function(){
+      return (this.shopDayValue%(64+32+16+8+4+2+1) === 0);
+    },
+    shopDayNotion: function(){
+      var day = this.shopdata.service_days;
+      var notion = '';
+      if (this.shopOpenDaily){
+        return 'Opens daily';
+      }
+      else if (this.shopDayValue === 32+16+8+4+2) {
+        return 'Opens weekday'
+      }
+      else if (this.shopDayValue === 64+1) {
+        return 'Opens weekend'
+      }
+      else {
+        if (day.sun) notion += 'Sun ';
+        if (day.mon) notion += 'Mon ';
+        if (day.tue) notion += 'Tue ';
+        if (day.wed) notion += 'Wed ';
+        if (day.thu) notion += 'Thu ';
+        if (day.fri) notion += 'Fri ';
+        if (day.sat) notion += 'Sat ';
+        return notion;
+      }
+    },
+  },
+  watch: {
+    '$route': '_FetchShopData',
   },
   methods: {
+    copyURL: function(){
+      this.$refs.shopURL.select();
+      document.execCommand('copy',true);
+      this.copyButton = 'Copied !'
+      setTimeout(() => { this.copyButton = 'Copy URL' }, 1000)
+    },
     toggleAside: function() {
       this.showAside = !this.showAside;
     },
     closeAside: function(){
       this.showAside = false;
     },
+    loginThenRedirectHere: function(){
+      this.$store.dispatch('setRedirect', this.$route.fullPath);
+      this.$router.push({name: 'login'});
+    },
+    bookReservation: function(){
+      let self = this;
+      var shopID = self.$route.params.id;
+      var bookTime = Date.now();
+
+      //Get Lastest queue count
+      var shopRef = db.ref('shops/' + shopID);
+      shopRef.once('value', function(snap) {
+        let shopSnapData = snap.val();
+        var lastQueue = { id: '', queue_number: 0};
+        if (shopSnapData.last_queue){
+          lastQueue = { 
+            id: shopSnapData.last_queue.id,
+            queue_number: shopSnapData.last_queue.queue_number
+          }
+        }
+        var queueRef = db.ref('queues');
+
+        queueRef.child(bookTime).set({
+          queue_number: lastQueue.queue_number + 1,
+          shop_id: shopID,
+          shop_name: self.shopdata.name,
+          shop_description: self.shopdata.description,
+          status: 'waiting',
+          user_id: self.user.uid,
+          user_display_name: self.user.displayName,
+          user_phone_number: self.userdata.phone_number
+        }).then(() =>{
+          //Added queue, last queue Increment
+
+          // shopRef.update({ last_queue: shopSnapData.last_queue + 1 })
+          shopRef.child('last_queue').set({
+              id: bookTime,
+              queue_number: lastQueue.queue_number + 1
+            })
+            .then(() => {
+              console.log('Update shop last queue');
+            })
+            .catch(err => {
+              console.log('Error update shop last queue\n' + err.code);
+            });
+
+          console.log('Booked reservation');
+          self.$router.push({name: 'queue', params: {id: bookTime}});
+
+        }).catch(err => {
+          //Fail to add queue
+          console.log('Error Booking reservation\n' + err.code);
+        })
+      })
+      
+    },
+    _FetchShopData: function(){
+      let self = this;
+      if (self.showAside) { self.closeAside(); }
+      
+      self.$store.dispatch('onLoadingAsync',true);
+      
+      var shopID = self.$route.params.id;
+      var ref = db.ref('shops/' + shopID);
+      ref.once('value', function(snap){
+      
+        self.$store.dispatch('onLoadingAsync',false);
+        if (snap.val()) self.shopNotExist = false;
+        else self.shopNotExist = true;
+        self.$store.dispatch('onFetchCurrentShopData', snap.val());
+      
+      }), function(err) {
+      
+        self.$store.dispatch('onLoadingAsync',false);
+        self.shopNotExist = true;
+        console.log('Error retrieving Shop Info\n' + err.code);
+
+      }
+    }
   },
   data() {
     return{
-      auth: true,
-      owner: true,
-      s: 'Shop descriptions',
-      showAside: false
+      shopNotExist: false,
+      showAside: false,
+      copyButton: 'Copy URL',
     }
   },
+  created(){
+    this._FetchShopData();
+  }
 }
 </script>
 
@@ -108,7 +243,7 @@ export default {
     white-space: pre-line;
   }
   .fa{
-    width: 1.5em;
+    padding: 0 .25em;
     align-self: flex-start;
     line-height: 1.5em;
   }
@@ -206,9 +341,13 @@ export default {
     line-height: 2rem;
     padding: 0 .25rem;
     cursor: text;
+    &::selection{
+      background-color: $color-orange;
+      color: white;
+    }
 }
 .shopurl:focus{
-    box-shadow: inset 0 0 3px $color-blue;
+    box-shadow: inset 0 0 8px $color-orange;
 }
 .slide-enter-active, .slide-leave-active{
   transition: transform .3s;

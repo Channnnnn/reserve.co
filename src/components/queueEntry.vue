@@ -1,29 +1,62 @@
 <template>
     <div class="queue rounded">
         <span class="q-num">{{data.queue_number}}</span>
-        <router-link :to="{path: 'queue'+ data.key}" class="detail">
-            <span class="q-name">{{data.shop_id}}</span>
-            <span class="q-status" :class="[data.waiting ? 'waiting':'waiting']"></span>
+        <router-link :to="{name: 'queue', params: {id: data.key}}" class="detail">
+            <span class="q-name" v-if="$route.name === 'account'">{{data.shop_name}}</span>
+            <span class="q-name" v-if="$route.name === 'managequeue'">{{data.user_display_name}}</span>
+            <span class="q-status" :class="[data.status]"></span>
             <span class="q-more fa fa-ellipsis-v"></span>
         </router-link>
-        <a @click="queueAccept" v-if="$route.path==='/managequeue' && data.waiting === 'waiting'" class="accept button"></a>
-        <a @click="queueDecline" v-if="$route.path==='/managequeue' && data.waiting === 'waiting'" class="decline button"></a>
-        <!-- <a @click="queueDismiss" v-if="$route.path==='/managequeue' && (data.status === 'expired' || data.status === 'canceled')" class="dismiss button"></a> -->
+        <a @click="queueAccept" v-if="$route.name==='managequeue' && data.status === 'waiting'" class="accept button"></a>
+        <a @click="queueDecline" v-if="$route.name==='managequeue' && data.status === 'waiting'" class="decline button"></a>
+        <a @click="queueCancel" v-if="$route.name==='account' && data.status === 'waiting'" class="cancel button"></a>
     </div>
 </template>
 
 <script>
+import {db,auth} from '@/scripts/firebase_config'
 export default {
     name: 'queue',
     props: ['data'],
+    // data() {
+    //     return {
+    //         details: {}
+    //     }
+    // },
+    // watch: {
+    //     'data' : function (newData, OldData) { 
+    //         console.log('New:' + newData + " Old:" + OldData);
+    //         // _FetchExtraData();
+    //      }
+    // },
     methods: {
         queueAccept(){
             // this.data.status = 'accepted'
+            var queue_id = this.data.key;
+            var queueRef = db.ref('queues').child(queue_id);
+            queueRef.update({
+                status: 'accepted',
+                timestamp_complete: Date.now()
+            });
         },
         queueDecline(){
             // this.data.status = 'expired'
+            var queue_id = this.data.key;
+            var queueRef = db.ref('queues').child(queue_id);
+            queueRef.update({
+                status: 'expired',
+                timestamp_complete: Date.now()
+            });
         },
-    }
+        queueCancel(){
+            var queue_id = this.data.key;
+            var queueRef = db.ref('queues').child(queue_id);
+            queueRef.update({
+                status: 'canceled',
+                timestamp_complete: Date.now()
+            });
+        },
+    },
 }
 </script>
 
@@ -136,6 +169,16 @@ a.detail{
         width: 5.9em;
         &::before{
             content: "DISMISS";
+            font-family: 'Kanit','Arial', sans-serif;
+            display: block;
+            font-size: 1em;
+        }
+    }
+    &.cancel{
+        background-color: $color-red85;
+        width: 5.9em;
+        &::before{
+            content: "CANCEL";
             font-family: 'Kanit','Arial', sans-serif;
             display: block;
             font-size: 1em;

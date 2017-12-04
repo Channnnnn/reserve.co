@@ -125,19 +125,21 @@ var signOut = function(trash, callback) {
 //Get User's Info
 var getUserInfo = function() { 
     var ref = db.ref("users/" + getUserID());
-    var snapValue;
+    let snapValue;
     
     ref.once("value", function(snapshot) {
         // console.log('ID:' + getUserID() +"\n"+
         // "data:" + snapshot.val()
         // );
-        snapValue = snapshot.val();
+        snapValue = snapshot.val();console.log(snapValue);
         return snapValue;
-
+        
     }, function(error) {
         console.log("Error while retrieving User's Info");
         console.log(error.code);
     });
+    // console.log(snapValue);
+    // return snapValue;
 }
 
 //Get Current Queuing
@@ -344,7 +346,30 @@ var updateQueue = function(qid, action, callback) {
 * TODO: REFRACTOR PROMISE https://stackoverflow.com/questions/35805603/are-nested-promises-normal-in-node-js
 *
 */
-
+var _updateProfile = function(data, statusTracker){
+    var ref = db.ref("users");
+    
+    ref.child(getUserID()).update({
+        "email": data.email,
+        "phone_number": data.phone,
+        })
+    .then(() => { 
+        console.log('Email and Phone number updated');
+    })
+    .catch((err) => { console.log('Fail to update Email and Phone number\n' + err); });
+    
+    auth.currentUser.updateProfile({
+        displayName: data.displayName,
+        })
+    .then(()=>{ console.log('Display name updated'); statusTracker = true; })
+    .catch(err => { console.log('Fail to update Display name\n' + err); });
+    
+    if(data.password != ""){
+        auth.password.updatePassword(data.password)
+            .then(()=>{ console.log('Password Updated'); statusTracker = true;})
+            .catch(err => { alert('Fail to update Password\n' + err.code);})
+    }
+}
 
 //Update Profile
 var updateProfile = function(username, email, password, firstName, lastName, phoneNumber, pushNotification, callback) {
@@ -553,6 +578,7 @@ export {
             getShopQueues, 
             addQueue,
             updateQueue,
+            _updateProfile,
             updateProfile,
             updateShopInfo,
             addNewShop,
