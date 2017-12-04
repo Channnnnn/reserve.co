@@ -174,6 +174,7 @@ window.App = new Vue({
 })
 
 router.beforeEach((to,from, next) => {
+  console.log(to);
   if (to.matched.some(record => record.meta.requiresAuth)) {
     console.log('req Auth');
     if (store.getters.HasAuth){

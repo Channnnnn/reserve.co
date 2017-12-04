@@ -205,12 +205,12 @@ export default {
       }
     }
   },
-  // created() {
-  //   this._getUserInfo();
-  // },
-  updated() {
+  created() {
     this._getUserInfo();
-  }
+  },
+  // updated() {
+  //   this._getUserInfo();
+  // }
 }
 </script>
 
