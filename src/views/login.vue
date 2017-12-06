@@ -1,6 +1,6 @@
 <template>
   <div class="login-dialog">
-    <div class="header">RESERVE.CO</div>
+    <div class="header" :class="{'completed' : completed}">RESERVE.CO</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <keep-alive><transition name="fade" mode="out-in">
@@ -9,70 +9,70 @@
         <div class="form">
           <div class="bundle">
             <input v-model="register.username" v-validate="'required|alpha_num'" data-vv-delay="1000"
-            :class="{'invalid' : !fields.username.pending &&
+            :class="{'invalid' : fields.username && (!fields.username.pending &&
               ((fields.username.invalid && (fields.username.dirty||fields.username.touched)) || 
-              this.warnReg.validUsername.length > 1)}" 
+              this.warnReg.validUsername.length > 1))}" 
             type="text" name="username" id="username" required />
             
             <label for="username">Username</label>
-            <span v-show="!fields.username.pending && ((errors.has('username') ||
-              this.warnReg.validUsername.length > 1))" class="notifier">
+            <span v-show=" fields.username && (!fields.username.pending && ((errors.has('username') ||
+              this.warnReg.validUsername.length > 1)))" class="notifier">
               {{errors.first('username') || this.warnReg.validUsername}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
             <input v-model="register.email" v-validate="'required|email'"
-            :class="{'invalid' : !fields.email.pending &&
+            :class="{'invalid' : fields.email && (!fields.email.pending &&
               ((fields.email.invalid && (fields.email.dirty||fields.email.touched)) ||
-              this.warnReg.validEmail)}" 
+              this.warnReg.validEmail))}" 
             type="text" name="email" id="email" required />
             
             <label for="email">Email</label>
-            <span v-show="!fields.email.pending && (errors.has('email') ||
-              this.warnReg.validEmail)" class="notifier">
+            <span v-show=" fields.email && (!fields.email.pending && (errors.has('email') ||
+              this.warnReg.validEmail))" class="notifier">
               {{errors.first('email') || this.warnReg.validEmail}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
             <input v-model="register.phone" v-validate="'required'" data-vv-delay="1000"
-            :class="{'invalid' : !fields.phone.pending &&
+            :class="{'invalid' : fields.phone && (!fields.phone.pending &&
               ((fields.phone.invalid && (fields.phone.dirty||fields.phone.touched)) || 
-              this.warnReg.validPhone.length > 1)}" 
+              this.warnReg.validPhone.length > 1))}" 
             type="text" name="phone" id="phone" required />
             
             <label for="phone">Phone No.</label>
-            <span v-show="!fields.phone.pending && (errors.has('phone') ||
-              this.warnReg.validPhone.length > 1)" class="notifier">
+            <span v-show=" fields.phone && (!fields.phone.pending && (errors.has('phone') ||
+              this.warnReg.validPhone.length > 1))" class="notifier">
               {{errors.first('phone') || this.warnReg.validPhone}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
             <input v-model="register.password1" v-validate="'required'" data-vv-delay="1000"
-            :class="{'invalid' : !fields.Password.pending &&
+            :class="{'invalid' : fields.Password && (!fields.Password.pending &&
               ((fields.Password.invalid && (fields.Password.dirty||fields.Password.touched)) || 
-              this.warnReg.validPassword.length > 1)}" 
+              this.warnReg.validPassword.length > 1))}" 
             type="password" name="Password" id="password1" required />
             
             <label for="password1">Password</label>
-            <span v-show="!fields.Password.pending && (errors.has('Password') || 
-              this.warnReg.validPassword.length > 1)" class="notifier">
+            <span v-show=" fields.Password && (!fields.Password.pending && (errors.has('Password') || 
+              this.warnReg.validPassword.length > 1))" class="notifier">
               {{errors.first('Password') || this.warnReg.validPassword}}
             </span>
           </div>
           <!--  -->
           <div class="bundle">
             <input v-model="register.password2" v-validate="'required|confirmed:Password'" data-vv-delay="1000"
-            :class="{'invalid' : !fields.password.pending &&
+            :class="{'invalid' : fields.password && (!fields.password.pending &&
               ((fields.password.invalid && (fields.password.dirty||fields.password.touched)) ||
-              this.warnReg.matchPassword.length > 1)}" 
+              this.warnReg.matchPassword.length > 1))}" 
             type="password" name="password" id="password2" required />
             
             <label for="password2">Confirm Password</label>
-            <span v-show="!fields.password.pending && (errors.has('password') ||
-              this.warnReg.matchPassword.length > 1)" class="notifier">
+            <span v-show=" fields.password && (!fields.password.pending && (errors.has('password') ||
+              this.warnReg.matchPassword.length > 1))" class="notifier">
               {{errors.first('password') || this.warnReg.matchPassword}}
             </span>
           </div>
@@ -83,12 +83,19 @@
       <div v-if="isLogin" class="loginDialog" key="log">
         <div class="form">
           <div class="bundle">
-            <input required v-model="login.username" type="text" id="u-name" name="username" />
+            <input required v-model="login.username" type="text" id="u-name" name="Username" />
             <label for="u-name">Username</label>
+            <span v-show="warnLog.hasUsername != ''" class="notifier">
+              {{warnLog.hasUsername}}
+            </span>
           </div>
           <div class="bundle">
-            <input @keyup.enter="loginAuthentication" required v-model="login.password" type="text" id="u-pass" name="password" />
+            <input required v-model="login.password" type="password" id="u-pass" name="Password"
+              @keyup.enter="loginAuthentication" />
             <label for="u-pass">Password</label>
+            <span v-show="warnLog.hasPassword != ''" class="notifier">
+              {{warnLog.hasPassword}}
+            </span>
           </div>
           <a class="button blue" @click="loginAuthentication">Login</a>
         </div>
@@ -173,18 +180,37 @@ export default {
         validPhone: '',
         validPassword: '',
         matchPassword: '',
-      }
+      },
+      warnLog: {
+        hasUsername: '',
+        hasPassword: ''
+      },
+      completed: false,
     }
   },
   watch: {
     user: '_CheckAuth',
+
     'register.username': _.debounce(function(){
+      var self = this;
       var regex = /^[a-zA-Z0-9]{4,25}$/
-      if(!this.register.username.match(regex) && this.register.username){
-        this.warnReg.validUsername = 'Password length must be 4-25 characters.';
-      } else { this.warnReg.validUsername = '';}
+      if(!self.register.username.match(regex) && self.register.username){
+        self.warnReg.validUsername = 'Username length must be 4-25 characters.';
+      } 
+      else { 
+        var usernameQuery = db.ref('users')
+          .orderByChild('username')
+          .equalTo(self.register.username);
+        usernameQuery.once('value', function(snap){
+          if (snap.val() && self.register.username){
+            self.warnReg.validUsername = "This username has already taken."
+          }
+        })
+        self.warnReg.validUsername = '';
+      }
     },
     this.delay),
+
     'register.phone': _.debounce(function(){
       var regex = /^0(\d\s*){9}$/
       if (!this.register.phone.match(regex) && this.register.phone){
@@ -192,6 +218,7 @@ export default {
       } else { this.warnReg.validPhone = ''; }
     },
     this.delay),
+
     'register.password1': _.debounce(function(){
       var regex = /^.{6,}$/
       if( !this.register.password1.match(regex) && this.register.password1){
@@ -199,12 +226,25 @@ export default {
       } else { this.warnReg.validPassword = '';}
     },
     this.delay),
+
     'register.email': _.debounce(function(){
       if ( this.fields.email.invalid && this.register.email ){
         this.warnReg.validEmail = this.errors.first('email');
       } else { this.warnReg.validEmail = ''; }
     },
     this.delay),
+
+    'login.username': function(){
+      if (this.login.username.length > 0) {
+        this.warnLog.hasUsername = '';
+      }
+    },
+
+    'login.password': function(){
+      if (this.login.password.length > 0) {
+        this.warnLog.hasPassword = '';
+      }
+    },
   },
   computed: {
     user: function(){
@@ -241,6 +281,18 @@ export default {
 
     loginAuthentication(){
       let self = this;
+
+      if (self.login.username.length === 0) {
+        self.warnLog.hasUsername = 'Please enter username.'
+      }
+      if (self.login.password.length === 0) {
+        self.warnLog.hasPassword = 'Please enter password.'
+      }
+      if (self.warnLog.hasPassword + self.warnLog.hasUsername != '') {
+        return;
+      }
+
+
       var payload = this.login;
       var ref = db.ref("users");
       self.$store.dispatch('onLoadingAsync',true);
@@ -255,6 +307,7 @@ export default {
         .catch((error) => {
           self.$store.dispatch('onLoadingAsync',false);
           console.log("Error while retrieving Username\n" + error);
+          alert(error);
         });
     },
 
@@ -294,6 +347,7 @@ export default {
       let self = this;
       auth.signInWithEmailAndPassword(email, password)
         .then(function() {
+          self.completed = true;
           self.$store.dispatch('onAuthChanged');
           //Signed in Fetch data
           var userDataRef = db.ref('users/' + self.$store.getters.HasAuth.uid);
@@ -307,10 +361,12 @@ export default {
               console.log('Redirect to ' + redirect);
               self.$store.dispatch('completedRedirect');
               self.$router.push(redirect);
+              // window.location.reload();
             }
             else{
               console.log('Entering account');
               self.$router.push({name: 'account'});
+              // window.location.reload();
             }
 
           }), function(err) { console.log('Error getting user data\n' + err.code) }
@@ -319,6 +375,8 @@ export default {
         .catch(function(error) {
           self.$store.dispatch('onLoadingAsync',false);
           console.log("Error while Signing In\n" + error);
+          self.$store.dispatch('onLoadingAsync',false);
+          alert(error);
         });
     },
 
@@ -344,10 +402,12 @@ export default {
         photoURL: '/user-avatar.gif'
         })
         .then(()=>{ 
+          self.completed = true;
           console.log('Profile Created');
           self.$store.dispatch('onLoadingAsync',false);
           self.$store.dispatch('onAuthChanged');
           self.$router.push({name: 'account'});
+          window.location.reload();
         })
         .catch(err => { 
           console.log('Createing profile in FAuth failed\n' + err); 
@@ -365,90 +425,6 @@ export default {
           console.log('Rollback failed\n' + err);
           self.$store.dispatch('onLoadingAsync',false);
         });
-    },
-
-
-
-
-
-
-    addNewUser(){
-      addNewUser("mekmekja", "01 2345 6789", "mekmekja@jongja.com", "mekmekja", function(result) {
-          console.log(result);
-      });
-    },
-    signIn(){
-      signIn("ch@nch.ai", "ch@nch.ai", false, function(result) {
-          console.log(result);
-      });
-      signIn("test@jongja.com", "testjongja", false, function(result) {
-          console.log(result);
-      });
-    },
-    // signInWithUsername(){
-    //   signInWithUsername("chanchai", "ch@nch.ai", function(result) {
-    //       console.log(result);
-    //   });
-      // signInWithUsername("mekmekja", "mekmekja", function(result) {
-      //     console.log(result);
-      // });
-    // },
-    signOut(){
-      signOut("trash", function(result) {
-          console.log(result);
-      });
-    },
-    getUserID(){
-      var uid = getUserID();
-      console.log(uid);
-    },
-    getUserInfo(){
-      getUserInfo();
-    },
-    getUserReservation(){
-      getUserReservation("trash", function(result) {
-          console.log(result);
-      });
-    },
-    getUserHistory(){
-      getUserHistory("trash", function(result) {
-          console.log(result);
-      });
-    },
-    getShopInfo(){
-      getShopInfo("MekMek", function(result) {
-          console.log(result);
-      });
-    },
-    getShopQueues(){
-      getShopQueues("MekMek", function(result) {
-          console.log(result);
-      });
-    },
-    addQueue(){
-      addQueue("MekMek", function(result) {
-          console.log(result);
-      });
-    },
-    updateQueue(){
-      updateQueue("1511971409","accept", function(result) {
-          console.log(result);
-      });
-    },
-    updateProfile(){
-      updateProfile("mekmekja", "mekmekja@jongja.com", "mekmekja", "Mekmek", "JongJa", "01 2345 6789", true, function(result) {
-          console.log(result);
-      });
-    },
-    updateShopInfo(){
-      updateShopInfo("-L-10WCvFxAdpCl0D5OJ", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
-          console.log(result);
-      });
-    },
-    addNewShop(){
-      addNewShop("MekMek", "Tester's Shop", "Tester's Shop Description", {}, "012 345 678", 100, "9:30", "21:30", {"fri": true}, function(result) {
-          console.log(result);
-      });
     },
     registerDialog(){
       this.isRegister = true;
@@ -491,7 +467,7 @@ export default {
 
       }, function error(err) {
         console.log("Error while retrieving Shop's Username");
-        console.log(error.code);
+        console.log(err.code);
 
       }, function complete() {
         var downloadUrl = task.snapshot.downloadUrl;
@@ -507,6 +483,9 @@ export default {
       });
     }
   },
+  created(){
+    this.$store.dispatch('onLoadingAsync',false);
+  }
 }
 
 </script>
@@ -530,13 +509,16 @@ export default {
   align-items: center;
   justify-content: center;
   @media screen and (max-height: 880px) {
-    height: 100%;
-    margin-top: 3em;
+    justify-content: unset;
   }
   .header{
     margin-top: auto;
     font-size: 3.45em;
     color: $color-blue;
+    transition: all .15s;
+  }
+  .completed{
+    color: $color-green;
   }
   .subheader{
     font-size: 1.75em;

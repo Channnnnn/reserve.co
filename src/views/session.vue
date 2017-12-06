@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="center">
         <h2>Session Timeout</h2>
-        <router-link tag="h5" :to="{name: 'login'}">Login</router-link>
+        <router-link class="link" :to="{name: 'login'}">Login</router-link>
     </div>
 </template>
 
@@ -12,5 +12,13 @@ export default {
 </script>
 
 <style scoped>
-
+.center{
+    display: flex;
+    flex-flow: column;
+    height: 100vh;
+    width: 100%;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+}
 </style>

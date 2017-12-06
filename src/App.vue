@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <Loader :loading="loading"></Loader>
-        <transition name="fade-half" mode="in-out">
+        <transition name="fade-half">
         <router-view class="app-div" 
             :class="{'container': $route.name != 'login', 
             'app-div100': $route.name == 'managequeue'}">
@@ -54,6 +54,15 @@ html,body{
   font-weight: lighter;
   text-align: center;
   color: #2c3e50;
+}
+
+.dummy{
+    color: transparent;
+    background-color: $color-grey10 !important;
+    border-radius: 5px;
+    &.hidden{
+        visibility: hidden;
+    }
 }
 
 .app-div{
@@ -129,6 +138,7 @@ li {
 a {
   color: $color-blue;
   text-decoration: none;
+  user-select: none;
 }
 
 a.button{

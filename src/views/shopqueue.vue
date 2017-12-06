@@ -1,24 +1,30 @@
 <template>
-  <div>
+  <div v-if="shopdata && shopdata.owner === $store.getters.HasAuth.uid">
     <div class="nav orange">
         <a @click="backToShop" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>MY SHOP
         </a>
     </div>
     <div class="panel shop">
-      <h2>Shop Name Reservation</h2>
+      <h2>{{shopdata.name}} Reservation</h2>
       <div class="row group tab">
           <a href="#" class="blue tab" :class="{'active': showingReservation}" @click="SwitchTab('reservation')">Reservation</a>
-          <a href="#" class="blue tab" :class="{'active': showingHistory}" @click="SwitchTab('history')">History</a>
+          <a href="#" class="blue tab" :class="{'active': !showingReservation}" @click="SwitchTab('history')">History</a>
       </div>
     </div>
     <div class="reservation account">
-      <QueueItem v-if="data" v-for="queue in _Queues()" :key="queue.key" :data="queue"></QueueItem>
+      <div v-if="showingReservation">
+        <QueueItem v-if="!_IsHistory(queue)" v-for="queue in _Queues()" :key="queue.key" :data="queue"></QueueItem>
+      </div>
+      <div v-if="!showingReservation">
+        <QueueItem v-if="_IsHistory(queue)" v-for="queue in _Queues()" :key="queue.key" :data="queue"></QueueItem>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
 import {db,auth} from '@/scripts/firebase_config'
 import Navbar from '@/components/navigationbar.vue'
 import QueueItem from '@/components/queueEntry.vue'
@@ -28,6 +34,14 @@ export default {
     QueueItem
   },
   // props: ['data'],
+  computed: {
+    shopdata: function() {
+      return this.$store.getters.CurrentShopData;
+    },
+  },
+  watch: {
+    shopdata: '_FetchShopQueues'
+  },
   data(){
     return {
       data: {},
@@ -42,11 +56,38 @@ export default {
       SwitchTab(input){
         if (input === "reservation"){
           this.showingReservation = true;
-          this.showingHistory = false;
+          // this.showingHistory = false;
         }
         else if (input === "history") {
           this.showingReservation = false;
-          this.showingHistory = true;
+          // this.showingHistory = true;
+        }
+      },
+      _FetchShopData: function(){
+        let self = this;
+
+        self.$store.dispatch('onLoadingAsync',true);
+        
+        var shopID = self.$route.params.id;
+        var ref = db.ref('shops/' + shopID);
+        ref.once('value', function(snap){
+          // console.log(snap.key)
+          var shopData = Object.assign({key: snap.key}, snap.val());
+          self.$store.dispatch('onLoadingAsync',false);
+          if (snap.val()) {
+            if (shopData.owner != self.$store.getters.HasAuth.uid){
+              alert('Unauthorized access to ' + shopData.name + '. Returning to previous page.');
+              self.$router.go(-1);
+              return;
+            }
+          }
+          self.$store.dispatch('onFetchCurrentShopData', shopData);
+        
+        }), function(err) {
+        
+          self.$store.dispatch('onLoadingAsync',false);
+          console.log('Error retrieving Shop Info\n' + err.code);
+
         }
       },
       _FetchShopQueues: function(){
@@ -66,11 +107,29 @@ export default {
         for (const q in queues) {
           qu.push(Object.assign({key: q}, queues[q]));
         }
-        return qu;
+        return qu.reverse();
+      },
+      _IsHistory(item){
+          let self = this;
+          var timeMark = item.key;
+          var shopOpenTime = self.shopdata.open_time;
+          var isBeforeShopOpen = timeMark < moment(moment().format('L ') + shopOpenTime);
+          // console.log(parseInt(timeMark)<moment())
+          // if (item.timestamp_complete) timeMark = item.timestamp_complete;
+          return (self._CheckShouldBeHistory(timeMark) || isBeforeShopOpen);
+      },
+      _CheckShouldBeHistory(timestamp){
+          if (!timestamp){
+              return false;
+          }
+          else {
+              let unixTime = parseInt(Date.now());
+              return (unixTime - timestamp) > 86400000;
+          }
       }
   },
   created() {
-    this._FetchShopQueues()
+    this._FetchShopData()
   }
 }
 </script>

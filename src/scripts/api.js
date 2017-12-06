@@ -564,32 +564,32 @@ var checkAlreadyInQueue = function(sid, callback) {
     });
 }
 
-var checkIfInInterval = function(openTime, closeTime) {
+// var checkIfInInterval = function(openTime, closeTime) {
 
-    var dateFormat = require('dateformat');
+//     var dateFormat = require('dateformat');
 
-    var now = new Date();
+//     var now = new Date();
 
-    openTime = 77400000; //21:30
-    closeTime = 9000000; //02:30
+//     openTime = 77400000; //21:30
+//     closeTime = 9000000; //02:30
 
-    var hour_now = parseInt(dateFormat(now, "HH"));
-    var minute_now = parseInt(dateFormat(now, "MM"));
+//     var hour_now = parseInt(dateFormat(now, "HH"));
+//     var minute_now = parseInt(dateFormat(now, "MM"));
 
-    var hour_now = 20;
-    var minute_now = 30;
+//     var hour_now = 20;
+//     var minute_now = 30;
     
-    var nowUnix = (hour_now*60*60 + minute_now*60) * 1000;
+//     var nowUnix = (hour_now*60*60 + minute_now*60) * 1000;
 
-    if(nowUnix >= openTime || nowUnix <= closeTime) {
-        console.log("TRUE");
-        return true;
-    }
-    else {
-        console.log("FALSE");
-        return false;
-    }
-}
+//     if(nowUnix >= openTime || nowUnix <= closeTime) {
+//         console.log("TRUE");
+//         return true;
+//     }
+//     else {
+//         console.log("FALSE");
+//         return false;
+//     }
+// }
 
 var uploadImage = function(image) {
     

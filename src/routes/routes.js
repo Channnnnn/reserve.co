@@ -35,7 +35,7 @@ export default [
     path: '/account/settings',
     name: 'settings',
     component: Settings,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/:id/edit',

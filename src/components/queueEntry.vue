@@ -4,8 +4,8 @@
         <router-link :to="{name: 'queue', params: {qid: data.key}}" class="detail">
             <span class="q-name" v-if="$route.name === 'account'">{{data.shop_name}}</span>
             <span class="q-name" v-if="$route.name === 'managequeue'">{{data.user_display_name}}</span>
-            <span class="q-status" :class="[data.status]"></span>
-            <span class="q-more fa fa-ellipsis-v"></span>
+            <span class="q-status" :class="[data.status]" :data-timestamp="timestamp_created"></span>
+            <span class="q-more fa fa-angle-right"></span>
         </router-link>
         <a @click="queueAccept" v-if="$route.name==='managequeue' && data.status === 'waiting'" class="accept button"></a>
         <a @click="queueDecline" v-if="$route.name==='managequeue' && data.status === 'waiting'" class="decline button"></a>
@@ -14,10 +14,47 @@
 </template>
 
 <script>
+import moment from 'moment'
 import {db,auth} from '@/scripts/firebase_config'
+
+moment.updateLocale('en', {
+    longDateFormat: {
+        LT: "h:mm:ss A",
+        L: "MM/DD/YYYY",
+        l: "M/D/YYYY",
+        LL: "MMMM Do YYYY",
+        ll: "MMM D YYYY",
+        LLL: "MMMM Do YYYY LT",
+        lll: "MMM D YYYY LT",
+        LLLL: "dddd, MMMM Do YYYY LT",
+        llll: "ddd, MMM D YYYY LT"
+    }
+});
+moment.updateLocale('en', {
+    calendar : {
+        lastDay : '[Yesterday] LT',
+        sameDay : '[Today] LT',
+        nextDay : '[Tomorrow] LT',
+        lastWeek : '[last] dddd [at] LT',
+        nextWeek : 'dddd [at] LT',
+        sameElse : 'L'
+    }
+});
 export default {
     name: 'queue',
-    props: ['data'],
+    props: ['data', 'showDate'],
+    computed: {
+        timestamp_created: function(){
+            var unixtime = parseInt(this.data.key);
+            var date = new Date(unixtime);
+            if (date > moment().startOf('day'))
+                return moment(date).format('LT');
+            if (date < moment().startOf('day') && date > moment().subtract(1,'day').startOf('day'))
+                return moment(date).calendar();
+            else
+                return moment(date).format('D/M/YY LT');
+        },
+    },
     // data() {
     //     return {
     //         details: {}
@@ -56,7 +93,42 @@ export default {
                 timestamp_complete: Date.now()
             });
         },
+        queueExpires(book_time){
+            // this.data.status = 'expired'
+            var queue_id = this.data.key;
+            var queueRef = db.ref('queues').child(queue_id);
+            queueRef.update({
+                status: 'expired',
+                timestamp_complete: book_time + 86400000
+            });
+        },
+        _IsHistory(){
+            var timeMark = this.data.key;
+            // var shopOpenTime = this.shopOpenTime;
+            // var isBeforeShopOpen = false;
+            // var isBeforeShopOpen = timeMark < moment(moment().format('L ') + shopOpenTime);
+            return (this._CheckShouldBeHistory(timeMark) /*|| isBeforeShopOpen*/);
+        },
+        _CheckShouldBeHistory(timestamp){
+            if (!timestamp){
+                return false;
+            }
+            else {
+                let unixTime = parseInt(Date.now());
+                return (unixTime - timestamp) > 86400000;
+            }
+        },
+        checkIfExpired(){
+            var unixtime = parseInt(this.data.key);
+            if (this.data.status === 'waiting' && this._CheckShouldBeHistory(unixtime)){
+                console.log("queue expired")
+                this.queueExpires(unixtime);
+            }
+        }
     },
+    created(){
+        this.checkIfExpired()
+    }
 }
 </script>
 
@@ -89,7 +161,7 @@ export default {
 }
 a.detail{
     display: grid;
-    grid-template-columns: auto 3em;
+    grid-template-columns: auto 1.5em;
     grid-template-rows: 1fr 1fr;
     grid-template-areas: "name more" "status more";
     vertical-align: middle;
@@ -97,13 +169,21 @@ a.detail{
     &:hover > .q-more{
         background-color: $color-grey10 !important;
     }
+    &:not(:last-child){ 
+        .q-more{
+            display: none;
+        }
+        .q-name, .q-status{
+            grid-column: span 2;
+        }
+    }
 }
 
 .q-name{
     grid-area: name;
     text-align: left;
     align-self: end;
-    padding: 0 .5em 0 .5em;
+    padding: 0 .5em;
     line-height: 1.1em;
 }
 
@@ -112,23 +192,31 @@ a.detail{
     text-align: left;
     align-self: start;
     font-weight: $font-bold;
-    padding: 0 .5em 0 .5em;
-    line-height: 1.1em;
-    &.accepted::after{
+    padding: 0 .5em;
+    line-height: 1.1rem;
+    &.accepted::before{
         content: "ACCEPTED";
         color: $color-green;
     }
-    &.waiting::after{
+    &.waiting::before{
         content: "WAITING";
         color: $color-blue;
     }
-    &.expired::after{
+    &.expired::before{
         content: "EXPIRED";
         color: $color-red;
     }
-    &.canceled::after{
+    &.canceled::before{
         content: "CANCELED";
         color: $color-grey;
+    }
+    &::after{
+        content: attr(data-timestamp);
+        color: $color-grey50;
+        font-size: 0.85em;
+        line-height: 1.25rem;
+        float: right;
+        font-weight: $font-normal;
     }
 }
 

@@ -13,11 +13,11 @@
     <div class="cover">{{routeType==='editshop' ? 'Change Brand Image':''}}{{routeType==='setupshop' ? 'Choose Brand Image':''}}</div>
     <div class="s-detail">
       <h2 v-if="routeType==='setupshop'">Setup Shop</h2>
-      <h2 v-if="routeType==='editshop'">Edit Shop</h2>
+      <h2 v-if="routeType==='editshop'">Edit Shop - {{shopForm.name}}</h2>
       <div class="shopform">
         <!--  -->
-        <div class="fa fa-id-card-o"></div>
-        <div class="form group">
+        <div class="fa fa-id-card-o" v-if="routeType==='setupshop'"></div>
+        <div class="form group" v-if="routeType==='setupshop'">
           <input v-model="shopForm.shop_id" v-validate="'required|alpha_num'" data-vv-delay="500"
             :class="{'invalid' : !fields.shopURL.pending && ((fields.shopURL.invalid && (fields.shopURL.dirty||fields.shopURL.touched)) || warnURL.length > 1)}"
             required type="text" name="shopURL" id="s-id" class="lite" />
@@ -27,7 +27,7 @@
           </span>
         </div>
         <!--  -->
-        <div class="fa fa-pencil"></div>
+        <div class="fa fa-pencil "></div>
         <div class="form group">
           <input v-model="shopForm.name" v-validate="'required'"
             :class="{'invalid' : !fields.shopName.pending && (fields.shopName.invalid && (fields.shopName.dirty||fields.shopName.touched))}"
@@ -160,7 +160,7 @@ export default {
           if (self.routeType === 'setupshop'){
             
             var ref = db.ref('shops');
-            var userRef = db.ref('users/' + self.user.uid + 'shop_list/');
+            var userShopListRef = db.ref('users/' + self.user.uid + '/shop_list');
             ref.child(self.shopForm.shop_id).set({
               "name": self.shopForm.name,
               "description": self.shopForm.desc,
@@ -172,7 +172,7 @@ export default {
             }).then(() => {
               console.log("Add New Shop Complete");
 
-              userRef.child(self.shopForm.shop_id).set(self.shopForm.shop_id)
+              userShopListRef.child(self.shopForm.shop_id).set(self.shopForm.shop_id)
               .then(() => {
 
                 console.log("Update shop list complete");
@@ -213,9 +213,37 @@ export default {
       }); 
       //self.commitSave = true;
     },
+    _FetchShopData: function(){
+      let self = this;
+
+      self.$store.dispatch('onLoadingAsync',true);
+      
+      var shopID = self.$route.params.id;
+      var ref = db.ref('shops/' + shopID);
+      ref.once('value', function(snap){
+        // console.log(snap.key)
+        var shopData = Object.assign({key: snap.key}, snap.val());
+        self.$store.dispatch('onLoadingAsync',false);
+        if (snap.val()) {
+          if (shopData.owner != self.$store.getters.HasAuth.uid){
+            alert('Unauthorized access to ' + shopData.name + '. Returning to previous page.');
+            self.$router.go(-1);
+            return;
+          }
+        }
+        self.$store.dispatch('onFetchCurrentShopData', shopData);
+      
+      }), function(err) {
+      
+        self.$store.dispatch('onLoadingAsync',false);
+        console.log('Error retrieving Shop Info\n' + err.code);
+
+      }
+    }
   },
   watch:{
     shopdata : 'populateForm',
+
     'shopForm.shop_id': _.debounce(function(){
       let self = this;
       if (self.routeType === 'setupshop'){
@@ -228,6 +256,7 @@ export default {
         }, function(err) { self.warnURL = ''; })
       }
     }, 500),
+
     'shopForm.phone': function(){
       var regex = /^0(\d\s*){9}$/
       if(!this.shopForm.phone.match(regex) && this.shopForm.phone){
@@ -311,7 +340,9 @@ export default {
     }
   },
   created(){
-    this.populateForm();
+    if (this.routeType==='editshop') {
+      this._FetchShopData();
+    }
   }
 }
 </script>
@@ -389,6 +420,14 @@ export default {
   & + label{
     color: $color-red !important;
   }
+}
+label.readonly{
+  // font-size: .8em;
+  // top: -1.25em;
+  color: $color-orange;
+}
+input.readonly{
+  visibility: hidden;
 }
 .group.form{
     display: grid;

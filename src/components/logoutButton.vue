@@ -32,7 +32,7 @@ export default {
 .logout{
     margin-top: auto !important;
     margin-bottom: 1em !important;
-    color: white;
+    color: white !important;
     .fa{
         margin-bottom: 0;
         margin-right: .25em;

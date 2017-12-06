@@ -1,11 +1,32 @@
 <template>
-  <div v-if="userdata">
+  <div v-if="!Ready">
+    <div class="nav dummy hidden"></div>
+    <div class="queueheader">
+      <div class="q-date dummy">00/00/0000</div>
+      <div class="q-label dummy">Queue</div>
+      <div class="q-order dummy hidden">~</div>
+      <div class="q-status dummy"></div>
+    </div>
+    <div class="q-detail">
+      <div class="shopname dummy">#</div>
+      <div class="shopdesc dummy">~</div>
+      <div class="q-action">          
+        <div class="dummy">View Shop</div>
+      </div>
+      <div class="big divider dummy hidden">Queue Timestamp</div>
+      <div class="q-time">
+        <span class="dummy">!!!!!!</span>
+        <span class="dummy">Registered queue</span>
+      </div>
+    </div>
+  </div>
+  <div v-else-if="Ready">
     <div v-if="shopOwner" class="nav orange">
-        <router-link :to="{name: 'managequeue', params: {qid: queuedata.shop_id}}" class="menu link">
+        <router-link :to="{name: 'managequeue', params: {id: queuedata.shop_id}}" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>ALL RESERVATIONS
         </router-link>
     </div>
-    <div v-if="queueOwner" class="nav blue">
+    <div v-if="!shopOwner" class="nav blue">
         <router-link :to="{name: 'account'}" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>MY ACCOUNT
         </router-link>
@@ -18,13 +39,13 @@
       <div class="q-status">{{queuedata.status}}</div>
     </div>
     <div class="q-detail">
-      <div v-if="queueOwner" class="shopname">{{queuedata.shop_name}}</div>
-      <div v-if="queueOwner" class="shopdesc">{{queuedata.shop_description}}</div>
-      <div v-if="queueOwner && queuedata.status === 'waiting'" class="q-action">          
+      <div v-if="!shopOwner" class="shopname">{{queuedata.shop_name}}</div>
+      <div v-if="!shopOwner" class="shopdesc">{{queuedata.user_display_name}}</div>
+      <div v-if="!shopOwner && queuedata.status === 'waiting'" class="q-action">          
         <vButton :link="{name: 'shop', params: {id: queuedata.shop_id}}" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
         <a @click="queueCancel" class="right red transparent mini button fullwidth"><div class="fa fa-times"></div>Cancel reservation</a>
       </div>
-      <div v-if="queueOwner && (['accepted', 'expired', 'canceled'].includes(queuedata.status))" class="q-action">          
+      <div v-if="!shopOwner && (['accepted', 'expired', 'canceled'].includes(queuedata.status))" class="q-action">          
         <vButton :link="{name: 'shop', params: {id: queuedata.shop_id}}" class="blue transparent mini button fullwidth"><div class="fa fa-search"></div>View Shop</vButton>
       </div>
 
@@ -60,6 +81,7 @@ export default {
   data(){
     return{
       routeType: 'user',
+      Ready: false
     }
   },
   computed: {
@@ -76,7 +98,12 @@ export default {
       return this.user.uid===this.queuedata.user_id
     },
     shopOwner: function(){
-      return Object.values(this.userdata.shop_list).includes(this.queuedata.shop_id);
+      if (this.userdata && this.queuedata){
+        return Object.values(this.userdata.shop_list).includes(this.queuedata.shop_id);
+      }
+      else{
+        return false;
+      }
     },
     queueDate: function(){
       let date = this.UnixTimeToDate(this.$route.params.qid);
@@ -89,7 +116,7 @@ export default {
         value = value * 1000;
       }
       var time = new Date(parseInt(value));
-      console.log(time);
+      // console.log(time);
       return time;
     },
     GetQueueTime: function(value){
@@ -108,26 +135,27 @@ export default {
         self.$store.dispatch('onFetchCurrentQueueData', queueData);
 
         if (queueData){
-          console.log(queueData);
+          // console.log(queueData);
           //GET SHOP DATA
           let shopOfQueueRef = db.ref('shops/' + queueData.shop_id);
           shopOfQueueRef.once('value', function(snap){
 
             self.$store.dispatch('onFetchCurrentShopData', snap.val());
+            self.Ready = true;
 
           }, function(err) {
             console.log('Error fetching Shop data of queue\n' + err.code);
           });
 
           //GET USER DATA
-          let userOfQueueRef = db.ref('users/' + queueData.user_id);
-          userOfQueueRef.once('value', function(snap){
+          // let userOfQueueRef = db.ref('users/' + queueData.user_id);
+          // userOfQueueRef.once('value', function(snap){
 
-            self.$store.dispatch('onFetchCurrentQueueUserData', snap.val());
+          //   self.$store.dispatch('onFetchCurrentQueueUserData', snap.val());
           
-          }, function(err) {
-            console.log('Error fetching User data of queue\n' + err.code);
-          })
+          // }, function(err) {
+          //   console.log('Error fetching User data of queue\n' + err.code);
+          // })
 
         }
         else {
@@ -168,7 +196,17 @@ export default {
     }
   },
   created(){
+    this.Ready = false;
     this._FetchQueueData()
+  },
+  beforeRouteLeave(to, from, next){
+    if (to.name === 'queue') {
+      this.Ready = false;
+      next();
+    }
+    else {
+      next();
+    }
   }
 }
 </script>
@@ -179,6 +217,10 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: center;
+  * {
+      width: fit-content;
+      margin: 0 auto;
+  }
   &.ready{
     .q-date, .q-label, .q-order{
       color: $color-blue;

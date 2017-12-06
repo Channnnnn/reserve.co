@@ -29,13 +29,13 @@
       </div>
       <div class="column-group">
         <a @click="bookReservation" 
-          v-if="(shopdata.owner != user.uid) && checkAvailableTime && pendingConfirmed && hasPendingReservation.status != 'waiting'" 
+          v-if="user && (shopdata.owner != user.uid) && checkAvailableTime && pendingConfirmed && hasPendingReservation.status != 'waiting'" 
           class="huge wide green button">Book Reservation</a>
-        <vButton v-if="(shopdata.owner != user.uid) && hasPendingReservation.status === 'waiting'" 
+        <vButton v-if="user && (shopdata.owner != user.uid) && hasPendingReservation.status === 'waiting'" 
           :link="{name: 'queue', params: {qid: hasPendingReservation.key}}" 
           class="huge wide blue button">View Reservation</vButton>
-        <vButton v-if="shopdata.owner === user.uid" :link="{name: 'managequeue'}" class="huge wide green button">Manage Reservation</vButton>
-        <vButton v-if="shopdata.owner === user.uid" :link="{name: 'editshop'}" class="orange transparent button link">Edit Shop Info</vButton>
+        <vButton v-if="user && shopdata.owner === user.uid" :link="{name: 'managequeue'}" class="huge wide green button">Manage Reservation</vButton>
+        <vButton v-if="user && shopdata.owner === user.uid" :link="{name: 'editshop'}" class="orange transparent button link">Edit Shop Info</vButton>
       </div>
       <div class="rounded row group urlinfo">
         <a @click="copyURL" class="copy button">{{copyButton}}</a>
@@ -228,6 +228,15 @@ export default {
       })
       
     },
+    _FetchUserData: function(){
+        if (this.user){
+            let self = this;
+            var ref = db.ref('users/' + self.user.uid);
+            ref.on('value', function(snap){
+                self.$store.dispatch('onSyncUserData', snap.val());
+            }, function(err) { console.log('Error getting user data\n' + err.code); })
+        }
+    },
     _FetchShopData: function(){
       let self = this;
       if (self.showAside) { self.closeAside(); }
@@ -252,7 +261,7 @@ export default {
 
       }
     },
-    _LastResevation(){
+    _LastResevation: function(){
       let self = this;
       var query = db.ref('queues')
         .orderByChild('shop_id')
@@ -285,6 +294,7 @@ export default {
     }
   },
   created(){
+    this._FetchUserData();
     this._FetchShopData();
     this._LastResevation();
   }
@@ -354,7 +364,7 @@ export default {
       border: 1px solid $color-red;
     }
     &.closing:after{
-      content: "Closing";
+      content: "Closed";
     }
   }
 }

@@ -14,19 +14,26 @@
         </AccountPanel>
         <div class="reservation account" v-if="showingReservation">
             <div class="waiting-group">
-                <QueueItem v-if="_Filter(queue) && queue.status === 'waiting'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+                <QueueItem v-if="!_IsHistory(queue) && queue.status === 'waiting'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
             </div>
             <div class="accepted-group">
-                <QueueItem v-if="_Filter(queue) && queue.status === 'accepted'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+                <QueueItem v-if="!_IsHistory(queue) && queue.status === 'accepted'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
             </div>
-            <div>
-                <QueueItem v-if="_Filter(queue) && queue.status === 'canceled' || queue.status === 'expired'" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+            <div class="declined-group">
+                <QueueItem v-if="!_IsHistory(queue) && (queue.status === 'canceled' || queue.status === 'expired')" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
             </div>
         </div>
         <div class="reservation account" v-if="!showingReservation">
-            <QueueItem v-if="_Filter(queue)" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
+            <QueueItem v-if="_IsHistory(queue)" v-for="queue in _Reservations()" :key="queue.key" :data="queue"></QueueItem>
         </div>
-        <vButton :link="'#'" class="before-after-space huge blue transparent button">Make Reservation</vButton>
+        
+        <label class="search" for="searchID">
+            <a :data-shop-id-result="searchResult" class="before-after-space huge blue transparent button">
+                Make Reservation<input @keyup.enter="SearchShop" v-model="searchQuery" required type="text" name="searchID" id="searchID" placeholder="Enter Shop ID"/>
+                <a class="minibutton" @click="SearchShop">GO</a>
+            </a>
+        </label>
+        
         <transition name="slide">
         <div class="aside" v-if="showAside">
             <a class="menu link" @click="toggleAside">
@@ -44,6 +51,12 @@
         <transition name="fade">
             <div v-if="showAside" class="aside-hide" @mousedown.left="closeAside" key="not-aside"></div>
         </transition>
+        <!-- <transition name="modal" mode="out-in">
+            <Modal :visible.sync="showModal" v-if="showModal">
+                <h2>Visit Shop</h2>
+                <input class="searchbox" type="text" name="shop-link" id="shopLink" placeholder="Enter Shop ID" />
+            </Modal>
+        </transition> -->
     </div>
 </template>
 
@@ -54,12 +67,7 @@ import vButton from "@/components/button.vue"
 import AccountPanel from "@/components/accountPanel.vue"
 import QueueItem from '@/components/queueEntry.vue'
 import Logout from '@/components/logoutButton.vue';
-import {
-    getUserID,
-    getUserInfo, 
-    getUserReservation, 
-    getUserHistory,
-} from "@/scripts/api.js"
+import Modal from '@/components/modalDialog.vue';
 
 export default {
     components: {
@@ -67,7 +75,8 @@ export default {
         QueueItem,
         AccountPanel,
         vButton,
-        Logout
+        Logout,
+        Modal
     },
     computed:{
         user: function(){
@@ -96,6 +105,7 @@ export default {
             }
         },
         'userdata': '_GetUserAllReservation',
+        'searchQuery': 'ClearQuery'
     },
     methods: {
         _CheckAuth(){
@@ -137,13 +147,10 @@ export default {
             }
             return reserve.reverse();
         },
-        _Filter(item){
+        _IsHistory(item){
             let self = this;
             var timeMark = item.key;
-            if (item.timestamp_complete) timeMark = item.timestamp_complete;
-            var isHistory = self._CheckShouldBeHistory(timeMark);
-            var showHistory = !self.showingReservation;
-            return (isHistory && showHistory) || (!isHistory && !showHistory);
+            return self._CheckShouldBeHistory(timeMark);
         },
         _GetUserAllReservation(){
             let self = this;
@@ -165,8 +172,26 @@ export default {
             }
             else {
                 let unixTime = parseInt(Date.now());
-                return (unixTime - timestamp) > 8640000;
+                return (unixTime - timestamp) > 86400000;
             }
+        },
+
+        SearchShop: function(){
+            var self = this;
+            if (this.searchQuery != ''){
+                var searchRef = db.ref('shops/' + self.searchQuery);
+                searchRef.once('value', function(snap){
+                    if (snap.val()){
+                        self.$router.push({name: 'shop', params: {id: self.searchQuery}})
+                    }
+                    else {
+                        self.searchResult = 'Invalid Shop ID'
+                    }
+                })
+            }
+        },
+        ClearQuery: function(){
+            if (this.searchResult != '') this.searchResult = '';
         }
     },
     data() {
@@ -174,6 +199,8 @@ export default {
             showingReservation: true,
             showAside: false,
             notFetchedOnCreate: false,
+            searchQuery: '',
+            searchResult: ''
         }
     },
     created(){
@@ -185,10 +212,6 @@ export default {
             this.notFetchedOnCreate = true;
         }
     },
-    destroyed(){
-        // this.$store.dispatch('onSyncUserData', null);
-        // this.$store.dispatch('onSyncAllReservations', null);
-    }
 }
 </script>
 
@@ -199,15 +222,109 @@ hr{
     border-bottom: 1px solid $color-grey25;
 }
 
-.waiting-group, .accepted-group{
-    >:last-child::after{
+.waiting-group:not(:empty) + .accepted-group:not(:empty){
+    &::before{
         content: "";
-        margin: 1em;
+        display: block;
+        margin: 1em 0;
         border: 0;
         border-bottom: 1px solid $color-grey25;
     }
 }
 
+.accepted-group:not(:empty) + .declined-group:not(:empty),
+.waiting-group:not(:empty) + .accepted-group:empty + .declined-group:not(:empty){
+    &::before{
+        content: "";
+        display: block;
+        margin: 1em 0;
+        border: 0;
+        border-bottom: 1px solid $color-grey25;
+    }
+}
+
+.search{
+    position: relative;
+    a{
+        &:hover{
+            color: saturate(hsl(193, 66%, 45%), 50%);
+            filter: none;
+        }
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        &:after{
+            content: attr(data-shop-id-result);
+            font-size: 1rem;
+            height: 0;
+            position: relative;
+            top: -.5rem;
+        }
+    }
+    .minibutton{
+        display: block;
+        position: absolute;
+        width: fit-content;
+        padding: .4em;
+        margin-left: auto;
+        font-size: 1.25rem;
+        right: 1.25em;
+        box-sizing: border-box;
+        margin-top: 0.5em;
+        border-radius: 0 5px 5px 0;
+        height: 0;
+        visibility: hidden;
+        transition: all .15s;
+        background-color: transparent;
+        color: transparent;
+    }
+    input{
+        box-sizing: border-box;
+        height: 0;
+        width: 200px;
+        padding: 0 1em;
+        border: none;
+        outline: none;
+        transition: all .15s;
+        &:focus, &:valid, &:active{
+            height: unset;
+            width: 200px;
+            margin: 1em 0;
+            padding: .5em 1em;
+            border-radius: 5px;
+            border: 1px solid $color-green;
+            background-color: white;
+            box-shadow: 0 0 0 $color-blue;
+            z-index: 1;
+            font-family: 'Kanit', Arial, Helvetica, sans-serif;
+            font-weight: $font-normal;
+            & + .minibutton{
+                height: unset;
+                visibility: visible;
+                z-index: 15;
+                padding: .4em;
+                background-color: #8fbe0d;
+                color: white;
+                &:hover{
+                    filter: brightness(1.1) saturate(.9);
+                    box-shadow: 0 0 3px;
+                }
+                &:active{
+                    filter: brightness(0.9);
+                }
+            }
+        }
+    }
+}
+
+.modal-leave-active{
+  transition: all .15s;
+}
+
+.modal-leave-to{
+  opacity: 0;
+  z-index: 5;
+}
 .slide-enter-active, .slide-leave-active{
   transition: transform .3s;
 }
@@ -456,7 +573,7 @@ a.detail:hover .q-more{
     grid-area: name;
     text-align: left;
     align-self: end;
-    padding: 0 .5em 0 .5em;
+    padding-left: .5em;
     line-height: 1.1em;
 }
 
@@ -465,7 +582,7 @@ a.detail:hover .q-more{
     text-align: left;
     align-self: start;
     font-weight: $font-bold;
-    padding: 0 .5em 0 .5em;
+    padding-left: .5em;
     line-height: 1.1em;
     /* Status Text */
     &.servicing::after{
