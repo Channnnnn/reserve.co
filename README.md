@@ -2,6 +2,21 @@
 
 > Queuing app for everyone
 
+
+
+``` git
+# User
+ mekmekja (mekmekja)
+ chanchai (ch@nch.ai)
+ zero (zerozero)
+ zerotemp (zerotemp)
+# Shop
+ asd => mekmekja
+ MekMek => mekmekja
+ chanchan => chanchai
+ chanshop => chanchai
+```
+
 ## Build Setup
 
 ``` bash
