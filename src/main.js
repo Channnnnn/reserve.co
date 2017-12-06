@@ -23,8 +23,16 @@ window.App = new Vue({
   }
 })
 router.beforeEach((to,from, next) => {
-  // console.log(to);
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (!from.name){
+    console.log('Hayyy')
+    // if (store.getters.HasAuth){
+      next();
+    // }
+    // else {
+    //   next({ name: 'login' });
+    // }
+  }
+  else if (to.matched.some(record => record.meta.requiresAuth)) {
     console.log('req Auth');
     if (store.getters.HasAuth){
       console.log('has Auth');
@@ -35,14 +43,10 @@ router.beforeEach((to,from, next) => {
       var confirm = window.confirm("Login is required, do you wish to proceed?");
       if (confirm){
         if (!store.getters.GetRedirectPath && !(from.name == 'login')){
-          // console.log('has redirect:' + !store.getters.GetRedirectPath);
-          // console.log('from login:' + !(from.name == 'login'));
           store.dispatch('setRedirect', to.fullPath);
         }
         console.log('go login');
-        next({
-          name: 'login', 
-        });
+        next({ name: 'login' });
       } else {
         next(false);
       }

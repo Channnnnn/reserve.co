@@ -28,12 +28,17 @@
           <div class="fa fa-phone"></div>087 654 3210</div>
       </div>
       <div class="column-group">
+        
         <a @click="bookReservation" 
-          v-if="user && (shopdata.owner != user.uid) && checkAvailableTime && pendingConfirmed && hasPendingReservation.status != 'waiting'" 
+          v-if="user && (shopdata.owner != user.uid) && checkAvailableTime && pendingConfirmed && (hasPendingReservation.user_id != user.uid || hasPendingReservation.status != 'waiting')" 
           class="huge wide green button">Book Reservation</a>
-        <vButton v-if="user && (shopdata.owner != user.uid) && hasPendingReservation.status === 'waiting'" 
+
+        <a v-if="!user" class="huge wide green button">Book Reservation</a>
+
+        <vButton v-if="user && (shopdata.owner != user.uid) && (hasPendingReservation.user_id === user.uid && hasPendingReservation.status === 'waiting')" 
           :link="{name: 'queue', params: {qid: hasPendingReservation.key}}" 
           class="huge wide blue button">View Reservation</vButton>
+
         <vButton v-if="user && shopdata.owner === user.uid" :link="{name: 'managequeue'}" class="huge wide green button">Manage Reservation</vButton>
         <vButton v-if="user && shopdata.owner === user.uid" :link="{name: 'editshop'}" class="orange transparent button link">Edit Shop Info</vButton>
       </div>
@@ -77,7 +82,7 @@ export default {
   },
   computed:{
     shopURL: function(){
-      return 'http://jongja.com/' + this.$route.params.id;
+      return window.location.origin + this.$route.path;
     },
     user : function() {
       return this.$store.getters.HasAuth;
@@ -89,8 +94,13 @@ export default {
       return this.$store.getters.CurrentShopData;
     },
     shopDayValue: function(){
-      var day = this.shopdata.service_days;
-      return (day.sun?64:0) + (day.mon?32:0) + (day.tue?16:0) + (day.wed?8:0) + (day.thu?4:0) + (day.fri?2:0) + (day.sat?1:0);
+      if (this.shopdata) {
+        var day = this.shopdata.service_days;
+        return (day.sun?64:0) + (day.mon?32:0) + (day.tue?16:0) + (day.wed?8:0) + (day.thu?4:0) + (day.fri?2:0) + (day.sat?1:0);
+      }
+      else {
+        return 0;
+      }
     },
     shopOpenDaily: function(){
       return (this.shopDayValue%(64+32+16+8+4+2+1) === 0);
@@ -247,10 +257,15 @@ export default {
       var ref = db.ref('shops/' + shopID);
       ref.once('value', function(snap){
         // console.log(snap.key)
-        var shopData = Object.assign({key: snap.key}, snap.val());
+        var shopData = null;
+        if (snap.val()) {
+          self.shopNotExist = false;
+          shopData = Object.assign({key: snap.key}, snap.val());
+        }
+        else { 
+          self.shopNotExist = true;
+        }
         self.$store.dispatch('onLoadingAsync',false);
-        if (snap.val()) self.shopNotExist = false;
-        else self.shopNotExist = true;
         self.$store.dispatch('onFetchCurrentShopData', shopData);
       
       }), function(err) {
@@ -265,20 +280,22 @@ export default {
       let self = this;
       var query = db.ref('queues')
         .orderByChild('shop_id')
-        .equalTo(self.$route.params.id)
-        .limitToLast(1);
+        .equalTo(self.$route.params.id).limitToLast(100);
       query.once('value', function(snapQuery){
         if (snapQuery.val()){
-          var Keys = Object.keys(snapQuery.val());
-          var Values = Object.values(snapQuery.val());
-          var Item = Object.assign({key: Keys[0]}, Values[0]);
-          self.hasPendingReservation = Item;
+          var results = snapQuery.val();
+          var foundPending = {key: '', status: ''};
+          for (const r in results){
+            if (results[r].user_id === self.user.uid && results[r].status === 'waiting'){
+              foundPending = Object.assign({key: r}, results[r]);
+            }
+          }
+          self.hasPendingReservation = foundPending;
           self.pendingConfirmed = true;
         }
         else {
           self.pendingConfirmed = true;
         }
-        // return Object.assign({key: Keys[0]}, Values[0]);
       }, function(err) {
         console.log("Error get last reservation\n" + err.code);
       })
@@ -294,9 +311,18 @@ export default {
     }
   },
   created(){
-    this._FetchUserData();
     this._FetchShopData();
-    this._LastResevation();
+    if (this.$store.getters.HasAuth) {
+      this._FetchUserData();
+      this._LastResevation();
+    }
+  },
+  beforeRouteEnter(to, from, next){
+    if (to.params.id === 'queue') {
+      next({name: '404'});
+      return;
+    }
+    next();
   }
 }
 </script>

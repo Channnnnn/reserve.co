@@ -8,7 +8,7 @@
     </div>
     <!-- <Navbar :hasBack='true' :link="'/account'"></Navbar> -->
     <keep-alive>
-      <AccountPanel :data="user">
+      <AccountPanel v-if="user" :data="user">
         <h3>Settings</h3>
       </AccountPanel>
     </keep-alive>
@@ -30,16 +30,16 @@
         <input v-model="editData.email" type="text" name="email" id="email">
         
         <label for="password">Password (minimum of 6)</label>
-        <input v-model="editData.password" v-validate="'min:6'" data-vv-delay="1000"
+        <input v-model="editData.password" v-validate="'min:6'"
           :class="{'invalid' : editData.password != '' && !fields.password.pending &&
-              ((fields.password.invalid && (fields.password.dirty||fields.password.touched)))}"
+              (fields.password.invalid && fields.password.dirty)}"
           type="password" name="password" id="password" placeholder="(Unchanged)">
         
         <label for="displayName">Reservation Name</label>
         <input v-model="editData.displayName" type="text" name="displayName" id="displayName">
       </div>
       <a @click="validateThenUpdate" class="blue button transparent link" v-if="isEdit">Save Changes</a>
-      <div class="accinfo"  v-if="!isEdit">
+      <div class="accinfo"  v-if="!isEdit && userdata">
         <span>Phone Number</span><span>{{userdata.phone_number}}</span>
         <span>Email</span><span>{{user.email}}</span>
         <span>Password</span><span>••••••••</span>
@@ -78,6 +78,12 @@ export default {
       },
       userdata: function () {
           return this.$store.getters.UserData;
+      },
+      'editData.phone': function(){
+        //validate phone
+      },
+      'editData.password': function(){
+        //validate pass
       }
   },
   data(){
@@ -90,6 +96,10 @@ export default {
         email: '',
         password: '',
         displayName: '',
+      },
+      warn:{
+        phone: '',
+        password: ''
       }
     }
   },
@@ -107,7 +117,7 @@ export default {
     },
     toggleInfoEdit: function(){
       if (!this.isEdit) { 
-        this.editData.phone = this.userdata.phone_number;
+        this.editData.phone = this.userdata ? this.userdata.phone_number:'';
         this.editData.email = this.user.email;
         this.editData.displayName = this.user.displayName;
         this.commitSave = false; 
@@ -206,7 +216,12 @@ export default {
     }
   },
   created() {
-    this._getUserInfo();
+    if (this.$store.getters.HasAuth){
+      this._getUserInfo();
+    }
+    else {
+      this.$router.push({name: 'login'})
+    }
   },
   // updated() {
   //   this._getUserInfo();
@@ -254,6 +269,12 @@ input{
   }
   &.invalid{
     box-shadow: 0 -2px 0 $color-red inset;
+    &:after{
+      content: "";
+      font-family: 'FontAwesome';
+      display: block;
+      font-size: 1.3em;
+    }
   }
 }
 .red {

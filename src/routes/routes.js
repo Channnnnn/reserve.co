@@ -18,18 +18,18 @@ export default [
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: Login,
   },
   {
     path: '/account',
     name: 'account',
     component: Account,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/queue/:qid',
     name: 'queue',
-    component: Queue
+    component: Queue,
   },
   {
     path: '/account/settings',
@@ -41,19 +41,19 @@ export default [
     path: '/:id/edit',
     name: 'editshop',
     component: FormShop,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/:id/managequeue',
     name: 'managequeue',
     component: QueueShop,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/account/setupshop',
     name: 'setupshop',
     component: FormShop,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/timeout',
@@ -65,4 +65,9 @@ export default [
     name: 'shop',
     component: Shop,
   },
+  {
+    path: '/404',
+    name: '404',
+    component: NotFound,
+  }
 ]

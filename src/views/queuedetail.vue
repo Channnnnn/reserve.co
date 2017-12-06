@@ -98,7 +98,7 @@ export default {
       return this.user.uid===this.queuedata.user_id
     },
     shopOwner: function(){
-      if (this.userdata && this.queuedata){
+      if (this.userdata && this.userdata.shop_list && this.queuedata){
         return Object.values(this.userdata.shop_list).includes(this.queuedata.shop_id);
       }
       else{
@@ -127,7 +127,7 @@ export default {
     _FetchQueueData: function() {
       var self = this;
       var queue_id = this.$route.params.qid;
-      console.log(this.$route)
+      // console.log(this.$route)
       var queueRef = db.ref('queues/' + queue_id);
       queueRef.on('value', function(snap){
 

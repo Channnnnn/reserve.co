@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="(user && routeType==='setupshop') || (shopdata && routeType==='editshop')">
     <div v-if="routeType==='setupshop'" class="nav blue">
         <router-link :to="{name:'settings'}" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>DISCARD
@@ -198,7 +198,6 @@ export default {
               "open_time": self.shopForm.open,
               "close_time":  self.shopForm.close,
               "service_days":  service_days,
-              "last_queue": 1
             }).then(() => {
               console.log("Update Shop's Info Complete");
               self.commitSave = true;
@@ -301,7 +300,7 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next){
-    if (this.commitSave) { next(); }
+    if (this.commitSave || !this.$store.getters.HasAuth) { next(); }
     else {
       var msg = ''
       if (this.routeType === 'setupshop') msg = 'Abort shop setup and return to your account?';
@@ -341,8 +340,18 @@ export default {
     }
   },
   created(){
-    if (this.routeType==='editshop') {
-      this._FetchShopData();
+    if (this.$store.getters.HasAuth) {
+      if (this.routeType==='editshop') {
+        this._FetchShopData();
+      }
+    }
+    else {
+      if (this.routeType==='editshop') {
+        this.$router.push({name: 'shop', params: {id: this.$route.params.id}})
+      }
+      else {
+        this.$router.push({name: 'login'});
+      }
     }
   }
 }
@@ -443,6 +452,7 @@ textarea{
   box-shadow: 0 1px $color-grey50;
   resize: vertical;
   width: 100%;
+  width: -webkit-fill-available;
   font-family: 'Kanit', sans-serif;
   font-weight: $font-normal;
   font-size: 1em;

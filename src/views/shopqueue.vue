@@ -1,5 +1,5 @@
 <template>
-  <div v-if="shopdata && shopdata.owner === $store.getters.HasAuth.uid">
+  <div v-if="shopdata && $store.getters.HasAuth && shopdata.owner === $store.getters.HasAuth.uid">
     <div class="nav orange">
         <a @click="backToShop" class="menu link">
             <div class="fa fa-arrow-left rightspaced"></div>MY SHOP
@@ -129,7 +129,12 @@ export default {
       }
   },
   created() {
-    this._FetchShopData()
+    if (this.$store.getters.HasAuth){
+      this._FetchShopData()
+    }
+    else {
+      this.$router.push({name: 'shop', params: {id: this.$route.params.id}})
+    }
   }
 }
 </script>

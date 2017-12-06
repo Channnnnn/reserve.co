@@ -67,7 +67,7 @@ import vButton from "@/components/button.vue"
 import AccountPanel from "@/components/accountPanel.vue"
 import QueueItem from '@/components/queueEntry.vue'
 import Logout from '@/components/logoutButton.vue';
-import Modal from '@/components/modalDialog.vue';
+// import Modal from '@/components/modalDialog.vue';
 
 export default {
     components: {
@@ -76,7 +76,7 @@ export default {
         AccountPanel,
         vButton,
         Logout,
-        Modal
+        // Modal
     },
     computed:{
         user: function(){
@@ -212,6 +212,13 @@ export default {
             this.notFetchedOnCreate = true;
         }
     },
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            if (!vm.$store.getters.HasAuth){
+            vm.$router.push({name: 'login'});
+        }
+        });
+    }
 }
 </script>
 

@@ -32,18 +32,6 @@ export default {
 
 <style lang="scss">
 @import "~@/assets/variable";
-@font-face{
-    font-family: 'Kanit';
-    font-style: normal;
-    font-weight: 300;
-    src: url(./assets/Kanit-Light.ttf) format('truetype');
-}
-@font-face{
-    font-family: 'Kanit';
-    font-style: bold;
-    font-weight: 500;
-    src: url(./assets/Kanit-Medium.ttf) format('truetype');
-}
 html,body{
   margin: 0;
 }

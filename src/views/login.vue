@@ -1,6 +1,6 @@
 <template>
   <div class="login-dialog">
-    <div class="header" :class="{'completed' : completed}">RESERVE.CO</div>
+    <div class="header" :class="{'completed' : completed}">JONGJA.COM</div>
     <div class="subheader">จองคิวง่ายๆ แค่ไม่กี่คลิก</div>
     <div class="button-group">
       <keep-alive><transition name="fade" mode="out-in">
@@ -76,7 +76,7 @@
               {{errors.first('password') || this.warnReg.matchPassword}}
             </span>
           </div>
-          <a @click="validateBeforeRegister" class="button green">Register</a>
+          <a @click="validateBeforeRegister" title="Complete registeration" class="button green">Register</a>
         </div>
       </div>
       
@@ -107,20 +107,20 @@
       <a @click="loginDialog" class="button transparent blue" v-if="isRegister && !isLogin">or Login with your account</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
-        <a class="button facebook disabled">Facebook</a>
-        <a class="button google disabled">Google</a>
+        <a class="button facebook disabled" title="Coming Soon">Facebook</a>
+        <a class="button google disabled" title="Coming Soon">Google</a>
       </div>
       <div class="section">
-        <a class="button wide transparent blue disabled">LOGIN AS GUEST</a>
+        <a class="button wide transparent blue disabled" title="Coming Soon">LOGIN AS GUEST</a>
       </div>
     </div>
     <div class="footer">
       <span>Reserve.co © 2017</span>
       <ul>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Help</a></li>
-        <li><a href="#">Terms</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a>About</a></li>
+        <li><a>Help</a></li>
+        <li><a>Terms</a></li>
+        <li><a>Contact</a></li>
       </ul>
     </div>
   </div>
@@ -514,7 +514,7 @@ export default {
   .header{
     margin-top: auto;
     font-size: 3.45em;
-    color: $color-blue;
+    color: $color-orange;
     transition: all .15s;
   }
   .completed{
