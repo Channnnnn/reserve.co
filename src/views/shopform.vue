@@ -172,11 +172,12 @@ export default {
             }).then(() => {
               console.log("Add New Shop Complete");
 
+              self.commitSave = true;
               userShopListRef.child(self.shopForm.shop_id).set(self.shopForm.shop_id)
               .then(() => {
 
-                console.log("Update shop list complete");
                 self.commitSave = true;
+                console.log("Update shop list complete");
                 self.$router.push({name: 'shop', params: {id: self.shopForm.shop_id}})
               
               }).catch(err => {

@@ -107,11 +107,11 @@
       <a @click="loginDialog" class="button transparent blue" v-if="isRegister && !isLogin">or Login with your account</a>
       <div class="divider">OR CONNECT WITH</div>
       <div class="button-row">
-        <a href="#" class="button facebook">Facebook</a>
-        <a href="#" class="button google">Google</a>
+        <a class="button facebook disabled">Facebook</a>
+        <a class="button google disabled">Google</a>
       </div>
       <div class="section">
-        <a class="button wide transparent blue">LOGIN AS GUEST</a>
+        <a class="button wide transparent blue disabled">LOGIN AS GUEST</a>
       </div>
     </div>
     <div class="footer">
@@ -361,12 +361,12 @@ export default {
               console.log('Redirect to ' + redirect);
               self.$store.dispatch('completedRedirect');
               self.$router.push(redirect);
-              // window.location.reload();
+              window.location.reload();
             }
             else{
               console.log('Entering account');
               self.$router.push({name: 'account'});
-              // window.location.reload();
+              window.location.reload();
             }
 
           }), function(err) { console.log('Error getting user data\n' + err.code) }
